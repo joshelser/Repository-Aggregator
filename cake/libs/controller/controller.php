@@ -1,191 +1,234 @@
 <?php
-/* SVN FILE: $Id: controller.php 5317 2007-06-20 08:28:35Z phpnut $ */
+/* SVN FILE: $Id: controller.php 8166 2009-05-04 21:17:19Z gwoo $ */
 /**
  * Base controller class.
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs.controller
- * @since			CakePHP(tm) v 0.2.9
- * @version			$Revision: 5317 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-06-20 03:28:35 -0500 (Wed, 20 Jun 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs.controller
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision: 8166 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2009-05-04 14:17:19 -0700 (Mon, 04 May 2009) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  * Include files
  */
-	uses(DS . 'controller' . DS . 'component', DS . 'view' . DS . 'view');
+App::import('Core', array('Component', 'View'));
 /**
  * Controller
  *
- * Application controller (controllers are where you put all the actual code)
- * Provides basic functionality, such as rendering views (aka displaying templates).
- * Automatically selects model name from on singularized object class name
- * and creates the model object if proper class exists.
+ * Application controller class for organization of business logic.
+ * Provides basic functionality, such as rendering views inside layouts,
+ * automatic model availability, redirection, callbacks, and more.
  *
- * @package		cake
- * @subpackage	cake.cake.libs.controller
+ * @package       cake
+ * @subpackage    cake.cake.libs.controller
+ * @link          http://book.cakephp.org/view/49/Controllers
  *
  */
-class Controller extends Object{
+class Controller extends Object {
 /**
- * Name of the controller.
+ * The name of this controller. Controller names are plural, named after the model they manipulate.
  *
  * @var string
  * @access public
+ * @link http://book.cakephp.org/view/52/name
  */
 	var $name = null;
 /**
- * Stores the current URL (for links etc.)
+ * Stores the current URL, relative to the webroot of the application.
  *
  * @var string
  * @access public
  */
 	var $here = null;
 /**
- * The webroot of the application
+ * The webroot of the application. Helpful if your application is placed in a folder under the current domain name.
  *
  * @var string
  * @access public
  */
 	var $webroot = null;
 /**
- * Action to be performed.
+ * The name of the currently requested controller action.
  *
  * @var string
  * @access public
  */
 	var $action = null;
 /**
- * An array of names of models the particular controller wants to use.
+ * An array containing the class names of models this controller uses.
+ *
+ * Example: var $uses = array('Product', 'Post', 'Comment');
  *
  * @var mixed A single name as a string or a list of names as an array.
  * @access protected
+ * @link http://book.cakephp.org/view/53/components-helpers-and-uses
  */
 	var $uses = false;
 /**
- * An array of names of built-in helpers to include.
+ * An array containing the names of helpers this controller uses. The array elements should
+ * not contain the "Helper" part of the classname.
+ *
+ * Example: var $helpers = array('Html', 'Javascript', 'Time', 'Ajax');
  *
  * @var mixed A single name as a string or a list of names as an array.
  * @access protected
+ * @link http://book.cakephp.org/view/53/components-helpers-and-uses
  */
-	var $helpers = array('Html');
+	var $helpers = array('Html', 'Form');
 /**
- * Parameters received in the current request, i.e. GET and POST data
+ * Parameters received in the current request: GET and POST data, information
+ * about the request, etc.
  *
  * @var array
  * @access public
+ * @link http://book.cakephp.org/view/55/The-Parameters-Attribute-params
  */
 	var $params = array();
 /**
- * POST'ed model data
+ * Data POSTed to the controller using the HtmlHelper. Data here is accessible
+ * using the $this->data['ModelName']['fieldName'] pattern.
  *
  * @var array
  * @access public
  */
 	var $data = array();
 /**
- * Directory where controllers views are stored
- * Normaly this is automatically set
+ * Holds pagination defaults for controller actions. The keys that can be included
+ * in this array are: 'conditions', 'fields', 'order', 'limit', 'page', and 'recursive',
+ * similar to the keys in the second parameter of Model::find().
+ *
+ * Pagination defaults can also be supplied in a model-by-model basis by using
+ * the name of the model as a key for a pagination array:
+ *
+ * var $paginate = array(
+ * 		'Post' => array(...),
+ * 		'Comment' => array(...)
+ * 	);
+ *
+ * @var array
+ * @access public
+ * @link http://book.cakephp.org/view/164/Pagination
+ */
+	var $paginate = array('limit' => 20, 'page' => 1);
+/**
+ * The name of the views subfolder containing views for this controller.
  *
  * @var string
  * @access public
  */
 	var $viewPath = null;
 /**
- * Variables for the view
+ * The name of the layouts subfolder containing layouts for this controller.
+ *
+ * @var string
+ * @access public
+ */
+	var $layoutPath = null;
+/**
+ * Contains variables to be handed to the view.
  *
  * @var array
  * @access public
  */
 	var $viewVars = array();
 /**
- * Web page title
+ * Text to be used for the $title_for_layout layout variable (usually
+ * placed inside <title> tags.)
  *
  * @var boolean
  * @access public
+ * @link http://book.cakephp.org/view/54/Page-related-Attributes-layout-and-pageTitle
  */
 	var $pageTitle = false;
 /**
- * An array of model objects.
+ * An array containing the class names of the models this controller uses.
  *
  * @var array Array of model objects.
  * @access public
  */
 	var $modelNames = array();
 /**
- * Base url path
+ * Base URL path.
  *
  * @var string
  * @access public
  */
 	var $base = null;
 /**
- * Layout file to use (see /app/views/layouts/default.thtml)
+ * The name of the layout file to render the view inside of. The name specified
+ * is the filename of the layout in /app/views/layouts without the .ctp
+ * extension.
  *
  * @var string
  * @access public
+ * @link http://book.cakephp.org/view/54/Page-related-Attributes-layout-and-pageTitle
  */
 	var $layout = 'default';
 /**
- * Automatically render the view (the dispatcher checks for this variable before running render())
+ * Set to true to automatically render the view
+ * after action logic.
  *
  * @var boolean
  * @access public
  */
 	var $autoRender = true;
 /**
- * Automatically render the layout
+ * Set to true to automatically render the layout around views.
  *
  * @var boolean
  * @access public
  */
 	var $autoLayout = true;
 /**
- * Array of components a controller will use
+ * Instance of Component used to handle callbacks.
+ *
+ * @var string
+ * @access public
+ */
+	var $Component = null;
+/**
+ * Array containing the names of components this controller uses. Component names
+ * should not contain the "Component" portion of the classname.
+ *
+ * Example: var $components = array('Session', 'RequestHandler', 'Acl');
  *
  * @var array
  * @access public
+ * @link http://book.cakephp.org/view/53/components-helpers-and-uses
  */
 	var $components = array();
 /**
- * The name of the View class a controller sends output to
+ * The name of the View class this controller sends output to.
  *
  * @var string
  * @access public
  */
 	var $view = 'View';
 /**
- * File extension for view templates. Defaults to Cake's conventional ".thtml".
+ * File extension for view templates. Defaults to Cake's conventional ".ctp".
  *
  * @var string
  * @access public
  */
-	var $ext = '.thtml';
-/**
- * Instance of $view class create by a controller
- *
- * @var object
- * @access private
- */
-	var $__viewClass = null;
+	var $ext = '.ctp';
 /**
  * The output of the requested action.  Contains either a variable
  * returned from the action, or the data of the rendered view;
- * You can use this var in Child classes afterFilter() to alter output.
+ * You can use this var in child controllers' afterFilter() callbacks to alter output.
  *
  * @var string
  * @access public
@@ -199,42 +242,90 @@ class Controller extends Object{
  */
 	var $plugin = null;
 /**
- * Used to set methods a controller will allow the View to cache
+ * Used to define methods a controller that will be cached. To cache a
+ * single action, the value is set to an array containing keys that match
+ * action names and values that denote cache expiration times (in seconds).
+ *
+ * Example: var $cacheAction = array(
+ *		'view/23/' => 21600,
+ *		'recalled/' => 86400
+ *	);
+ *
+ * $cacheAction can also be set to a strtotime() compatible string. This
+ * marks all the actions in the controller for view caching.
  *
  * @var mixed
  * @access public
+ * @link http://book.cakephp.org/view/346/Caching-in-the-Controller
  */
 	var $cacheAction = false;
 /**
  * Used to create cached instances of models a controller uses.
- * When set to true all models related to the controller will be cached,
- * this can increase performance in many cases
+ * When set to true, all models related to the controller will be cached.
+ * This can increase performance in many cases.
  *
  * @var boolean
  * @access public
  */
 	var $persistModel = false;
 /**
- * Replaced with Controller::beforeFilter();
+ * Holds all params passed and named.
  *
- * @deprecated will not be avialable after 1.1.x.x
+ * @var mixed
+ * @access public
  */
-	var $beforeFilter = null;
+	var $passedArgs = array();
 /**
- * Replaced with Router::parseExtensions();
+ * Triggers Scaffolding
  *
- * @deprecated will not be avialable after 1.1.x.x
+ * @var mixed
+ * @access public
+ * @link http://book.cakephp.org/view/105/Scaffolding
  */
-	var $webservices = null;
+	var $scaffold = false;
+/**
+ * Holds current methods of the controller
+ *
+ * @var array
+ * @access public
+ * @link
+ */
+	var $methods = array();
+/**
+ * This controller's primary model class name, the Inflector::classify()'ed version of 
+ * the controller's $name property.
+ *
+ * Example: For a controller named 'Comments', the modelClass would be 'Comment'
+ *
+ * @var string
+ * @access public
+ */
+	var $modelClass = null;
+/**
+ * This controller's model key name, an underscored version of the controller's $modelClass property.
+ *
+ * Example: For a controller named 'ArticleComments', the modelKey would be 'article_comment'
+ *
+ * @var string
+ * @access public
+ */
+	var $modelKey = null;
+/**
+ * Holds any validation errors produced by the last call of the validateErrors() method/
+ *
+ * @var array Validation errors, or false if none
+ * @access public
+ */
+	var $validationErrors = null;
 /**
  * Constructor.
+ *
  */
 	function __construct() {
 		if ($this->name === null) {
 			$r = null;
-
 			if (!preg_match('/(.*)Controller/i', get_class($this), $r)) {
-				die ("Controller::__construct() : Can't get or parse my own class name, exiting.");
+				die (__("Controller::__construct() : Can not get or parse my own class name, exiting."));
 			}
 			$this->name = $r[1];
 		}
@@ -242,146 +333,221 @@ class Controller extends Object{
 		if ($this->viewPath == null) {
 			$this->viewPath = Inflector::underscore($this->name);
 		}
-
 		$this->modelClass = Inflector::classify($this->name);
 		$this->modelKey = Inflector::underscore($this->modelClass);
+		$this->Component =& new Component();
 
-		if (is_subclass_of($this, 'AppController')) {
+		$childMethods = get_class_methods($this);
+		$parentMethods = get_class_methods('Controller');
+
+		foreach ($childMethods as $key => $value) {
+			$childMethods[$key] = strtolower($value);
+		}
+
+		foreach ($parentMethods as $key => $value) {
+			$parentMethods[$key] = strtolower($value);
+		}
+		$this->methods = array_diff($childMethods, $parentMethods);
+		parent::__construct();
+	}
+/**
+ * Merge components, helpers, and uses vars from AppController and PluginAppController.
+ *
+ * @return void
+ * @access protected
+ */
+	function __mergeVars() {
+		$pluginName = Inflector::camelize($this->plugin);
+		$pluginController = $pluginName . 'AppController';
+
+		if (is_subclass_of($this, 'AppController') || is_subclass_of($this, $pluginController)) {
 			$appVars = get_class_vars('AppController');
 			$uses = $appVars['uses'];
 			$merge = array('components', 'helpers');
+			$plugin = null;
+
+			if (!empty($this->plugin)) {
+				$plugin = $pluginName . '.';
+				if (!is_subclass_of($this, $pluginController)) {
+					$pluginController = null;
+				}
+			} else {
+				$pluginController = null;
+			}
 
 			if ($uses == $this->uses && !empty($this->uses)) {
-				array_unshift($this->uses, $this->modelClass);
+				if (!in_array($plugin . $this->modelClass, $this->uses)) {
+					array_unshift($this->uses, $plugin . $this->modelClass);
+				} elseif ($this->uses[0] !== $plugin . $this->modelClass) {
+					$this->uses = array_flip($this->uses);
+					unset($this->uses[$plugin . $this->modelClass]);
+					$this->uses = array_flip($this->uses);
+					array_unshift($this->uses, $plugin . $this->modelClass);
+				}
 			} elseif ($this->uses !== null || $this->uses !== false) {
 				$merge[] = 'uses';
 			}
 
 			foreach ($merge as $var) {
-				if (isset($appVars[$var]) && !empty($appVars[$var]) && is_array($this->{$var})) {
-					$this->{$var} = array_merge($this->{$var}, array_diff($appVars[$var], $this->{$var}));
+				if (!empty($appVars[$var]) && is_array($this->{$var})) {
+					if ($var === 'components') {
+						$normal = Set::normalize($this->{$var});
+						$app = Set::normalize($appVars[$var]);
+						$this->{$var} = Set::merge($app, $normal);
+					} else {
+						$this->{$var} = Set::merge($this->{$var}, array_diff($appVars[$var], $this->{$var}));
+					}
 				}
 			}
 		}
-		parent::__construct();
-	}
 
-	function _initComponents() {
-		$component = new Component();
-		$component->init($this);
+		if ($pluginController && $pluginName != null) {
+			$appVars = get_class_vars($pluginController);
+			$uses = $appVars['uses'];
+			$merge = array('components', 'helpers');
+
+			if ($this->uses !== null || $this->uses !== false) {
+				$merge[] = 'uses';
+			}
+
+			foreach ($merge as $var) {
+				if (isset($appVars[$var]) && !empty($appVars[$var]) && is_array($this->{$var})) {
+					if ($var === 'components') {
+						$normal = Set::normalize($this->{$var});
+						$app = Set::normalize($appVars[$var]);
+						$this->{$var} = Set::merge($normal, array_diff_assoc($app, $normal));
+					} else {
+						$this->{$var} = Set::merge($this->{$var}, array_diff($appVars[$var], $this->{$var}));
+					}
+				}
+			}
+		}
+	}
+/**
+ * Loads Model classes based on the the uses property
+ * see Controller::loadModel(); for more info.
+ * Loads Components and prepares them for initialization.
+ *
+ * @return mixed true if models found and instance created, or cakeError if models not found.
+ * @access public
+ * @see Controller::loadModel()
+ * @link http://book.cakephp.org/view/429/constructClasses
+ */
+	function constructClasses() {
+		$this->__mergeVars();
+		$this->Component->init($this);
+
+		if ($this->uses !== null || ($this->uses !== array())) {
+			if (empty($this->passedArgs) || !isset($this->passedArgs['0'])) {
+				$id = false;
+			} else {
+				$id = $this->passedArgs['0'];
+			}
+
+			if ($this->uses === false) {
+				$this->loadModel($this->modelClass, $id);
+			} elseif ($this->uses) {
+				$uses = is_array($this->uses) ? $this->uses : array($this->uses);
+				$modelClassName = $uses[0];
+				if (strpos($uses[0], '.') !== false) {
+					list($plugin, $modelClassName) = explode('.', $uses[0]);
+				}
+				$this->modelClass = $modelClassName;
+				foreach ($uses as $modelClass) {
+					$this->loadModel($modelClass);
+				}
+			}
+		}
+		return true;
 	}
 /**
  * Loads and instantiates models required by this controller.
  * If Controller::persistModel; is true, controller will create cached model instances on first request,
- * additional request will used cached models
+ * additional request will used cached models.
+ * If the model is non existent, it will throw a missing database table error, as Cake generates
+ * dynamic models for the time being.
  *
+ * @param string $modelClass Name of model class to load
+ * @param mixed $id Initial ID the instanced model class should have
  * @return mixed true when single model found and instance created error returned if models not found.
  * @access public
  */
-	function constructClasses() {
-		if ($this->uses === null || ($this->uses === array())) {
-			return false;
-		}
-		if (empty($this->passedArgs) || !isset($this->passedArgs['0'])) {
-			$id = false;
-		} else {
-			$id = $this->passedArgs['0'];
+	function loadModel($modelClass = null, $id = null) {
+		if ($modelClass === null) {
+			$modelClass = $this->modelClass;
 		}
 		$cached = false;
 		$object = null;
+		$plugin = null;
+		if ($this->uses === false) {
+			if ($this->plugin) {
+				$plugin = $this->plugin . '.';
+			}
+		}
+
+		if (strpos($modelClass, '.') !== false) {
+			list($plugin, $modelClass) = explode('.', $modelClass);
+			$plugin = $plugin . '.';
+		}
 
 		if ($this->persistModel === true) {
-			uses('neat_array');
-		}
-		if ($this->uses === false) {
-			if (!class_exists($this->modelClass)) {
-				loadModel($this->modelClass);
-			}
+			$cached = $this->_persist($modelClass, null, $object);
 		}
 
-		if (class_exists($this->modelClass) && ($this->uses === false)) {
-			if ($this->persistModel === true) {
-				$cached = $this->_persist($this->modelClass, null, $object);
-			}
+		if (($cached === false)) {
+			$this->modelNames[] = $modelClass;
 
-			if (($cached === false)) {
-				$model =& new $this->modelClass($id);
-				$this->modelNames[] = $this->modelClass;
-				$this->{$this->modelClass} =& $model;
-
-				if ($this->persistModel === true) {
-					$this->_persist($this->modelClass, true, $model);
-					$registry = ClassRegistry::getInstance();
-					$this->_persist($this->modelClass . 'registry', true, $registry->_objects, 'registry');
-				}
+			if (!PHP5) {
+				$this->{$modelClass} =& ClassRegistry::init(array('class' => $plugin . $modelClass, 'alias' => $modelClass, 'id' => $id));
 			} else {
-				$this->_persist($this->modelClass . 'registry', true, $object, 'registry');
-				$this->_persist($this->modelClass, true, $object);
-				$this->modelNames[] = $this->modelClass;
+				$this->{$modelClass} = ClassRegistry::init(array('class' => $plugin . $modelClass, 'alias' => $modelClass, 'id' => $id));
 			}
-			return true;
-		} elseif ($this->uses === false) {
-			return $this->cakeError('missingModel', array(array('className' => $this->modelClass, 'webroot' => '', 'base' => $this->base)));
-		}
 
-		if ($this->uses) {
-			$uses = is_array($this->uses) ? $this->uses : array($this->uses);
-			$this->modelClass = $uses[0];
-
-			foreach ($uses as $modelClass) {
-				$id = false;
-				$cached = false;
-				$object = null;
-				$modelKey = Inflector::underscore($modelClass);
-
-				if (!class_exists($modelClass)) {
-					loadModel($modelClass);
-				}
-
-				if (class_exists($modelClass)) {
-					if ($this->persistModel === true) {
-						$cached = $this->_persist($modelClass, null, $object);
-					}
-
-					if (($cached === false)) {
-						$model =& new $modelClass($id);
-						$this->modelNames[] = $modelClass;
-						$this->{$modelClass} =& $model;
-
-						if ($this->persistModel === true) {
-							$this->_persist($modelClass, true, $model);
-							$registry = ClassRegistry::getInstance();
-							$this->_persist($modelClass . 'registry', true, $registry->_objects, 'registry');
-						}
-					} else {
-						$this->_persist($modelClass . 'registry', true, $object, 'registry');
-						$this->_persist($modelClass, true, $object);
-						$this->modelNames[] = $modelClass;
-					}
-				} else {
-					return $this->cakeError('missingModel', array(array('className' => $modelClass, 'webroot' => '', 'base' => $this->base)));
-				}
+			if (!$this->{$modelClass}) {
+				return $this->cakeError('missingModel', array(array('className' => $modelClass, 'webroot' => '', 'base' => $this->base)));
 			}
-			return true;
+
+			if ($this->persistModel === true) {
+				$this->_persist($modelClass, true, $this->{$modelClass});
+				$registry = ClassRegistry::getInstance();
+				$this->_persist($modelClass . 'registry', true, $registry->__objects, 'registry');
+			}
+		} else {
+			$this->_persist($modelClass . 'registry', true, $object, 'registry');
+			$this->_persist($modelClass, true, $object);
+			$this->modelNames[] = $modelClass;
 		}
 	}
 /**
  * Redirects to given $url, after turning off $this->autoRender.
- * Please notice that the script execution is not stopped after the redirect.
+ * Script execution is halted after the redirect.
  *
- * @param string $url
- * @param integer $status
+ * @param mixed $url A string or array-based URL pointing to another location within the app, or an absolute URL
+ * @param integer $status Optional HTTP status code (eg: 404)
+ * @param boolean $exit If true, exit() will be called after the redirect
+ * @return mixed void if $exit = false. Terminates script if $exit = true
  * @access public
+ * @link http://book.cakephp.org/view/425/redirect
  */
-	function redirect($url, $status = null) {
+	function redirect($url, $status = null, $exit = true) {
 		$this->autoRender = false;
-		$pos = strpos($url, '://');
-		$base = strip_plugin($this->base, $this->plugin);
-		if ($pos === false) {
-			if (strpos($url, '/') !== 0) {
-				$url = '/' . $url;
+
+		if (is_array($status)) {
+			extract($status, EXTR_OVERWRITE);
+		}
+		$response = $this->Component->beforeRedirect($this, $url, $status, $exit);
+
+		if ($response === false) {
+			return;
+		}
+		if (is_array($response)) {
+			foreach ($response as $resp) {
+				if (is_array($resp) && isset($resp['url'])) {
+					extract($resp, EXTR_OVERWRITE);
+				} elseif ($resp !== null) {
+					$url = $resp;
+				}
 			}
-			$url = FULL_BASE_URL . $base . $url;
 		}
 
 		if (function_exists('session_write_close')) {
@@ -390,102 +556,157 @@ class Controller extends Object{
 
 		if (!empty($status)) {
 			$codes = array(
-				100 => "HTTP/1.1 100 Continue",
-				101 => "HTTP/1.1 101 Switching Protocols",
-				200 => "HTTP/1.1 200 OK",
-				201 => "HTTP/1.1 201 Created",
-				202 => "HTTP/1.1 202 Accepted",
-				203 => "HTTP/1.1 203 Non-Authoritative Information",
-				204 => "HTTP/1.1 204 No Content",
-				205 => "HTTP/1.1 205 Reset Content",
-				206 => "HTTP/1.1 206 Partial Content",
-				300 => "HTTP/1.1 300 Multiple Choices",
-				301 => "HTTP/1.1 301 Moved Permanently",
-				302 => "HTTP/1.1 302 Found",
-				303 => "HTTP/1.1 303 See Other",
-				304 => "HTTP/1.1 304 Not Modified",
-				305 => "HTTP/1.1 305 Use Proxy",
-				307 => "HTTP/1.1 307 Temporary Redirect",
-				400 => "HTTP/1.1 400 Bad Request",
-				401 => "HTTP/1.1 401 Unauthorized",
-				402 => "HTTP/1.1 402 Payment Required",
-				403 => "HTTP/1.1 403 Forbidden",
-				404 => "HTTP/1.1 404 Not Found",
-				405 => "HTTP/1.1 405 Method Not Allowed",
-				406 => "HTTP/1.1 406 Not Acceptable",
-				407 => "HTTP/1.1 407 Proxy Authentication Required",
-				408 => "HTTP/1.1 408 Request Time-out",
-				409 => "HTTP/1.1 409 Conflict",
-				410 => "HTTP/1.1 410 Gone",
-				411 => "HTTP/1.1 411 Length Required",
-				412 => "HTTP/1.1 412 Precondition Failed",
-				413 => "HTTP/1.1 413 Request Entity Too Large",
-				414 => "HTTP/1.1 414 Request-URI Too Large",
-				415 => "HTTP/1.1 415 Unsupported Media Type",
-				416 => "HTTP/1.1 416 Requested range not satisfiable",
-				417 => "HTTP/1.1 417 Expectation Failed",
-				500 => "HTTP/1.1 500 Internal Server Error",
-				501 => "HTTP/1.1 501 Not Implemented",
-				502 => "HTTP/1.1 502 Bad Gateway",
-				503 => "HTTP/1.1 503 Service Unavailable",
-				504 => "HTTP/1.1 504 Gateway Time-out"
+				100 => 'Continue',
+				101 => 'Switching Protocols',
+				200 => 'OK',
+				201 => 'Created',
+				202 => 'Accepted',
+				203 => 'Non-Authoritative Information',
+				204 => 'No Content',
+				205 => 'Reset Content',
+				206 => 'Partial Content',
+				300 => 'Multiple Choices',
+				301 => 'Moved Permanently',
+				302 => 'Found',
+				303 => 'See Other',
+				304 => 'Not Modified',
+				305 => 'Use Proxy',
+				307 => 'Temporary Redirect',
+				400 => 'Bad Request',
+				401 => 'Unauthorized',
+				402 => 'Payment Required',
+				403 => 'Forbidden',
+				404 => 'Not Found',
+				405 => 'Method Not Allowed',
+				406 => 'Not Acceptable',
+				407 => 'Proxy Authentication Required',
+				408 => 'Request Time-out',
+				409 => 'Conflict',
+				410 => 'Gone',
+				411 => 'Length Required',
+				412 => 'Precondition Failed',
+				413 => 'Request Entity Too Large',
+				414 => 'Request-URI Too Large',
+				415 => 'Unsupported Media Type',
+				416 => 'Requested range not satisfiable',
+				417 => 'Expectation Failed',
+				500 => 'Internal Server Error',
+				501 => 'Not Implemented',
+				502 => 'Bad Gateway',
+				503 => 'Service Unavailable',
+				504 => 'Gateway Time-out'
 			);
 			if (is_string($status)) {
 				$codes = array_combine(array_values($codes), array_keys($codes));
 			}
+
 			if (isset($codes[$status])) {
-				$code = ife(is_numeric($status), $status, $codes[$status]);
-				$msg  = ife(is_string($status),  $status, $codes[$status]);
+				$code = $msg = $codes[$status];
+				if (is_numeric($status)) {
+					$code = $status;
+				}
+				if (is_string($status)) {
+					$msg = $status;
+				}
 				$status = "HTTP/1.1 {$code} {$msg}";
 			} else {
 				$status = null;
 			}
 		}
+
 		if (!empty($status)) {
-			header($status);
+			$this->header($status);
 		}
-		header('Location: ' . $url);
-		if (!empty($status)) {
-			header($status);
+		if ($url !== null) {
+			$this->header('Location: ' . Router::url($url, true));
+		}
+
+		if (!empty($status) && ($status >= 300 && $status < 400)) {
+			$this->header($status);
+		}
+
+		if ($exit) {
+			$this->_stop();
 		}
 	}
 /**
- * Saves a variable to use inside a template.
+ * Convenience method for header()
  *
- * @param mixed $one A string or an array of data.
- * @param mixed $two Value in case $one is a string (which then works as the key). Unused if $one is an associative array, otherwise serves as the values to $one's keys.
- * @return mixed string or array of variables set
+ * @param string $status
+ * @return void
  * @access public
  */
+	function header($status) {
+		header($status);
+	}
+/**
+ * Saves a variable for use inside a view template.
+ *
+ * @param mixed $one A string or an array of data.
+ * @param mixed $two Value in case $one is a string (which then works as the key).
+ *   Unused if $one is an associative array, otherwise serves as the values to $one's keys.
+ * @return void
+ * @access public
+ * @link http://book.cakephp.org/view/427/set
+ */
 	function set($one, $two = null) {
+		$data = array();
+
 		if (is_array($one)) {
 			if (is_array($two)) {
-				return $this->_setArray(array_combine($one, $two));
+				$data = array_combine($one, $two);
 			} else {
-				return $this->_setArray($one);
+				$data = $one;
 			}
 		} else {
-			return $this->_setArray(array($one => $two));
+			$data = array($one => $two);
+		}
+
+		foreach ($data as $name => $value) {
+			if ($name === 'title') {
+				$this->pageTitle = $value;
+			} else {
+				if ($two === null && is_array($one)) {
+					$this->viewVars[Inflector::variable($name)] = $value;
+				} else {
+					$this->viewVars[$name] = $value;
+				}
+			}
 		}
 	}
 /**
- * Internally redirects one action to another
+ * Internally redirects one action to another. Examples:
+ *
+ * setAction('another_action');
+ * setAction('action_with_parameters', $parameter1);
  *
  * @param string $action The new action to be redirected to
  * @param mixed  Any other parameters passed to this method will be passed as
  *               parameters to the new action.
+ * @return mixed Returns the return value of the called action
  * @access public
  */
 	function setAction($action) {
 		$this->action = $action;
 		$args = func_get_args();
 		unset($args[0]);
-		call_user_func_array(array(&$this, $action), $args);
+		return call_user_func_array(array(&$this, $action), $args);
+	}
+/**
+ * Controller callback to tie into Auth component. Only called when AuthComponent::authorize is set to 'controller'.
+ *
+ * @return bool true if authorized, false otherwise
+ * @access public
+ * @link http://book.cakephp.org/view/396/authorize
+ */
+	function isAuthorized() {
+		trigger_error(sprintf(__('%s::isAuthorized() is not defined.', true), $this->name), E_USER_WARNING);
+		return false;
 	}
 /**
  * Returns number of errors in a submitted FORM.
  *
- * @return int Number of errors
+ * @return integer Number of errors
  * @access public
  */
 	function validate() {
@@ -498,41 +719,60 @@ class Controller extends Object{
 		return count($errors);
 	}
 /**
- * Validates a FORM according to the rules set up in the Model.
+ * Validates models passed by parameters. Example:
  *
- * @return int Number of errors
+ * $errors = $this->validateErrors($this->Article, $this->User);
+ *
+ * @param mixed A list of models as a variable argument
+ * @return array Validation errors, or false if none
  * @access public
  */
 	function validateErrors() {
 		$objects = func_get_args();
+
 		if (!count($objects)) {
 			return false;
 		}
 
 		$errors = array();
 		foreach ($objects as $object) {
-			$errors = array_merge($errors, $this->{$object->name}->invalidFields($object->data));
+			$this->{$object->alias}->set($object->data);
+			$errors = array_merge($errors, $this->{$object->alias}->invalidFields());
 		}
+
 		return $this->validationErrors = (count($errors) ? $errors : false);
 	}
 /**
- * Gets an instance of the view object and prepares it for rendering the output, then
- * asks the view to actualy do the job.
+ * Instantiates the correct view class, hands it its data, and uses it to render the view output.
  *
- * @param string $action
- * @param string $layout
- * @param string $file
- * @return controllers related views
+ * @param string $action Action name to render
+ * @param string $layout Layout to use
+ * @param string $file File to use for rendering
+ * @return string Full output string of view contents
  * @access public
+ * @link http://book.cakephp.org/view/428/render
  */
 	function render($action = null, $layout = null, $file = null) {
+		$this->beforeRender();
+
 		$viewClass = $this->view;
 		if ($this->view != 'View') {
-			$viewClass = $this->view . 'View';
-			loadView($this->view);
+			if (strpos($viewClass, '.') !== false) {
+				list($plugin, $viewClass) = explode('.', $viewClass);
+			}
+			$viewClass = $viewClass . 'View';
+			App::import('View', $this->view);
 		}
-		$this->beforeRender();
-		$this->__viewClass =& new $viewClass($this);
+
+		$this->Component->beforeRender($this);
+
+		$this->params['models'] = $this->modelNames;
+
+		if (Configure::read() > 2) {
+			$this->set('cakeDebug', $this);
+		}
+
+		$View =& new $viewClass($this);
 
 		if (!empty($this->modelNames)) {
 			$models = array();
@@ -541,7 +781,7 @@ class Controller extends Object{
 					$models[] = Inflector::underscore($currentModel);
 				}
 				if (isset($this->$currentModel) && is_a($this->$currentModel, 'Model') && !empty($this->$currentModel->validationErrors)) {
-					$this->__viewClass->validationErrors[Inflector::camelize($currentModel)] =& $this->$currentModel->validationErrors;
+					$View->validationErrors[Inflector::camelize($currentModel)] =& $this->$currentModel->validationErrors;
 				}
 			}
 			$models = array_diff(ClassRegistry::keys(), $models);
@@ -549,28 +789,36 @@ class Controller extends Object{
 				if (ClassRegistry::isKeySet($currentModel)) {
 					$currentObject =& ClassRegistry::getObject($currentModel);
 					if (is_a($currentObject, 'Model') && !empty($currentObject->validationErrors)) {
-						$this->__viewClass->validationErrors[Inflector::camelize($currentModel)] =& $currentObject->validationErrors;
+						$View->validationErrors[Inflector::camelize($currentModel)] =& $currentObject->validationErrors;
 					}
 				}
 			}
 		}
+
 		$this->autoRender = false;
-		return $this->__viewClass->render($action, $layout, $file);
+		$this->output .= $View->render($action, $layout, $file);
+
+		return $this->output;
 	}
 /**
- * Gets the referring URL of this request
+ * Returns the referring URL for this request.
  *
  * @param string $default Default URL to use if HTTP_REFERER cannot be read from headers
  * @param boolean $local If true, restrict referring URLs to local server
+ * @return string Referring URL
  * @access public
+ * @link http://book.cakephp.org/view/430/referer
  */
 	function referer($default = null, $local = false) {
 		$ref = env('HTTP_REFERER');
-		$base = FULL_BASE_URL . $this->webroot;
-
-		if ($ref != null && (defined(FULL_BASE_URL) || FULL_BASE_URL)) {
+		if (!empty($ref) && defined('FULL_BASE_URL')) {
+			$base = FULL_BASE_URL . $this->webroot;
 			if (strpos($ref, $base) === 0) {
-				return substr($ref, strlen($base) - 1);
+				$return =  substr($ref, strlen($base));
+				if ($return[0] != '/') {
+					$return = '/'.$return;
+				}
+				return $return;
 			} elseif (!$local) {
 				return $ref;
 			}
@@ -578,360 +826,301 @@ class Controller extends Object{
 
 		if ($default != null) {
 			return $default;
-		} else {
-			return '/';
 		}
+		return '/';
 	}
 /**
- * Sets data for this view. Will set title if the key "title" is in given $data array.
+ * Forces the user's browser not to cache the results of the current request.
  *
- * @param array $data Array of
- * @access protected
+ * @return void
+ * @access public
+ * @link http://book.cakephp.org/view/431/disableCache
  */
-	function _setArray($data) {
-		foreach ($data as $name => $value) {
-			if ($name == 'title') {
-				$this->_setTitle($value);
-			} else {
-				$this->viewVars[$name] = $value;
-			}
-		}
+	function disableCache() {
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
 	}
 /**
- * Set the title element of the page.
- *
- * @param string $pageTitle Text for the title
- * @access private
- */
-	function _setTitle($pageTitle) {
-		$this->pageTitle = $pageTitle;
-	}
-/**
- * Shows a message to the user $time seconds, then redirects to $url
- * Uses flash.thtml as a layout for the messages
+ * Shows a message to the user for $pause seconds, then redirects to $url.
+ * Uses flash.ctp as the default layout for the message.
+ * Does not work if the current debug level is higher than 0.
  *
  * @param string $message Message to display to the user
- * @param string $url Relative URL to redirect to after the time expires
- * @param int $time seconds to show the message
+ * @param mixed $url Relative string or array-based URL to redirect to after the time expires
+ * @param integer $pause Time to show the message
+ * @return void Renders flash layout
  * @access public
+ * @link http://book.cakephp.org/view/426/flash
  */
 	function flash($message, $url, $pause = 1) {
 		$this->autoRender = false;
-		$this->autoLayout = false;
-		$this->set('url', $this->base . $url);
+		$this->set('url', Router::url($url));
 		$this->set('message', $message);
 		$this->set('pause', $pause);
 		$this->set('page_title', $message);
-
-		if (file_exists(VIEWS . 'layouts' . DS . 'flash.thtml')) {
-			$flash = VIEWS . 'layouts' . DS . 'flash.thtml';
-		} elseif ($flash = fileExistsInPath(LIBS . 'view' . DS . 'templates' . DS . "layouts" . DS . 'flash.thtml')) {
-		}
-		$this->render(null, false, $flash);
+		$this->render(false, 'flash');
 	}
 /**
- * Replaced with Controller::flash();
- * @deprecated will not be avialable after 1.1.x.x
- */
-	function flashOut($message, $url, $pause = 1) {
-		trigger_error('(Controller::flashOut()) Deprecated: Use Controller::flash() instead', E_USER_WARNING);
-		$this->autoRender = false;
-		$this->autoLayout = false;
-		$this->set('url', $url);
-		$this->set('message', $message);
-		$this->set('pause', $pause);
-		$this->set('page_title', $message);
-
-		if (file_exists(VIEWS . 'layouts' . DS . 'flash.thtml')) {
-			$flash = VIEWS . 'layouts' . DS . 'flash.thtml';
-		} elseif ($flash = fileExistsInPath(LIBS . 'view' . DS . 'templates' . DS . "layouts" . DS . 'flash.thtml')) {
-		}
-		$this->render(null, false, $flash);
-	}
-/**
- * This function creates a $fieldNames array for the view to use.
- *
- * @param array $data
- * @param boolean $doCreateOptions
- * @return field name arrays for the view
- * @access public
- */
-	function generateFieldNames($data = null, $doCreateOptions = true) {
-		$fieldNames = array();
-		$model = $this->modelClass;
-		$modelKey = $this->modelKey;
-		$table = $this->{$model}->table;
-		$objRegistryModel =& ClassRegistry::getObject($modelKey);
-
-		foreach ($objRegistryModel->_tableInfo->value as $tabl) {
-			if ($objRegistryModel->isForeignKey($tabl['name'])) {
-				if (false !== strpos($tabl['name'], "_id")) {
-					$niceName = substr($tabl['name'], 0, strpos($tabl['name'], "_id" ));
-				} else {
-					$niceName = $niceName = $tabl['name'];
-				}
-				$fkNames = $this->{$model}->keyToTable[$tabl['name']];
-				$fieldNames[$tabl['name']]['table'] = $fkNames[0];
-				$fieldNames[$tabl['name']]['prompt'] = Inflector::humanize($niceName);
-				$fieldNames[$tabl['name']]['model'] = $fkNames[1];
-				$fieldNames[$tabl['name']]['modelKey'] = $this->{$model}->tableToModel[$fieldNames[$tabl['name']]['table']];
-				$fieldNames[$tabl['name']]['controller'] = Inflector::pluralize($this->{$model}->tableToModel[$fkNames[0]]);
-				$fieldNames[$tabl['name']]['foreignKey'] = true;
-
-			} elseif ('created' != $tabl['name'] && 'updated' != $tabl['name']) {
-				$fieldNames[$tabl['name']]['prompt'] = Inflector::humanize($tabl['name']);
-			} elseif ('created' == $tabl['name']) {
-				$fieldNames[$tabl['name']]['prompt'] = 'Created';
-			} elseif ('updated' == $tabl['name']) {
-				$fieldNames[$tabl['name']]['prompt'] = 'Modified';
-			}
-			$fieldNames[$tabl['name']]['tagName'] = $model . '/' . $tabl['name'];
-			$validationFields = $objRegistryModel->validate;
-
-			if (isset($validationFields[$tabl['name']])) {
-				if (VALID_NOT_EMPTY == $validationFields[$tabl['name']]) {
-					$fieldNames[$tabl['name']]['required'] = true;
-					$fieldNames[$tabl['name']]['errorMsg'] = "Required Field";
-				}
-			}
-			$lParenPos = strpos($tabl['type'], '(');
-			$rParenPos = strpos($tabl['type'], ')');
-
-			if (false != $lParenPos) {
-				$type = substr($tabl['type'], 0, $lParenPos);
-				$fieldLength = substr($tabl['type'], $lParenPos + 1, $rParenPos - $lParenPos - 1);
-			} else {
-				$type = $tabl['type'];
-			}
-
-			switch($type) {
-				case "text":
-					$fieldNames[$tabl['name']]['type'] = 'area';
-				break;
-				case "string":
-					if (isset($fieldNames[$tabl['name']]['foreignKey'])) {
-						$fieldNames[$tabl['name']]['type'] = 'select';
-						$fieldNames[$tabl['name']]['options'] = array();
-						$otherModel =& ClassRegistry::getObject(Inflector::underscore($fieldNames[$tabl['name']]['modelKey']));
-
-						if (is_object($otherModel)) {
-							if ($doCreateOptions) {
-								$otherDisplayField = $otherModel->getDisplayField();
-								$otherModel->recursive = 0;
-								$rec = $otherModel->findAll();
-
-								foreach ($rec as $pass) {
-									foreach ($pass as $key => $value) {
-										if ($key == $this->{$model}->tableToModel[$fieldNames[$tabl['name']]['table']] && isset($value[$otherModel->primaryKey]) && isset($value[$otherDisplayField])) {
-												$fieldNames[$tabl['name']]['options'][$value[$otherModel->primaryKey]] = $value[$otherDisplayField];
-										}
-									}
-								}
-							}
-							$fieldNames[$tabl['name']]['selected'] = $data[$model][$tabl['name']];
-						}
-					} else {
-						$fieldNames[$tabl['name']]['type'] = 'input';
-					}
-				break;
-				case "boolean":
-						$fieldNames[$tabl['name']]['type'] = 'checkbox';
-				break;
-				case "integer":
-				case "float":
-					if (strcmp($tabl['name'], $this->$model->primaryKey) == 0) {
-						$fieldNames[$tabl['name']]['type'] = 'hidden';
-					} elseif (isset($fieldNames[$tabl['name']]['foreignKey'])) {
-						$fieldNames[$tabl['name']]['type'] = 'select';
-						$fieldNames[$tabl['name']]['options'] = array();
-						$otherModel =& ClassRegistry::getObject(Inflector::underscore($fieldNames[$tabl['name']]['modelKey']));
-
-						if (is_object($otherModel)) {
-							if ($doCreateOptions) {
-								$otherDisplayField = $otherModel->getDisplayField();
-								$otherModel->recursive = 0;
-								$rec = $otherModel->findAll();
-
-								foreach ($rec as $pass) {
-									foreach ($pass as $key => $value) {
-										if ($key == $this->{$model}->tableToModel[$fieldNames[$tabl['name']]['table']] && isset($value[$otherModel->primaryKey]) && isset($value[$otherDisplayField])) {
-											$fieldNames[$tabl['name']]['options'][$value[$otherModel->primaryKey]] = $value[$otherDisplayField];
-										}
-									}
-								}
-							}
-							$fieldNames[$tabl['name']]['selected'] = $data[$model][$tabl['name']];
-						}
-					} else {
-						$fieldNames[$tabl['name']]['type'] = 'input';
-					}
-				break;
-				case "enum":
-					$fieldNames[$tabl['name']]['type'] = 'select';
-					$fieldNames[$tabl['name']]['options'] = array();
-					$enumValues = split(',', $fieldLength);
-
-					foreach ($enumValues as $enum) {
-						$enum = trim($enum, "'");
-						$fieldNames[$tabl['name']]['options'][$enum] = $enum;
-					}
-
-					$fieldNames[$tabl['name']]['selected'] = $data[$model][$tabl['name']];
-				break;
-				case "date":
-				case "datetime":
-				case "time":
-				case "year":
-					if (0 != strncmp("created", $tabl['name'], 7) && 0 != strncmp("modified", $tabl['name'], 8)) {
-						$fieldNames[$tabl['name']]['type'] = $type;
-					}
-
-					if (isset($data[$model][$tabl['name']])) {
-						$fieldNames[$tabl['name']]['selected'] = $data[$model][$tabl['name']];
-					} else {
-						$fieldNames[$tabl['name']]['selected'] = null;
-					}
-
-				break;
-				default:
-				break;
-			}
-		}
-
-		foreach ($objRegistryModel->hasAndBelongsToMany as $relation => $relData) {
-			$modelName = $relData['className'];
-			$manyAssociation = $relation;
-			$modelKeyM = Inflector::underscore($modelName);
-			$modelObject =& new $modelName();
-
-			if ($doCreateOptions) {
-				$otherDisplayField = $modelObject->getDisplayField();
-				$fieldNames[$relation]['model'] = $modelName;
-				$fieldNames[$relation]['prompt'] = "Related " . Inflector::humanize(Inflector::pluralize($relation));
-				$fieldNames[$relation]['type'] = "selectMultiple";
-				$fieldNames[$relation]['tagName'] = $manyAssociation . '/' . $manyAssociation;
-				$modelObject->recursive = 0;
-				$rec = $modelObject->findAll();
-
-				foreach ($rec as $pass) {
-					foreach ($pass as $key => $value) {
-						if ($key == $modelName && isset($value[$modelObject->primaryKey]) && isset($value[$otherDisplayField])) {
-							$fieldNames[$relation]['options'][$value[$modelObject->primaryKey]] = $value[$otherDisplayField];
-						}
-					}
-				}
-
-				if (isset($data[$manyAssociation])) {
-					foreach ($data[$manyAssociation] as $key => $row) {
-						$fieldNames[$relation]['selected'][$row[$modelObject->primaryKey]] = $row[$modelObject->primaryKey];
-					}
-				}
-			}
-		}
-		return $fieldNames;
-	}
-/**
- * Converts POST'ed model data to a model conditions array, suitable for a find or findAll Model query
+ * Converts POST'ed form data to a model conditions array, suitable for use in a Model::find() call.
  *
  * @param array $data POST'ed data organized by model and field
+ * @param mixed $op A string containing an SQL comparison operator, or an array matching operators to fields
+ * @param string $bool SQL boolean operator: AND, OR, XOR, etc.
+ * @param boolean $exclusive If true, and $op is an array, fields not included in $op will not be included in the returned conditions
  * @return array An array of model conditions
  * @access public
+ * @link http://book.cakephp.org/view/432/postConditions
  */
-	function postConditions($data) {
+	function postConditions($data = array(), $op = null, $bool = 'AND', $exclusive = false) {
 		if (!is_array($data) || empty($data)) {
-			return null;
+			if (!empty($this->data)) {
+				$data = $this->data;
+			} else {
+				return null;
+			}
 		}
-		$conditions = array();
+		$cond = array();
+
+		if ($op === null) {
+			$op = '';
+		}
 
 		foreach ($data as $model => $fields) {
 			foreach ($fields as $field => $value) {
-				$conditions[$model . '.' . $field] = $value;
+				$key = $model.'.'.$field;
+				$fieldOp = $op;
+				if (is_array($op) && array_key_exists($key, $op)) {
+					$fieldOp = $op[$key];
+				} elseif (is_array($op) && array_key_exists($field, $op)) {
+					$fieldOp = $op[$field];
+				} elseif (is_array($op)) {
+					$fieldOp = false;
+				}
+				if ($exclusive && $fieldOp === false) {
+					continue;
+				}
+				$fieldOp = strtoupper(trim($fieldOp));
+				if ($fieldOp === 'LIKE') {
+					$key = $key.' LIKE';
+					$value = '%'.$value.'%';
+				} elseif ($fieldOp && $fieldOp != '=') {
+					$key = $key.' '.$fieldOp;
+				}
+				$cond[$key] = $value;
 			}
 		}
-		return $conditions;
+		if ($bool != null && strtoupper($bool) != 'AND') {
+			$cond = array($bool => $cond);
+		}
+		return $cond;
 	}
 /**
- * Cleans up the date fields of current Model.
+ * Handles automatic pagination of model records.
  *
- * @param string $modelName
+ * @param mixed $object Model to paginate (e.g: model instance, or 'Model', or 'Model.InnerModel')
+ * @param mixed $scope Conditions to use while paginating
+ * @param array $whitelist List of allowed options for paging
+ * @return array Model query results
  * @access public
+ * @link http://book.cakephp.org/view/165/Controller-Setup
  */
-	function cleanUpFields($modelName = null) {
-		if ($modelName == null) {
-			$modelName = $this->modelClass;
+	function paginate($object = null, $scope = array(), $whitelist = array()) {
+		if (is_array($object)) {
+			$whitelist = $scope;
+			$scope = $object;
+			$object = null;
 		}
+		$assoc = null;
 
-		foreach ($this->{$modelName}->_tableInfo->value as $field) {
-			if ('date' == $field['type'] && isset($this->params['data'][$modelName][$field['name'] . '_year'])) {
-				$newDate = $this->params['data'][$modelName][$field['name'] . '_year'] . '-';
-				$newDate .= $this->params['data'][$modelName][$field['name'] . '_month'] . '-';
-				$newDate .= $this->params['data'][$modelName][$field['name'] . '_day'];
-				unset($this->params['data'][$modelName][$field['name'] . '_year']);
-				unset($this->params['data'][$modelName][$field['name'] . '_month']);
-				unset($this->params['data'][$modelName][$field['name'] . '_day']);
-				unset($this->params['data'][$modelName][$field['name'] . '_hour']);
-				unset($this->params['data'][$modelName][$field['name'] . '_min']);
-				unset($this->params['data'][$modelName][$field['name'] . '_meridian']);
-				$this->params['data'][$modelName][$field['name']] = $newDate;
-				$this->data[$modelName][$field['name']] = $newDate;
+		if (is_string($object)) {
+			$assoc = null;
 
-			} elseif ('datetime' == $field['type'] && isset($this->params['data'][$modelName][$field['name'] . '_year'])) {
-				$hour = $this->params['data'][$modelName][$field['name'] . '_hour'];
+			if (strpos($object, '.') !== false) {
+				list($object, $assoc) = explode('.', $object);
+			}
 
-				if ($hour != 12 && (isset($this->params['data'][$modelName][$field['name'] . '_meridian']) && 'pm' == $this->params['data'][$modelName][$field['name'] . '_meridian'])) {
-					$hour = $hour + 12;
+			if ($assoc && isset($this->{$object}->{$assoc})) {
+				$object = $this->{$object}->{$assoc};
+			} elseif ($assoc && isset($this->{$this->modelClass}) && isset($this->{$this->modelClass}->{$assoc})) {
+				$object = $this->{$this->modelClass}->{$assoc};
+			} elseif (isset($this->{$object})) {
+				$object = $this->{$object};
+			} elseif (isset($this->{$this->modelClass}) && isset($this->{$this->modelClass}->{$object})) {
+				$object = $this->{$this->modelClass}->{$object};
+			}
+		} elseif (empty($object) || $object === null) {
+			if (isset($this->{$this->modelClass})) {
+				$object = $this->{$this->modelClass};
+			} else {
+				$className = null;
+				$name = $this->uses[0];
+				if (strpos($this->uses[0], '.') !== false) {
+					list($name, $className) = explode('.', $this->uses[0]);
 				}
-
-				$newDate  = $this->params['data'][$modelName][$field['name'] . '_year'] . '-';
-				$newDate .= $this->params['data'][$modelName][$field['name'] . '_month'] . '-';
-				$newDate .= $this->params['data'][$modelName][$field['name'] . '_day'] . ' ';
-				$newDate .= $hour . ':' . $this->params['data'][$modelName][$field['name'] . '_min'] . ':00';
-				unset($this->params['data'][$modelName][$field['name'] . '_year']);
-				unset($this->params['data'][$modelName][$field['name'] . '_month']);
-				unset($this->params['data'][$modelName][$field['name'] . '_day']);
-				unset($this->params['data'][$modelName][$field['name'] . '_hour']);
-				unset($this->params['data'][$modelName][$field['name'] . '_min']);
-				unset($this->params['data'][$modelName][$field['name'] . '_meridian']);
-				$this->params['data'][$modelName][$field['name']] = $newDate;
-				$this->data[$modelName][$field['name']] = $newDate;
-
-			} elseif ('time' == $field['type'] && isset($this->params['data'][$modelName][$field['name'] . '_hour'])) {
-				$hour = $this->params['data'][$modelName][$field['name'] . '_hour'];
-
-				if ($hour != 12 && (isset($this->params['data'][$modelName][$field['name'] . '_meridian']) && 'pm' == $this->params['data'][$modelName][$field['name'] . '_meridian'])) {
-					$hour = $hour + 12;
+				if ($className) {
+					$object = $this->{$className};
+				} else {
+					$object = $this->{$name};
 				}
-				if ($hour == 12 && (isset($this->params['data'][$modelName][$field['name'] . '_meridian']) && 'am' == $this->params['data'][$modelName][$field['name'] . '_meridian'])) {
-				     $hour = '00';
-				}
-
-				$newDate = $hour . ':' . $this->params['data'][$modelName][$field['name'] . '_min'] . ':00';
-				unset($this->params['data'][$modelName][$field['name'] . '_hour']);
-				unset($this->params['data'][$modelName][$field['name'] . '_min']);
-				unset($this->params['data'][$modelName][$field['name'] . '_meridian']);
-				$this->params['data'][$modelName][$field['name']] = $newDate;
-				$this->data[$modelName][$field['name']] = $newDate;
 			}
 		}
+
+		if (!is_object($object)) {
+			trigger_error(sprintf(__('Controller::paginate() - can\'t find model %1$s in controller %2$sController', true), $object, $this->name), E_USER_WARNING);
+			return array();
+		}
+		$options = array_merge($this->params, $this->params['url'], $this->passedArgs);
+
+		if (isset($this->paginate[$object->alias])) {
+			$defaults = $this->paginate[$object->alias];
+		} else {
+			$defaults = $this->paginate;
+		}
+
+		if (isset($options['show'])) {
+			$options['limit'] = $options['show'];
+		}
+
+		if (isset($options['sort'])) {
+			$direction = null;
+			if (isset($options['direction'])) {
+				$direction = strtolower($options['direction']);
+			}
+			if ($direction != 'asc' && $direction != 'desc') {
+				$direction = 'asc';
+			}
+			$options['order'] = array($options['sort'] => $direction);
+		}
+
+		if (!empty($options['order']) && is_array($options['order'])) {
+			$alias = $object->alias ;
+			$key = $field = key($options['order']);
+
+			if (strpos($key, '.') !== false) {
+				list($alias, $field) = explode('.', $key);
+			}
+			$value = $options['order'][$key];
+			unset($options['order'][$key]);
+
+			if (isset($object->{$alias}) && $object->{$alias}->hasField($field)) {
+				$options['order'][$alias . '.' . $field] = $value;
+			} elseif ($object->hasField($field)) {
+				$options['order'][$alias . '.' . $field] = $value;
+			}
+		}
+		$vars = array('fields', 'order', 'limit', 'page', 'recursive');
+		$keys = array_keys($options);
+		$count = count($keys);
+
+		for ($i = 0; $i < $count; $i++) {
+			if (!in_array($keys[$i], $vars, true)) {
+				unset($options[$keys[$i]]);
+			}
+			if (empty($whitelist) && ($keys[$i] === 'fields' || $keys[$i] === 'recursive')) {
+				unset($options[$keys[$i]]);
+			} elseif (!empty($whitelist) && !in_array($keys[$i], $whitelist)) {
+				unset($options[$keys[$i]]);
+			}
+		}
+		$conditions = $fields = $order = $limit = $page = $recursive = null;
+
+		if (!isset($defaults['conditions'])) {
+			$defaults['conditions'] = array();
+		}
+
+		$type = 'all';
+
+		if (isset($defaults[0])) {
+			$type = $defaults[0];
+			unset($defaults[0]);
+		}
+
+		extract($options = array_merge(array('page' => 1, 'limit' => 20), $defaults, $options));
+
+		if (is_array($scope) && !empty($scope)) {
+			$conditions = array_merge($conditions, $scope);
+		} elseif (is_string($scope)) {
+			$conditions = array($conditions, $scope);
+		}
+		if ($recursive === null) {
+			$recursive = $object->recursive;
+		}
+
+		$extra = array_diff_key($defaults, compact(
+			'conditions', 'fields', 'order', 'limit', 'page', 'recursive'
+		));
+		if ($type !== 'all') {
+			$extra['type'] = $type;
+		}
+
+		if (method_exists($object, 'paginateCount')) {
+			$count = $object->paginateCount($conditions, $recursive, $extra);
+		} else {
+			$parameters = compact('conditions');
+			if ($recursive != $object->recursive) {
+				$parameters['recursive'] = $recursive;
+			}
+			$count = $object->find('count', array_merge($parameters, $extra));
+		}
+		$pageCount = intval(ceil($count / $limit));
+
+		if ($page === 'last' || $page >= $pageCount) {
+			$options['page'] = $page = $pageCount;
+		} elseif (intval($page) < 1) {
+			$options['page'] = $page = 1;
+		}
+		$page = $options['page'] = (integer)$page;
+
+		if (method_exists($object, 'paginate')) {
+			$results = $object->paginate($conditions, $fields, $order, $limit, $page, $recursive, $extra);
+		} else {
+			$parameters = compact('conditions', 'fields', 'order', 'limit', 'page');
+			if ($recursive != $object->recursive) {
+				$parameters['recursive'] = $recursive;
+			}
+			$results = $object->find($type, array_merge($parameters, $extra));
+		}
+		$paging = array(
+			'page'		=> $page,
+			'current'	=> count($results),
+			'count'		=> $count,
+			'prevPage'	=> ($page > 1),
+			'nextPage'	=> ($count > ($page * $limit)),
+			'pageCount'	=> $pageCount,
+			'defaults'	=> array_merge(array('limit' => 20, 'step' => 1), $defaults),
+			'options'	=> $options
+		);
+		$this->params['paging'][$object->alias] = $paging;
+
+		if (!in_array('Paginator', $this->helpers) && !array_key_exists('Paginator', $this->helpers)) {
+			$this->helpers[] = 'Paginator';
+		}
+		return $results;
 	}
 /**
- * Called before the controller action.  Overridden in subclasses.
+ * Called before the controller action.
  *
  * @access public
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function beforeFilter() {
 	}
 /**
- * Called after the controller action is run, but before the view is rendered.  Overridden in subclasses.
+ * Called after the controller action is run, but before the view is rendered.
  *
  * @access public
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function beforeRender() {
 	}
 /**
- * Called after the controller action is run and rendered.  Overridden in subclasses.
+ * Called after the controller action is run and rendered.
  *
  * @access public
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function afterFilter() {
 	}
@@ -939,8 +1128,9 @@ class Controller extends Object{
  * This method should be overridden in child classes.
  *
  * @param string $method name of method called example index, edit, etc.
- * @return boolean
+ * @return boolean Success
  * @access protected
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function _beforeScaffold($method) {
 		return true;
@@ -949,8 +1139,9 @@ class Controller extends Object{
  * This method should be overridden in child classes.
  *
  * @param string $method name of method called either edit or update.
- * @return boolean
+ * @return boolean Success
  * @access protected
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function _afterScaffoldSave($method) {
 		return true;
@@ -959,8 +1150,9 @@ class Controller extends Object{
  * This method should be overridden in child classes.
  *
  * @param string $method name of method called either edit or update.
- * @return boolean
+ * @return boolean Success
  * @access protected
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function _afterScaffoldSaveError($method) {
 		return true;
@@ -971,28 +1163,12 @@ class Controller extends Object{
  * Method MUST return true in child classes
  *
  * @param string $method name of method called example index, edit, etc.
- * @return boolean
+ * @return boolean Success
  * @access protected
+ * @link http://book.cakephp.org/view/60/Callbacks
  */
 	function _scaffoldError($method) {
 		return false;
-	}
-/**
- * Used to convert HABTM data into an array for selectTag
- *
- * @param array $data
- * @param string $key
- * @return array
- * @access protected
- */
-	function _selectedArray($data, $key = 'id') {
-		$array = array();
-		if (!empty($data)) {
-			foreach ($data as $var) {
-				$array[$var[$key]] = $var[$key];
-			}
-		}
-		return $array;
 	}
 }
 ?>

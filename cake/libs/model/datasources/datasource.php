@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: datasource.php 5317 2007-06-20 08:28:35Z phpnut $ */
+/* SVN FILE: $Id: datasource.php 8166 2009-05-04 21:17:19Z gwoo $ */
 /**
  * DataSource base class
  *
@@ -7,32 +7,30 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs.model.datasources
- * @since			CakePHP(tm) v 0.10.5.1790
- * @version			$Revision: 5317 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-06-20 03:28:35 -0500 (Wed, 20 Jun 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs.model.datasources
+ * @since         CakePHP(tm) v 0.10.5.1790
+ * @version       $Revision: 8166 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2009-05-04 14:17:19 -0700 (Mon, 04 May 2009) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  * DataSource base class
  *
  * Long description for file
  *
- * @package		cake
- * @subpackage	cake.cake.libs.model.datasources
+ * @package       cake
+ * @subpackage    cake.cake.libs.model.datasources
  */
 class DataSource extends Object {
 /**
@@ -42,13 +40,6 @@ class DataSource extends Object {
  * @access public
  */
 	var $connected = false;
-/**
- * Print debug info?
- *
- * @var boolean
- * @access public
- */
-	var $debug = false;
 /**
  * Print full query debug info?
  *
@@ -85,11 +76,17 @@ class DataSource extends Object {
  */
 	var $took = null;
 /**
- * Enter description here...
+ * The starting character that this DataSource uses for quoted identifiers.
  *
- * @var boolean
+ * @var string
  */
-	var $cacheSources = true;
+	var $startQuote = null;
+/**
+ * The ending character that this DataSource uses for quoted identifiers.
+ *
+ * @var string
+ */
+	var $endQuote = null;
 /**
  * Enter description here...
  *
@@ -184,96 +181,55 @@ class DataSource extends Object {
  */
 	var $_transactionStarted = false;
 /**
+ * Whether or not source data like available tables and schema descriptions
+ * should be cached
+ *
+ * @var boolean
+ */
+	var $cacheSources = true;
+/**
  * Constructor.
  */
-	function __construct() {
+	function __construct($config = array()) {
 		parent::__construct();
-		if (func_num_args() > 0) {
-			$this->setConfig(func_get_arg(0));
-		}
+		$this->setConfig($config);
 	}
 /**
- * Returns true if the DataSource supports the given interface (method)
+ * Caches/returns cached results for child instances
  *
- * @param string $interface The name of the interface (method)
- * @return boolean True on success
+ * @return array
  */
-	function isInterfaceSupported($interface) {
-		$methods = get_class_methods(get_class($this));
-		$methods = strtolower(implode('|', $methods));
-		$methods = explode('|', $methods);
-		$return = in_array(strtolower($interface), $methods);
-		return $return;
-	}
-/**
- * Sets the configuration for the DataSource
- *
- * @param array $config The configuration array
- * @return void
- */
-	function setConfig($config) {
-		if (is_array($this->_baseConfig)) {
-			$this->config = $this->_baseConfig;
-			foreach ($config as $key => $val) {
-				$this->config[$key] = $val;
-			}
-		}
-	}
-/**
- * Cache the DataSource description
- *
- * @param string $object The name of the object (model) to cache
- * @param mixed $data The description of the model, usually a string or array
- * @return void
- */
-	function __cacheDescription($object, $data = null) {
+	function listSources($data = null) {
 		if ($this->cacheSources === false) {
 			return null;
 		}
-		if (Configure::read() > 0) {
-			$expires = "+15 seconds";
-		} else {
-			$expires = "+999 days";
+
+		if ($this->_sources !== null) {
+			return $this->_sources;
 		}
 
-		if ($data !== null) {
-			$this->__descriptions[$object] =& $data;
-			$cache = serialize($data);
-		} else {
-			$cache = null;
-		}
-		$new = cache('models' . DS . ConnectionManager::getSourceName($this) . '_' . $object, $cache, $expires);
+		$key = ConnectionManager::getSourceName($this) . '_' . $this->config['database'] . '_list';
+		$key = preg_replace('/[^A-Za-z0-9_\-.+]/', '_', $key);
+		$sources = Cache::read($key, '_cake_model_');
 
-		if ($new != null) {
-			$new = unserialize($new);
+		if (empty($sources)) {
+			$sources = $data;
+			Cache::write($key, $data, '_cake_model_');
 		}
-		return $new;
+
+		$this->_sources = $sources;
+		return $sources;
 	}
 /**
- * To-be-overridden in subclasses.
+ * Convenience method for DboSource::listSources().  Returns source names in lowercase.
  *
- * @return string
+ * @return array
  */
-	function conditions($conditions) {
-		return $conditions;
-	}
-/**
- * To-be-overridden in subclasses.
- *
- * @param unknown_type $name
- * @return unknown
- */
-	function name($name) {
-		return $name;
-	}
-/**
- * To-be-overridden in subclasses.
- *
- * @param unknown_type $value
- * @return unknown
- */
-	function value($value) {
-		return $value;
+	function sources($reset = false) {
+		if ($reset === true) {
+			$this->_sources = null;
+		}
+		return array_map('strtolower', $this->listSources());
 	}
 /**
  * Returns a Model description (metadata) or null if none found.
@@ -285,17 +241,50 @@ class DataSource extends Object {
 		if ($this->cacheSources === false) {
 			return null;
 		}
-
-		if (isset($this->__descriptions[$model->tablePrefix.$model->table])) {
-			return $this->__descriptions[$model->tablePrefix.$model->table];
+		$table = $this->fullTableName($model, false);
+		if (isset($this->__descriptions[$table])) {
+			return $this->__descriptions[$table];
 		}
-		$cache = $this->__cacheDescription($model->tablePrefix.$model->table);
+		$cache = $this->__cacheDescription($table);
 
 		if ($cache !== null) {
-			$this->__descriptions[$model->tablePrefix.$model->table] =& $cache;
+			$this->__descriptions[$table] =& $cache;
 			return $cache;
 		}
 		return null;
+	}
+/**
+ * Begin a transaction
+ *
+ * @return boolean Returns true if a transaction is not in progress
+ */
+	function begin(&$model) {
+		return !$this->_transactionStarted;
+	}
+/**
+ * Commit a transaction
+ *
+ * @return boolean Returns true if a transaction is in progress
+ */
+	function commit(&$model) {
+		return $this->_transactionStarted;
+	}
+/**
+ * Rollback a transaction
+ *
+ * @return boolean Returns true if a transaction is in progress
+ */
+	function rollback(&$model) {
+		return $this->_transactionStarted;
+	}
+/**
+ * Converts column types to basic types
+ *
+ * @param string $real Real  column type (i.e. "varchar(255)")
+ * @return string Abstract column type (i.e. "string")
+ */
+	function column($real) {
+		return false;
 	}
 /**
  * To-be-overridden in subclasses.
@@ -341,23 +330,78 @@ class DataSource extends Object {
 		}
 	}
 /**
- * To-be-overridden in subclasses.
+ * Returns the ID generated from the previous INSERT operation.
  *
- * @param mixed $fields
- * @return mixed
+ * @param unknown_type $source
+ * @return in
  */
-	function fields($fields) {
-		return $fields;
+	function lastInsertId($source = null) {
+		return false;
 	}
 /**
- * To-be-overridden in subclasses.
+ * Returns the ID generated from the previous INSERT operation.
  *
- * @param Model $model
- * @param unknown_type $fields
- * @return unknown
+ * @param unknown_type $source
+ * @return in
  */
-	function getColumnType(&$model, $fields) {
+	function lastNumRows($source = null) {
 		return false;
+	}
+/**
+ * Returns the ID generated from the previous INSERT operation.
+ *
+ * @param unknown_type $source
+ * @return in
+ */
+	function lastAffected($source = null) {
+		return false;
+	}
+/**
+ * Returns true if the DataSource supports the given interface (method)
+ *
+ * @param string $interface The name of the interface (method)
+ * @return boolean True on success
+ */
+	function isInterfaceSupported($interface) {
+		$methods = get_class_methods(get_class($this));
+		$methods = strtolower(implode('|', $methods));
+		$methods = explode('|', $methods);
+		$return = in_array(strtolower($interface), $methods);
+		return $return;
+	}
+/**
+ * Sets the configuration for the DataSource
+ *
+ * @param array $config The configuration array
+ * @return void
+ */
+	function setConfig($config = array()) {
+		$this->config = array_merge($this->_baseConfig, $this->config, $config);
+	}
+/**
+ * Cache the DataSource description
+ *
+ * @param string $object The name of the object (model) to cache
+ * @param mixed $data The description of the model, usually a string or array
+ */
+	function __cacheDescription($object, $data = null) {
+		if ($this->cacheSources === false) {
+			return null;
+		}
+
+		if ($data !== null) {
+			$this->__descriptions[$object] =& $data;
+		}
+
+		$key = ConnectionManager::getSourceName($this) . '_' . $object;
+		$cache = Cache::read($key, '_cake_model_');
+
+		if (empty($cache)) {
+			$cache = $data;
+			Cache::write($key, $cache, '_cake_model_');
+		}
+
+		return $cache;
 	}
 /**
  * Enter description here...
@@ -378,11 +422,11 @@ class DataSource extends Object {
 			$val = null;
 
 			if (strpos($query, $key) !== false) {
-				switch($key) {
+				switch ($key) {
 					case '{$__cakeID__$}':
-						if (isset($data[$model->name]) || isset($data[$association])) {
-							if (isset($data[$model->name][$model->primaryKey])) {
-								$val = $data[$model->name][$model->primaryKey];
+						if (isset($data[$model->alias]) || isset($data[$association])) {
+							if (isset($data[$model->alias][$model->primaryKey])) {
+								$val = $data[$model->alias][$model->primaryKey];
 							} elseif (isset($data[$association][$model->primaryKey])) {
 								$val = $data[$association][$model->primaryKey];
 							}
@@ -407,8 +451,8 @@ class DataSource extends Object {
 									if (isset($assoc['foreignKey'])) {
 										$foreignKey = $assoc['foreignKey'];
 
-										if (isset($data[$model->name][$foreignKey])) {
-											$val = $data[$model->name][$foreignKey];
+										if (isset($data[$model->alias][$foreignKey])) {
+											$val = $data[$model->alias][$foreignKey];
 										} elseif (isset($data[$association][$foreignKey])) {
 											$val = $data[$association][$foreignKey];
 										} else {
@@ -434,7 +478,7 @@ class DataSource extends Object {
 				if (empty($val) && $val !== '0') {
 					return false;
 				}
-				$query = r($key, $this->value($val, $model->getColumnType($model->primaryKey)), $query);
+				$query = str_replace($key, $this->value($val, $model->getColumnType($model->primaryKey)), $query);
 			}
 		}
 		return $query;
@@ -447,13 +491,17 @@ class DataSource extends Object {
  * @return unknown
  */
 	function resolveKey($model, $key) {
-		return $model->name . $key;
+		return $model->alias . $key;
 	}
 /**
  * Closes the current datasource.
  *
  */
 	function __destruct() {
+		if ($this->_transactionStarted) {
+			$null = null;
+			$this->rollback($null);
+		}
 		if ($this->connected) {
 			$this->close();
 		}

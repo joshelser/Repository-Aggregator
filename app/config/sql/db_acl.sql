@@ -1,8 +1,6 @@
-# $Id: db_acl.sql 5117 2007-05-18 16:46:55Z phpnut $
+# $Id: db_acl.sql 7945 2008-12-19 02:16:01Z gwoo $
 #
-# Copyright 2005-2007,	Cake Software Foundation, Inc.
-#								1785 E. Sahara Avenue, Suite 490-204
-#								Las Vegas, Nevada 89104
+# Copyright 2005-2008,	Cake Software Foundation, Inc.
 #
 # Licensed under The MIT License
 # Redistributions of files must retain the above copyright notice.
@@ -10,11 +8,13 @@
 
 CREATE TABLE acos (
   id INTEGER(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  object_id INTEGER(10) NULL DEFAULT NULL,
-  alias VARCHAR(255) NOT NULL DEFAULT '',
-  lft INTEGER(10) NULL DEFAULT NULL,
-  rght INTEGER(10) NULL DEFAULT NULL,
-  PRIMARY KEY(id)
+  parent_id INTEGER(10) DEFAULT NULL,
+  model VARCHAR(255) DEFAULT '',
+  foreign_key INTEGER(10) UNSIGNED DEFAULT NULL,
+  alias VARCHAR(255) DEFAULT '',
+  lft INTEGER(10) DEFAULT NULL,
+  rght INTEGER(10) DEFAULT NULL,
+  PRIMARY KEY  (id)
 );
 
 CREATE TABLE aros_acos (
@@ -30,9 +30,11 @@ CREATE TABLE aros_acos (
 
 CREATE TABLE aros (
   id INTEGER(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  foreign_key INTEGER(10) UNSIGNED NULL DEFAULT NULL,
-  alias VARCHAR(255) NOT NULL DEFAULT '',
-  lft INTEGER(10) NULL DEFAULT NULL,
-  rght INTEGER(10) NULL DEFAULT NULL,
-  PRIMARY KEY(id)
+  parent_id INTEGER(10) DEFAULT NULL,
+  model VARCHAR(255) DEFAULT '',
+  foreign_key INTEGER(10) UNSIGNED DEFAULT NULL,
+  alias VARCHAR(255) DEFAULT '',
+  lft INTEGER(10) DEFAULT NULL,
+  rght INTEGER(10) DEFAULT NULL,
+  PRIMARY KEY  (id)
 );

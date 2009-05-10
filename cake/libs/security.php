@@ -1,62 +1,69 @@
 <?php
-/* SVN FILE: $Id: security.php 5317 2007-06-20 08:28:35Z phpnut $ */
+/* SVN FILE: $Id: security.php 7945 2008-12-19 02:16:01Z gwoo $ */
 /**
- * Security Class
+ * Short description for file.
  *
- * This class is a singleton class that contains
- * functions for hasing and security.
+ * Long description for file
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs
- * @since			CakePHP(tm) v .0.10.0.1233
- * @version			$Revision: 5317 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-06-20 03:28:35 -0500 (Wed, 20 Jun 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs
+ * @since         CakePHP(tm) v .0.10.0.1233
+ * @version       $Revision: 7945 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2008-12-18 18:16:01 -0800 (Thu, 18 Dec 2008) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
- * Security Class
+ * Short description for file.
  *
- * This class is a singleton class that contains functions for hasing and security.
+ * Long description for file
  *
- * @package		cake
- * @subpackage	cake.cake.libs
+ * @package       cake
+ * @subpackage    cake.cake.libs
  */
 class Security extends Object {
 /**
- * Singleton method to retrieve the instance of the Security class
+ * Default hash method
  *
- * @return object Security
+ * @var string
  * @access public
  */
+	var $hashType = null;
+/**
+  * Singleton implementation to get object instance.
+  *
+  * @return object
+  * @access public
+  * @static
+  */
 	function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
-			$instance[0] = &new Security;
+			$instance[0] =& new Security;
 		}
 		return $instance[0];
 	}
 /**
- * Returns inactive minutes constant based on cake the security level
- *
- * @return integer
- * @access public
- */
+  * Get allowed minutes of inactivity based on security level.
+  *
+  * @return integer Allowed inactivity in minutes
+  * @access public
+  * @static
+  */
 	function inactiveMins() {
-		switch(CAKE_SECURITY) {
+		$_this =& Security::getInstance();
+		switch (Configure::read('Security.level')) {
 			case 'high':
 				return 10;
 			break;
@@ -66,76 +73,114 @@ class Security extends Object {
 			case 'low':
 			default:
 				return 300;
-			break;
+				break;
 		}
 	}
 /**
- * Generates a unique authkey
- *
- * @return mixed
- * @access public
- */
+  * Generate authorization hash.
+  *
+  * @return string Hash
+  * @access public
+  * @static
+  */
 	function generateAuthKey() {
-		$_this =& Security::getInstance();
-		return $_this->hash(uniqid(rand(), true));
+		if (!class_exists('String')) {
+			App::import('Core', 'String');
+		}
+		return Security::hash(String::uuid());
 	}
 /**
- * Validates the authkey
+ * Validate authorization hash.
  *
- * @param mixed $authKey
- * @return boolean
+ * @param string $authKey Authorization hash
+ * @return boolean Success
  * @access public
+ * @static
+ * @todo Complete implementation
  */
 	function validateAuthKey($authKey) {
 		return true;
 	}
 /**
- * Generates a hash of a string using a php built in hashing function
+ * Create a hash from string using given method.
+ * Fallback on next available method.
  *
- * @param string $string The string to be hashed
- * @param string $type The hashing algorithm
- * @return string
+ * @param string $string String to hash
+ * @param string $type Method to use (sha1/sha256/md5)
+ * @param boolean $salt If true, automatically appends the application's salt
+ * 				  value to $string (Security.salt)
+ * @return string Hash
  * @access public
+ * @static
  */
-	function hash($string, $type = 'sha1') {
+	function hash($string, $type = null, $salt = false) {
+		$_this =& Security::getInstance();
+
+		if ($salt) {
+			if (is_string($salt)) {
+				$string = $salt . $string;
+			} else {
+				$string = Configure::read('Security.salt') . $string;
+			}
+		}
+
+		if (empty($type)) {
+			$type = $_this->hashType;
+		}
 		$type = strtolower($type);
-		if ($type == 'sha1') {
+
+		if ($type == 'sha1' || $type == null) {
 			if (function_exists('sha1')) {
 				$return = sha1($string);
 				return $return;
-			} else {
-				$type = 'sha256';
 			}
+			$type = 'sha256';
 		}
 
-		if ($type == 'sha256') {
-			if (function_exists('mhash')) {
-				$return = bin2hex(mhash(MHASH_SHA256, $string));
-				return $return;
-			} else {
-				$type = 'md5';
-			}
+		if ($type == 'sha256' && function_exists('mhash')) {
+			return bin2hex(mhash(MHASH_SHA256, $string));
 		}
 
-		if ($type == 'md5') {
-			$return = md5($string);
-			return $return;
+		if (function_exists('hash')) {
+			return hash($type, $string);
 		}
+		return md5($string);
 	}
 /**
- * Function that ciphers a text using a key
+ * Sets the default hash method for the Security object.  This affects all objects using
+ * Security::hash().
  *
- * @param string $text
- * @param string $key
- * @return string
+ * @param string $hash Method to use (sha1/sha256/md5)
  * @access public
+ * @return void
+ * @static
+ * @see Security::hash()
+ */
+	function setHash($hash) {
+		$_this =& Security::getInstance();
+		$_this->hashType = $hash;
+	}
+/**
+ * Encrypts/Decrypts a text using the given key.
+ *
+ * @param string $text Encrypted string to decrypt, normal string to encrypt
+ * @param string $key Key to use
+ * @return string Encrypted/Decrypted string
+ * @access public
+ * @static
  */
 	function cipher($text, $key) {
+		if (empty($key)) {
+			trigger_error(__('You cannot use an empty key for Security::cipher()', true), E_USER_WARNING);
+			return '';
+		}
+
+		$_this =& Security::getInstance();
 		if (!defined('CIPHER_SEED')) {
 			//This is temporary will change later
 			define('CIPHER_SEED', '76859309657453542496749683645');
 		}
-		srand (CIPHER_SEED);
+		srand(CIPHER_SEED);
 		$out = '';
 
 		for ($i = 0; $i < strlen($text); $i++) {

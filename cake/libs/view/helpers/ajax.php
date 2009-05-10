@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: ajax.php 5421 2007-07-09 04:58:57Z phpnut $ */
+/* SVN FILE: $Id: ajax.php 8166 2009-05-04 21:17:19Z gwoo $ */
 /**
  * Helper for AJAX operations.
  *
@@ -7,125 +7,162 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs.view.helpers
- * @since			CakePHP(tm) v 0.10.0.1076
- * @version			$Revision: 5421 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-07-08 23:58:57 -0500 (Sun, 08 Jul 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs.view.helpers
+ * @since         CakePHP(tm) v 0.10.0.1076
+ * @version       $Revision: 8166 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2009-05-04 14:17:19 -0700 (Mon, 04 May 2009) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
- * AjaxHelper library.
+ * AjaxHelper helper library.
  *
  * Helps doing AJAX using the Prototype library.
  *
- * @package		cake
- * @subpackage	cake.cake.libs.view.helpers
+ * @package       cake
+ * @subpackage    cake.cake.libs.view.helpers
  */
-class AjaxHelper extends Helper {
+class AjaxHelper extends AppHelper {
 /**
  * Included helpers.
  *
  * @var array
+ */
+	var $helpers = array('Html', 'Javascript', 'Form');
+/**
+ * HtmlHelper instance
+ *
+ * @var HtmlHelper
  * @access public
  */
-	var $helpers = array('Html', 'Javascript');
+	var $Html = null;
+/**
+ * JavaScriptHelper instance
+ *
+ * @var JavaScriptHelper
+ * @access public
+ */
+	var $Javascript = null;
 /**
  * Names of Javascript callback functions.
  *
  * @var array
- * @access public
  */
-	var $callbacks = array('uninitialized', 'loading', 'loaded', 'interactive', 'complete', 'success', 'failure');
+	var $callbacks = array(
+		'complete', 'create', 'exception', 'failure', 'interactive', 'loading',
+		'loaded', 'success', 'uninitialized'
+	);
 /**
  * Names of AJAX options.
  *
  * @var array
- * @access public
  */
-	var $ajaxOptions = array('type', 'confirm', 'condition', 'before', 'after', 'fallback', 'update', 'loading', 'loaded', 'interactive', 'complete', 'with', 'url', 'method', 'position', 'form', 'parameters', 'evalScripts', 'asynchronous', 'onComplete', 'onUninitialized', 'onLoading', 'onLoaded', 'onInteractive', 'success', 'failure', 'onSuccess', 'onFailure', 'insertion', 'requestHeaders');
+	var $ajaxOptions = array(
+		'after', 'asynchronous', 'before', 'confirm', 'condition', 'contentType', 'encoding',
+		'evalScripts', 'failure', 'fallback', 'form', 'indicator', 'insertion', 'interactive',
+		'loaded', 'loading', 'method', 'onCreate', 'onComplete', 'onException', 'onFailure',
+		'onInteractive', 'onLoaded', 'onLoading', 'onSuccess', 'onUninitialized', 'parameters',
+		'position', 'postBody', 'requestHeaders', 'success', 'type', 'update', 'with'
+	);
 /**
  * Options for draggable.
  *
  * @var array
- * @access public
  */
-	var $dragOptions = array('handle', 'revert', 'constraint', 'change', 'ghosting');
+	var $dragOptions = array(
+		'handle', 'revert', 'snap', 'zindex', 'constraint', 'change', 'ghosting',
+		'starteffect', 'reverteffect', 'endeffect', 'scroll', 'scrollSensitivity',
+		'onStart', 'onDrag', 'onEnd'
+	);
 /**
  * Options for droppable.
  *
  * @var array
- * @access public
  */
-	var $dropOptions = array('accept', 'containment', 'overlap', 'greedy', 'hoverclass', 'onHover', 'onDrop');
+	var $dropOptions = array(
+		'accept', 'containment', 'greedy', 'hoverclass', 'onHover', 'onDrop', 'overlap'
+	);
 /**
  * Options for sortable.
  *
  * @var array
- * @access public
  */
-	var $sortOptions = array('tag', 'only', 'overlap', 'constraint', 'containment', 'handle', 'hoverclass', 'ghosting', 'dropOnEmpty', 'onUpdate', 'onChange');
+	var $sortOptions = array(
+		'constraint', 'containment', 'dropOnEmpty', 'ghosting', 'handle', 'hoverclass', 'onUpdate',
+		'onChange', 'only', 'overlap', 'scroll', 'scrollSensitivity', 'scrollSpeed', 'tag', 'tree',
+		'treeTag', 'update'
+	);
 /**
  * Options for slider.
  *
  * @var array
- * @access public
  */
-	var $sliderOptions = array('axis', 'increment', 'maximum', 'minimum', 'alignX', 'alignY', 'sliderValue', 'disabled', 'handleImage', 'handleDisabled', 'values', 'onSlide', 'onChange');
+	var $sliderOptions = array(
+		'alignX', 'alignY', 'axis', 'disabled', 'handleDisabled', 'handleImage', 'increment',
+		'maximum', 'minimum', 'onChange', 'onSlide', 'range', 'sliderValue', 'values'
+	);
 /**
  * Options for in-place editor.
  *
  * @var array
- * @access public
  */
-	var $editorOptions = array('okText', 'cancelText', 'savingText', 'formId', 'externalControl', 'rows', 'cols', 'size', 'highlightcolor', 'highlightendcolor', 'savingClassName', 'formClassName', 'loadTextURL', 'loadingText', 'callback', 'ajaxOptions', 'clickToEditText');
+	var $editorOptions = array(
+		'okText', 'cancelText', 'savingText', 'formId', 'externalControl', 'rows', 'cols', 'size',
+		'highlightcolor', 'highlightendcolor', 'savingClassName', 'formClassName', 'loadTextURL',
+		'loadingText', 'callback', 'ajaxOptions', 'clickToEditText', 'collection', 'okControl',
+		'cancelControl', 'submitOnBlur'
+	);
 /**
  * Options for auto-complete editor.
  *
  * @var array
- * @access public
  */
-	var $autoCompleteOptions = array('paramName', 'tokens', 'frequency', 'minChars', 'indicator', 'updateElement', 'afterUpdateElement', 'onShow', 'onHide');
+	var $autoCompleteOptions = array(
+		'afterUpdateElement', 'callback', 'frequency', 'indicator', 'minChars', 'onShow', 'onHide',
+		'parameters', 'paramName', 'tokens', 'updateElement'
+	);
 /**
  * Output buffer for Ajax update content
  *
  * @var array
- * @access private
  */
 	var $__ajaxBuffer = array();
 /**
  * Returns link to remote action
  *
  * Returns a link to a remote action defined by <i>options[url]</i>
- * (using the urlFor format) that's called in the background using
+ * (using the url() format) that's called in the background using
  * XMLHttpRequest. The result of that request can then be inserted into a
  * DOM object whose id can be specified with <i>options[update]</i>.
  *
  * Examples:
  * <code>
- *  $ajax->link("Delete this post", "/posts/delete/{$post['Post']['id']}"
- * 				array("update" => "posts", "loading"=>"Element.show('loading');", "complete"=>"Element.hide('loading');"),
- *				"Are you sure you want to delte this post?");
- *  $ajax->link($html->img("refresh"), '/emails/refresh',
- *  			array("update" => "posts", "loading"=>"Element.show('loading');", "complete"=>"Element.hide('loading');"),
- *				null, false);
+ *  link("Delete this post",
+ * array("update" => "posts", "url" => "delete/{$postid->id}"));
+ *  link(imageTag("refresh"),
+ *		array("update" => "emails", "url" => "list_emails" ));
  * </code>
  *
  * By default, these remote requests are processed asynchronous during
  * which various callbacks can be triggered (for progress indicators and
  * the likes).
+ *
+ * Example:
+ * <code>
+ *	link (word,
+ *		array("url" => "undo", "n" => word_counter),
+ *		array("complete" => "undoRequestCompleted(request)"));
+ * </code>
  *
  * The callbacks that may be specified are:
  *
@@ -136,39 +173,37 @@ class AjaxHelper extends Helper {
  * - <i>interactive</i>::	Called when the user can interact with the
  *							remote document, even though it has not
  *							finished loading.
- * - <i>complete</i>:: Called when the request is complete.
+ * - <i>complete</i>:: Called when the XMLHttpRequest is complete.
  *
  * If you for some reason or another need synchronous processing (that'll
  * block the browser while the request is happening), you can specify
- * <i>$options['type'] = synchronous</i>.
+ * <i>options[type] = synchronous</i>.
  *
  * You can customize further browser side call logic by passing
  * in Javascript code snippets via some optional parameters. In
  * their order of use these are:
  *
- * - <i>confirm</i> :: Adds confirmation dialog.
- * - <i>condition</i> :: Perform remote request conditionally
+ * - <i>confirm</i>:: Adds confirmation dialog.
+ * -<i>condition</i>::	Perform remote request conditionally
  *                      by this expression. Use this to
  *                      describe browser-side conditions when
  *                      request should not be initiated.
- * - <i>before</i> ::		Called before request is initiated.
- * - <i>after</i> ::		Called immediately after request was
+ * - <i>before</i>::		Called before request is initiated.
+ * - <i>after</i>::		Called immediately after request was
  *						initiated and before <i>loading</i>.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Ajax.Updater
  * @param string $title Title of link
- * @param string $href href string "/products/view/12"
- * @param array $options Options for JavaScript function
- * @param string $confirm Confirmation message. Calls up a JavaScript confirm() message.
- * @param boolean $escapeTitle Escaping the title string to HTML entities
- * @return HTML code for link to remote action
- * @access public
+ * @param string $href Href string "/products/view/12"
+ * @param array $options		Options for JavaScript function
+ * @param string $confirm		Confirmation message. Calls up a JavaScript confirm() message.
+ * @param boolean $escapeTitle  Escaping the title string to HTML entities
+ *
+ * @return string				HTML code for link to remote action
  */
 	function link($title, $href = null, $options = array(), $confirm = null, $escapeTitle = true) {
 		if (!isset($href)) {
 			$href = $title;
 		}
-
 		if (!isset($options['url'])) {
 			$options['url'] = $href;
 		}
@@ -177,22 +212,18 @@ class AjaxHelper extends Helper {
 			$options['confirm'] = $confirm;
 			unset($confirm);
 		}
-		$htmlOptions = $this->__getHtmlOptions($options);
+		$htmlOptions = $this->__getHtmlOptions($options, array('url'));
 
 		if (empty($options['fallback']) || !isset($options['fallback'])) {
 			$options['fallback'] = $href;
 		}
+		$htmlDefaults = array('id' => 'link' . intval(mt_rand()), 'onclick' => '');
+		$htmlOptions = array_merge($htmlDefaults, $htmlOptions);
 
-		if (!isset($htmlOptions['id'])) {
-			$htmlOptions['id'] = 'link' . intval(rand());
-		}
-
-		if (!isset($htmlOptions['onclick'])) {
-			$htmlOptions['onclick'] = '';
-		}
-		$htmlOptions['onclick'] .= ' return false;';
+		$htmlOptions['onclick'] .= ' event.returnValue = false; return false;';
 		$return = $this->Html->link($title, $href, $htmlOptions, null, $escapeTitle);
-		$script = $this->Javascript->event("'{$htmlOptions['id']}'", "click", $this->remoteFunction($options));
+		$callback = $this->remoteFunction($options);
+		$script = $this->Javascript->event("'{$htmlOptions['id']}'", "click", $callback);
 
 		if (is_string($script)) {
 			$return .= $script;
@@ -203,15 +234,13 @@ class AjaxHelper extends Helper {
  * Creates JavaScript function for remote AJAX call
  *
  * This function creates the javascript needed to make a remote call
- * it is primarily used as a helper for link.
+ * it is primarily used as a helper for AjaxHelper::link.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Ajax.Updater
- * @see link() for docs on options parameter.
  * @param array $options options for javascript
  * @return string html code for link to remote action
- * @access public
+ * @see AjaxHelper::link() for docs on options parameter.
  */
-	function remoteFunction($options = null) {
+	function remoteFunction($options) {
 		if (isset($options['update'])) {
 			if (!is_array($options['update'])) {
 				$func = "new Ajax.Updater('{$options['update']}',";
@@ -229,128 +258,128 @@ class AjaxHelper extends Helper {
 			$func = "new Ajax.Request(";
 		}
 
-		$func .= "'" . $this->Html->url(isset($options['url']) ? $options['url'] : "") . "'";
+		$func .= "'" . $this->url(isset($options['url']) ? $options['url'] : "") . "'";
 		$func .= ", " . $this->__optionsForAjax($options) . ")";
 
 		if (isset($options['before'])) {
 			$func = "{$options['before']}; $func";
 		}
-
 		if (isset($options['after'])) {
 			$func = "$func; {$options['after']};";
 		}
-
 		if (isset($options['condition'])) {
 			$func = "if ({$options['condition']}) { $func; }";
 		}
 
 		if (isset($options['confirm'])) {
 			$func = "if (confirm('" . $this->Javascript->escapeString($options['confirm'])
-				. "')) { $func; } else { return false; }";
+				. "')) { $func; } else { event.returnValue = false; return false; }";
 		}
 		return $func;
 	}
 /**
  * Periodically call remote url via AJAX.
  *
- * Periodically calls the specified url (<i>options['url']</i>) every <i>options['frequency']</i> seconds (default is 10).
- * Usually used to update a specified div (<i>options['update']</i>) with the results of the remote call.
- * The options for specifying the target with url and defining callbacks is the same as link.
+ * Periodically calls the specified url (<i>options[url]</i>) every <i>options[frequency]</i>
+ * seconds (default is 10).  Usually used to update a specified div (<i>options[update]</i>) with
+ * the results of the remote call.  The options for specifying the target with url and defining
+ * callbacks is the same as AjaxHelper::link().
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Ajax.Updater
  * @param array $options Callback options
- * @return string Javascript codeblock
- * @access public
+ * @return string Javascript code
+ * @see AjaxHelper::link()
  */
 	function remoteTimer($options = null) {
-		$frequency=(isset($options['frequency'])) ? $options['frequency'] : 10;
-		$code="new PeriodicalExecuter(function() {" . $this->remoteFunction($options) . "}, $frequency)";
+		$frequency = (isset($options['frequency'])) ? $options['frequency'] : 10;
+		$callback = $this->remoteFunction($options);
+		$code = "new PeriodicalExecuter(function() {{$callback}}, $frequency)";
 		return $this->Javascript->codeBlock($code);
 	}
 /**
  * Returns form tag that will submit using Ajax.
  *
  * Returns a form tag that will submit using XMLHttpRequest in the background instead of the regular
- * reloading POST arrangement. Even though it's using Javascript to serialize the form elements, the form submission
- * will work just like a regular submission as viewed by the receiving side (all elements available in params).
- * The options for defining callbacks is the same as link().
+ * reloading POST arrangement. Even though it's using Javascript to serialize the form elements,
+ * the form submission will work just like a regular submission as viewed by the receiving side
+ * (all elements available in params).  The options for defining callbacks is the same
+ * as AjaxHelper::link().
  *
- * @param array $params Form target
+ * @param mixed $params Either a string identifying the form target, or an array of method parameters, including:
+ *  - 'params' => Acts as the form target
+ *  - 'type' => 'post' or 'get'
+ *  - 'options' => An array containing all HTML and script options used to
+ *  generate the form tag and Ajax request.
  * @param array $type How form data is posted: 'get' or 'post'
  * @param array $options Callback/HTML options
  * @return string JavaScript/HTML code
- * @access public
+ * @see AjaxHelper::link()
  */
 	function form($params = null, $type = 'post', $options = array()) {
+		$model = false;
 		if (is_array($params)) {
 			extract($params, EXTR_OVERWRITE);
-
-			if (!isset($action)) {
-				$action = null;
-			}
-
-			if (!isset($type)) {
-				$type = 'post';
-			}
-
-			if (!isset($options)) {
-				$options = array();
-			}
-		} else {
-			$action = $params;
 		}
-		$htmlOptions = $this->__getHtmlOptions($options);
-		$htmlOptions['action'] = $action;
 
-		if (!isset($htmlOptions['id'])) {
-			$htmlOptions['id'] = 'form' . intval(rand());
+		if (empty($options['url'])) {
+			$options['url'] = array('action' => $params);
 		}
-		$htmlOptions['onsubmit']="return false;";
 
-		if (!isset($options['with'])) {
-				$options['with'] = "Form.serialize('{$htmlOptions['id']}')";
-		}
-		$options['url']=$action;
+		$htmlDefaults = array(
+			'id' => 'form' . intval(mt_rand()),
+			'onsubmit'	=> "event.returnValue = false; return false;",
+			'type' => $type
+		);
+		$htmlOptions = $this->__getHtmlOptions($options, array('model', 'with'));
+		$htmlOptions = array_merge($htmlDefaults, $htmlOptions);
 
-		return $this->Html->formTag($htmlOptions['action'], $type, $htmlOptions)
-				. $this->Javascript->event("'" . $htmlOptions['id']. "'", "submit", $this->remoteFunction($options));
+		$defaults = array('model' => $model, 'with' => "Form.serialize('{$htmlOptions['id']}')");
+		$options = array_merge($defaults, $options);
+		$callback = $this->remoteFunction($options);
+
+		$form = $this->Form->create($options['model'], $htmlOptions);
+		$script = $this->Javascript->event("'" . $htmlOptions['id']. "'", 'submit', $callback);
+		return $form . $script;
 	}
 /**
  * Returns a button input tag that will submit using Ajax
  *
- * Returns a button input tag that will submit form using XMLHttpRequest in the background instead of regular
- * reloading POST arrangement. <i>options</i> argument is the same as in <i>form_remote_tag</i>
+ * Returns a button input tag that will submit form using XMLHttpRequest in the background instead
+ * of regular reloading POST arrangement. <i>options</i> argument is the same as
+ * in AjaxHelper::form().
  *
  * @param string $title Input button title
  * @param array $options Callback options
  * @return string Ajaxed input button
- * @access public
+ * @see AjaxHelper::form()
  */
 	function submit($title = 'Submit', $options = array()) {
-		$htmlOptions         =$this->__getHtmlOptions($options);
-		$htmlOptions['value']=$title;
+		$htmlOptions = $this->__getHtmlOptions($options);
+		$htmlOptions['value'] = $title;
 
 		if (!isset($options['with'])) {
-				$options['with'] = 'Form.serialize(Event.element(event).form)';
+			$options['with'] = 'Form.serialize(Event.element(event).form)';
+		}
+		if (!isset($htmlOptions['id'])) {
+			$htmlOptions['id'] = 'submit' . intval(mt_rand());
 		}
 
-		if (!isset($htmlOptions['id'])) {
-				$htmlOptions['id'] = 'submit' . intval(rand());
-		}
-		$htmlOptions['onclick']="return false;";
-		return $this->Html->submit($title, $htmlOptions)
-			. $this->Javascript->event('"' . $htmlOptions['id'] . '"', 'click', $this->remoteFunction($options));
+		$htmlOptions['onclick'] = "event.returnValue = false; return false;";
+		$callback = $this->remoteFunction($options);
+
+		$form = $this->Form->submit($title, $htmlOptions);
+		$script = $this->Javascript->event('"' . $htmlOptions['id'] . '"', 'click', $callback);
+		return $form . $script;
 	}
 /**
  * Observe field and call ajax on change.
  *
- * Observes the field with the DOM ID specified by <i>field_id</i> and makes
+ * Observes the field with the DOM ID specified by <i>field</i> and makes
  * an Ajax when its contents have changed.
  *
  * Required +options+ are:
  * - <i>frequency</i>:: The frequency (in seconds) at which changes to
  *						this field will be detected.
- * - <i>url</i>::		@see urlFor() -style options for the action to call
+ * - <i>url</i>::		@see url() -style options for the action to call
  *						when the field has changed.
  *
  * Additional options are:
@@ -359,54 +388,64 @@ class AjaxHelper extends Helper {
  *						XMLHttpRequest response text.
  * - <i>with</i>:: A Javascript expression specifying the
  *						parameters for the XMLHttpRequest. This defaults
- *						to Form.Element.serialize('$field_id'), which can be
+ *						to Form.Element.serialize('$field'), which can be
  *						accessed from params['form']['field_id'].
  *
- * @see link().
- * @param string $field_id DOM ID of field to observe
+ * Additionally, you may specify any of the options documented in
+ * @see linkToRemote().
+ *
+ * @param string $field DOM ID of field to observe
  * @param array $options ajax options
  * @return string ajax script
- * @access public
  */
-	function observeField($field_id, $options = array()) {
+	function observeField($field, $options = array()) {
 		if (!isset($options['with'])) {
-			$options['with'] = "Form.Element.serialize('$field_id')";
+			$options['with'] = 'Form.Element.serialize(\'' . $field . '\')';
 		}
-		return $this->Javascript->codeBlock($this->_buildObserver('Form.Element.Observer', $field_id, $options));
+		$observer = 'Observer';
+		if (!isset($options['frequency']) || intval($options['frequency']) == 0) {
+			$observer = 'EventObserver';
+		}
+		return $this->Javascript->codeBlock(
+			$this->_buildObserver('Form.Element.' . $observer, $field, $options)
+		);
 	}
 /**
  * Observe entire form and call ajax on change.
  *
  * Like @see observeField(), but operates on an entire form identified by the
- * DOM ID <b>form_id</b>. <b>options</b> are the same as <b>observe_field</b>, except
+ * DOM ID <b>form</b>. <b>options</b> are the same as <b>observeField</b>, except
  * the default value of the <i>with</i> option evaluates to the
  * serialized (request string) value of the form.
  *
- * @param string $field_id DOM ID of field to observe
+ * @param string $form DOM ID of form to observe
  * @param array $options ajax options
  * @return string ajax script
- * @access public
  */
-	function observeForm($field_id, $options = array()) {
+	function observeForm($form, $options = array()) {
 		if (!isset($options['with'])) {
-				$options['with'] = 'Form.serialize("' . $field_id . '")';
+			$options['with'] = 'Form.serialize(\'' . $form . '\')';
 		}
-		return $this->Javascript->codeBlock($this->_buildObserver('Form.Observer', $field_id, $options));
+		$observer = 'Observer';
+		if (!isset($options['frequency']) || intval($options['frequency']) == 0) {
+			$observer = 'EventObserver';
+		}
+		return $this->Javascript->codeBlock(
+			$this->_buildObserver('Form.' . $observer, $form, $options)
+		);
 	}
 /**
  * Create a text field with Autocomplete.
  *
  * Creates an autocomplete field with the given ID and options.
  *
- * options['with'] defaults to "Form.Element.serialize('$field_id')",
- * but can be any valid javascript expression defining the
+ * options['with'] defaults to "Form.Element.serialize('$field')",
+ * but can be any valid javascript expression defining the additional fields.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Ajax.Autocompleter
- * @param string $field_id DOM ID of field to observe
+ * @param string $field DOM ID of field to observe
  * @param string $url URL for the autocomplete action
  * @param array $options Ajax options
  * @return string Ajax script
- * @access public
  */
 	function autoComplete($field, $url = "", $options = array()) {
 		$var = '';
@@ -416,14 +455,19 @@ class AjaxHelper extends Helper {
 		}
 
 		if (!isset($options['id'])) {
-			$options['id'] = Inflector::camelize(r("/", "_", $field));
+			$options['id'] = Inflector::camelize(str_replace(".", "_", $field));
 		}
-		$divOptions = array('id' => $options['id'] . "_autoComplete", 'class' => isset($options['class']) ? $options['class'] : 'auto_complete');
+
+		$divOptions = array(
+			'id' => $options['id'] . "_autoComplete",
+			'class' => isset($options['class']) ? $options['class'] : 'auto_complete'
+		);
 
 		if (isset($options['div_id'])) {
 			$divOptions['id'] = $options['div_id'];
 			unset($options['div_id']);
 		}
+
 		$htmlOptions = $this->__getHtmlOptions($options);
 		$htmlOptions['autocomplete'] = "off";
 
@@ -438,53 +482,43 @@ class AjaxHelper extends Helper {
 				$options['tokens'] = '"' . $options['tokens'] . '"';
 			}
 		}
+
 		$options = $this->_optionsToString($options, array('paramName', 'indicator'));
 		$options = $this->_buildOptions($options, $this->autoCompleteOptions);
-		return $this->Html->input($field, $htmlOptions) . "\n" .
-				$this->Html->tag('div', $divOptions, true) . "</div>\n" .
-				$this->Javascript->codeBlock("{$var}new Ajax.Autocompleter('" . $htmlOptions['id']
-					. "', '" . $divOptions['id'] . "', '" . $this->Html->url($url) . "', " .
-						$options . ");");
-	}
-/**
- * Setup a Draggable Element.
- * For a reference on the options for this function, check out
- *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Draggable
- * @param sting $id the DOM id to enable
- * @param array $options a set of options
- * @return string Javascript::codeBlock();
- * @access public
- */
-	function drag($id, $options = array()) {
-		return $this->Javascript->codeBlock("new Draggable('$id', " . $this->_optionsForDraggable($options) . ");");
+
+
+		$text = $this->Form->text($field, $htmlOptions);
+		$div = $this->Html->div(null, '', $divOptions);
+		$script = "{$var}new Ajax.Autocompleter('{$htmlOptions['id']}', '{$divOptions['id']}', '";
+		$script .= $this->Html->url($url) . "', {$options});";
+
+		return  "{$text}\n{$div}\n" . $this->Javascript->codeBlock($script);
 	}
 /**
  * Creates an Ajax-updateable DIV element
  *
  * @param string $id options for javascript
- * @param array $options a set of options
  * @return string HTML code
- * @access public
  */
 	function div($id, $options = array()) {
 		if (env('HTTP_X_UPDATE') != null) {
+			$this->Javascript->enabled = false;
 			$divs = explode(' ', env('HTTP_X_UPDATE'));
+
 			if (in_array($id, $divs)) {
 				@ob_end_clean();
 				ob_start();
 				return '';
 			}
 		}
-		$attr = $this->Html->_parseAttributes(am($options, array('id' => $id)));
-		return $this->output(sprintf($this->tags['blockstart'], $attr));
+		$attr = $this->_parseAttributes(array_merge($options, array('id' => $id)));
+		return $this->output(sprintf($this->Html->tags['blockstart'], $attr));
 	}
 /**
  * Closes an Ajax-updateable DIV element
  *
  * @param string $id The DOM ID of the element
  * @return string HTML code
- * @access public
  */
 	function divEnd($id) {
 		if (env('HTTP_X_UPDATE') != null) {
@@ -492,101 +526,135 @@ class AjaxHelper extends Helper {
 			if (in_array($id, $divs)) {
 				$this->__ajaxBuffer[$id] = ob_get_contents();
 				ob_end_clean();
+				ob_start();
 				return '';
 			}
 		}
-		return $this->output($this->tags['blockend']);
+		return $this->output($this->Html->tags['blockend']);
 	}
 /**
- * Protectd helper method to return an array of options for draggable.
+ * Detects Ajax requests
  *
- * @param array $options
- * @return array
- * @access protected
+ * @return boolean True if the current request is a Prototype Ajax update call
  */
-	function _optionsForDraggable($options) {
-		$options = $this->_optionsToString($options, array('handle', 'constraint'));
-		return $this->_buildOptions($options, $this->dragOptions);
+	function isAjax() {
+		return (isset($this->params['isAjax']) && $this->params['isAjax'] === true);
 	}
 /**
- * Setup a droppable element
- * For a reference on the options for this function, check out
+ * Creates a draggable element.  For a reference on the options for this function,
+ * check out http://github.com/madrobby/scriptaculous/wikis/draggable
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Droppables.add
- * @param string $id
+ * @param unknown_type $id
  * @param array $options
- * @return array
- * @access public
+ * @return unknown
+ */
+	function drag($id, $options = array()) {
+		$var = '';
+		if (isset($options['var'])) {
+			$var = 'var ' . $options['var'] . ' = ';
+			unset($options['var']);
+		}
+		$options = $this->_buildOptions(
+			$this->_optionsToString($options, array('handle', 'constraint')), $this->dragOptions
+		);
+		return $this->Javascript->codeBlock("{$var}new Draggable('$id', " .$options . ");");
+	}
+/**
+ * For a reference on the options for this function, check out
+ * http://github.com/madrobby/scriptaculous/wikis/droppables
+ *
+ * @param unknown_type $id
+ * @param array $options
+ * @return string
  */
 	function drop($id, $options = array()) {
-		$options = $this->_optionsForDroppable($options);
-		return $this->Javascript->codeBlock("Droppables.add('$id', $options);");
+		$optionsString = array('overlap', 'hoverclass');
+		if (!isset($options['accept']) || !is_array($options['accept'])) {
+			$optionsString[] = 'accept';
+		} else if (isset($options['accept'])) {
+			$options['accept'] = $this->Javascript->object($options['accept']);
+		}
+		$options = $this->_buildOptions(
+			$this->_optionsToString($options, $optionsString), $this->dropOptions
+		);
+		return $this->Javascript->codeBlock("Droppables.add('{$id}', {$options});");
 	}
 /**
- * Protected helper method to return an array of options for droppable.
+ * Make an element with the given $id droppable, and trigger an Ajax call when a draggable is
+ * dropped on it.
  *
- * @param string $options
- * @return string	String of Javascript array definition
- * @access protected
- */
-	function _optionsForDroppable($options) {
-		$options = $this->_optionsToString($options, array('accept', 'overlap', 'hoverclass'));
-		return $this->_buildOptions($options, $this->dropOptions);
-	}
-/**
- * Setup a remote droppable element.
+ * For a reference on the options for this function, check out
+ * http://wiki.script.aculo.us/scriptaculous/show/Droppables.add
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Droppables.add
- * @see link() and remoteFunction()
- * @param string $id DOM id of droppable
- * @param array $options ame as drop()
- * @param array $ajaxOptions same as remoteFunction()
- * @return string Javascript::codeBlock()
- * @access public
+ * @param string $id
+ * @param array $options
+ * @param array $ajaxOptions
+ * @return string JavaScript block to create a droppable element
  */
 	function dropRemote($id, $options = array(), $ajaxOptions = array()) {
-		$options['onDrop'] = "function(element) {" . $this->remoteFunction($ajaxOptions) . "}";
-		$options = $this->_optionsForDroppable($options);
-		return $this->Javascript->codeBlock("Droppables.add('$id', $options);");
+		$callback = $this->remoteFunction($ajaxOptions);
+		$options['onDrop'] = "function(element, droppable, event) {{$callback}}";
+		$optionsString = array('overlap', 'hoverclass');
+
+		if (!isset($options['accept']) || !is_array($options['accept'])) {
+			$optionsString[] = 'accept';
+		} else if (isset($options['accept'])) {
+			$options['accept'] = $this->Javascript->object($options['accept']);
+		}
+
+		$options = $this->_buildOptions(
+			$this->_optionsToString($options, $optionsString),
+			$this->dropOptions
+		);
+		return $this->Javascript->codeBlock("Droppables.add('{$id}', {$options});");
 	}
 /**
  * Makes a slider control.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Slider
  * @param string $id DOM ID of slider handle
- * @param string $track_id DOM ID of slider track
+ * @param string $trackId DOM ID of slider track
  * @param array $options Array of options to control the slider
- * @return string Javascript::codeBlock()
- * @access public
+ * @link          http://github.com/madrobby/scriptaculous/wikis/slider
  */
-	function slider($id, $track_id, $options = array()) {
-		$options = $this->_optionsToString($options, array('axis', 'handleImage', 'handleDisabled'));
-
-		if (isset($options['change'])) {
-			$options['onChange'] = $options['change'];
-			unset($options['change']);
+	function slider($id, $trackId, $options = array()) {
+		if (isset($options['var'])) {
+			$var = 'var ' . $options['var'] . ' = ';
+			unset($options['var']);
+		} else {
+			$var = 'var ' . $id . ' = ';
 		}
 
-		if (isset($options['slide'])) {
-			$options['onSlide'] = $options['slide'];
-			unset($options['slide']);
+		$options = $this->_optionsToString($options, array(
+			'axis', 'handleImage', 'handleDisabled'
+		));
+		$callbacks = array('change', 'slide');
+
+		foreach ($callbacks as $callback) {
+			if (isset($options[$callback])) {
+				$call = $options[$callback];
+				$options['on' . ucfirst($callback)] = "function(value) {{$call}}";
+				unset($options[$callback]);
+			}
+		}
+
+		if (isset($options['values']) && is_array($options['values'])) {
+			$options['values'] = $this->Javascript->object($options['values']);
 		}
 
 		$options = $this->_buildOptions($options, $this->sliderOptions);
-		return $this->Javascript->codeBlock("var $id = new Control.Slider('$id', '$track_id', $options);");
+		$script = "{$var}new Control.Slider('$id', '$trackId', $options);";
+		return $this->Javascript->codeBlock($script);
 	}
 /**
  * Makes an Ajax In Place editor control.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Ajax.InPlaceEditor
  * @param string $id DOM ID of input element
  * @param string $url Postback URL of saved data
  * @param array $options Array of options to control the editor, including ajaxOptions (see link).
- * @return string Javascript::codeBlock()
- * @access public
+ * @link          http://github.com/madrobby/scriptaculous/wikis/ajax-inplaceeditor
  */
 	function editor($id, $url, $options = array()) {
-		$url = $this->Html->url($url);
+		$url = $this->url($url);
 		$options['ajaxOptions'] = $this->__optionsForAjax($options);
 
 		foreach ($this->ajaxOptions as $opt) {
@@ -599,78 +667,125 @@ class AjaxHelper extends Helper {
 			$options['callback'] = 'function(form, value) {' . $options['callback'] . '}';
 		}
 
-		$options = $this->_optionsToString($options, array('okText', 'cancelText', 'savingText', 'formId', 'externalControl', 'highlightcolor', 'highlightendcolor', 'savingClassName', 'formClassName', 'loadTextURL', 'loadingText', 'clickToEditText'));
+		$type = 'InPlaceEditor';
+		if (isset($options['collection']) && is_array($options['collection'])) {
+			$options['collection'] = $this->Javascript->object($options['collection']);
+			$type = 'InPlaceCollectionEditor';
+		}
+
+		$var = '';
+		if (isset($options['var'])) {
+			$var = 'var ' . $options['var'] . ' = ';
+			unset($options['var']);
+		}
+
+		$options = $this->_optionsToString($options, array(
+			'okText', 'cancelText', 'savingText', 'formId', 'externalControl', 'highlightcolor',
+			'highlightendcolor', 'savingClassName', 'formClassName', 'loadTextURL', 'loadingText',
+			'clickToEditText', 'okControl', 'cancelControl'
+		));
 		$options = $this->_buildOptions($options, $this->editorOptions);
-		return $this->Javascript->codeBlock("new Ajax.InPlaceEditor('{$id}', '{$url}', {$options});");
+		$script = "{$var}new Ajax.{$type}('{$id}', '{$url}', {$options});";
+		return $this->Javascript->codeBlock($script);
 	}
 /**
  * Makes a list or group of floated objects sortable.
  *
- * @link http://wiki.script.aculo.us/scriptaculous/show/Sortable.create
  * @param string $id DOM ID of parent
- * @param array $options Array of options to control sort
- * @return string Javascript::codeBlock()
- * @access public
+ * @param array $options Array of options to control sort.
+ * @link          http://github.com/madrobby/scriptaculous/wikis/sortable
  */
 	function sortable($id, $options = array()) {
 		if (!empty($options['url'])) {
-			$options['with'] = "Sortable.serialize('$id')";
+			if (empty($options['with'])) {
+				$options['with'] = "Sortable.serialize('$id')";
+			}
 			$options['onUpdate'] = 'function(sortable) {' . $this->remoteFunction($options) . '}';
 		}
+		$block = true;
 
-		$options = $this->__optionsForSortable($options);
-		return $this->Javascript->codeBlock("Sortable.create('$id', $options);");
+		if (isset($options['block'])) {
+			$block = $options['block'];
+			unset($options['block']);
+		}
+		$strings = array(
+			'tag', 'constraint', 'only', 'handle', 'hoverclass', 'tree',
+			'treeTag', 'update', 'overlap'
+		);
+		$scrollIsObject = (
+			isset($options['scroll']) &&
+			$options['scroll'] != 'window' &&
+			strpos($options['scroll'], '$(') !== 0
+		);
+
+		if ($scrollIsObject) {
+			$strings[] = 'scroll';
+		}
+
+		$options = $this->_optionsToString($options, $strings);
+		$options = array_merge($options, $this->_buildCallbacks($options));
+		$options = $this->_buildOptions($options, $this->sortOptions);
+		$result = "Sortable.create('$id', $options);";
+
+		if (!$block) {
+			return $result;
+		}
+		return $this->Javascript->codeBlock($result);
 	}
 /**
- * Private method; generates sortables code from array options
+ * Private helper function for Javascript.
  *
- * @param array $options
- * @return string	String of Javascript array definition
+ * @param array $options Set of options
  * @access private
  */
-	function __optionsForSortable($options) {
-		$options = $this->_optionsToString($options, array('handle', 'tag', 'constraint', 'ghosting', 'only', 'hoverclass'));
-		return $this->_buildOptions($options, $this->sortOptions);
-	}
-/**
- * Private helper function for Ajax.
- *
- * @param array $options
- * @return string	String of Javascript array definition
- * @access private
- */
-	function __optionsForAjax($options = array()) {
-
+	function __optionsForAjax($options) {
 		if (isset($options['indicator'])) {
 			if (isset($options['loading'])) {
-				$options['loading']  .= "Element.show('{$options['indicator']}');";
+				$loading = $options['loading'];
+
+				if (!empty($loading) && substr(trim($loading), -1, 1) != ';') {
+					$options['loading'] .= '; ';
+				}
+				$options['loading'] .= "Element.show('{$options['indicator']}');";
 			} else {
-				$options['loading']   = "Element.show('{$options['indicator']}');";
+				$options['loading'] = "Element.show('{$options['indicator']}');";
 			}
 			if (isset($options['complete'])) {
+				$complete = $options['complete'];
+
+				if (!empty($complete) && substr(trim($complete), -1, 1) != ';') {
+					$options['complete'] .= '; ';
+				}
 				$options['complete'] .= "Element.hide('{$options['indicator']}');";
 			} else {
-				$options['complete']  = "Element.hide('{$options['indicator']}');";
+				$options['complete'] = "Element.hide('{$options['indicator']}');";
 			}
 			unset($options['indicator']);
 		}
 
-		$jsOptions = am(
+		$jsOptions = array_merge(
 			array('asynchronous' => 'true', 'evalScripts'  => 'true'),
 			$this->_buildCallbacks($options)
 		);
-		$options = $this->_optionsToString($options, array('method'));
+
+		$options = $this->_optionsToString($options, array(
+			'contentType', 'encoding', 'fallback', 'method', 'postBody', 'update', 'url'
+		));
+		$jsOptions = array_merge($jsOptions, array_intersect_key($options, array_flip(array(
+			'contentType', 'encoding', 'method', 'postBody'
+		))));
 
 		foreach ($options as $key => $value) {
-			switch($key) {
+			switch ($key) {
 				case 'type':
-					$jsOptions['asynchronous'] = ife(($value == 'synchronous'), 'false', 'true');
+					$jsOptions['asynchronous'] = ($value == 'synchronous') ? 'false' : 'true';
 				break;
 				case 'evalScripts':
-					$jsOptions['evalScripts'] = ife($value, 'true', 'false');
+					$jsOptions['evalScripts'] = ($value) ? 'true' : 'false';
 				break;
 				case 'position':
-					$jsOptions['insertion'] = "Insertion." . Inflector::camelize($options['position']);
+					$pos = Inflector::camelize($options['position']);
+					$jsOptions['insertion'] = "Insertion.{$pos}";
 				break;
 				case 'with':
 					$jsOptions['parameters'] = $options['with'];
@@ -700,13 +815,7 @@ class AjaxHelper extends Helper {
  * @access private
  */
 	function __getHtmlOptions($options, $extra = array()) {
-		foreach ($this->ajaxOptions as $key) {
-			if (isset($options[$key])) {
-				unset($options[$key]);
-			}
-		}
-
-		foreach ($extra as $key) {
+		foreach (array_merge($this->ajaxOptions, $this->callbacks, $extra) as $key) {
 			if (isset($options[$key])) {
 				unset($options[$key]);
 			}
@@ -714,13 +823,11 @@ class AjaxHelper extends Helper {
 		return $options;
 	}
 /**
- * Protected Method to return a string of JavaScript with the given
- * option data as a JavaScript options hash.
+ * Returns a string of JavaScript with the given option data as a JavaScript options hash.
  *
  * @param array $options	Options in the shape of keys and values
  * @param array $acceptable	Array of legal keys in this options context
  * @return string	String of Javascript array definition
- * @access protected
  */
 	function _buildOptions($options, $acceptable) {
 		if (is_array($options)) {
@@ -728,7 +835,14 @@ class AjaxHelper extends Helper {
 
 			foreach ($options as $k => $v) {
 				if (in_array($k, $acceptable)) {
+					if ($v === true) {
+						$v = 'true';
+					} elseif ($v === false) {
+						$v = 'false';
+					}
 					$out[] = "$k:$v";
+				} elseif ($k === 'with' && in_array('parameters', $acceptable)) {
+					$out[] = "parameters:${v}";
 				}
 			}
 
@@ -740,13 +854,12 @@ class AjaxHelper extends Helper {
 		}
 	}
 /**
- * Protected Method to return JavaScript text for an observer...
+ * Return JavaScript text for an observer...
  *
  * @param string $klass Name of JavaScript class
  * @param string $name
  * @param array $options	Ajax options
  * @return string Formatted JavaScript
- * @access protected
  */
 	function _buildObserver($klass, $name, $options = null) {
 		if (!isset($options['with']) && isset($options['update'])) {
@@ -754,16 +867,16 @@ class AjaxHelper extends Helper {
 		}
 
 		$callback = $this->remoteFunction($options);
-		$javascript  = "new $klass('$name', ";
-		$javascript .= (isset($options['frequency']) ? $options['frequency'] : 2) . ", function(element, value) {";
-		$javascript .= "$callback})";
-		return $javascript;
+		$hasFrequency = !(!isset($options['frequency']) || intval($options['frequency']) == 0);
+    	$frequency = $hasFrequency ? $options['frequency'] . ', ' : '';
+
+		return "new $klass('$name', {$frequency}function(element, value) {{$callback}})";
 	}
 /**
- * Protected Method to return JavaScript text for all callbacks...
+ * Return Javascript text for callbacks.
  *
- * @param array $options
- * @return array
+ * @param array $options Option array where a callback is specified
+ * @return array Options with their callbacks properly set
  * @access protected
  */
 	function _buildCallbacks($options) {
@@ -773,24 +886,52 @@ class AjaxHelper extends Helper {
 			if (isset($options[$callback])) {
 				$name = 'on' . ucfirst($callback);
 				$code = $options[$callback];
-				$callbacks[$name] = "function(request) {" . $code . "}";
+				switch ($name) {
+					case 'onComplete':
+						$callbacks[$name] = "function(request, json) {" . $code . "}";
+						break;
+					case 'onCreate':
+						$callbacks[$name] = "function(request, xhr) {" . $code . "}";
+						break;
+					case 'onException':
+						$callbacks[$name] = "function(request, exception) {" . $code . "}";
+						break;
+					default:
+						$callbacks[$name] = "function(request) {" . $code . "}";
+						break;
+				}
+				if (isset($options['bind'])) {
+					$bind = $options['bind'];
+
+					$hasBinding = (
+						(is_array($bind) && in_array($callback, $bind)) ||
+						(is_string($bind) && strpos($bind, $callback) !== false)
+					);
+
+					if ($hasBinding) {
+						$callbacks[$name] .= ".bind(this)";
+					}
+				}
 			}
 		}
 		return $callbacks;
 	}
 /**
- * Protected Method to return a string of JavaScript with a string representation
- * of given options array.
+ * Returns a string of JavaScript with a string representation of given options array.
  *
  * @param array $options	Ajax options array
  * @param array $stringOpts	Options as strings in an array
  * @access private
  * @return array
- * @access protected
  */
 	function _optionsToString($options, $stringOpts = array()) {
 		foreach ($stringOpts as $option) {
-			if (isset($options[$option]) && !$options[$option][0] != "'") {
+			$hasOption = (
+				isset($options[$option]) && !empty($options[$option]) &&
+				is_string($options[$option]) && $options[$option][0] != "'"
+			);
+
+			if ($hasOption) {
 				if ($options[$option] === true || $options[$option] === 'true') {
 					$options[$option] = 'true';
 				} elseif ($options[$option] === false || $options[$option] === 'false') {
@@ -803,49 +944,40 @@ class AjaxHelper extends Helper {
 		return $options;
 	}
 /**
- * afterRender callback
+ * Executed after a view has rendered, used to include bufferred code
+ * blocks.
  *
- * @return array
  * @access public
  */
 	function afterRender() {
-		if (env('HTTP_X_UPDATE') != null && count($this->__ajaxBuffer) > 0) {
+		if (env('HTTP_X_UPDATE') != null && !empty($this->__ajaxBuffer)) {
+			@ob_end_clean();
+
 			$data = array();
 			$divs = explode(' ', env('HTTP_X_UPDATE'));
+			$keys = array_keys($this->__ajaxBuffer);
 
-			foreach ($this->__ajaxBuffer as $key => $val) {
-				if (in_array($key, $divs)) {
-					$data[] = $key . ':"' . rawurlencode($val) . '"';
+			if (count($divs) == 1 && in_array($divs[0], $keys)) {
+				e($this->__ajaxBuffer[$divs[0]]);
+			} else {
+				foreach ($this->__ajaxBuffer as $key => $val) {
+					if (in_array($key, $divs)) {
+						$data[] = $key . ':"' . rawurlencode($val) . '"';
+					}
 				}
+				$out  = 'var __ajaxUpdater__ = {' . join(", \n", $data) . '};' . "\n";
+				$out .= 'for (n in __ajaxUpdater__) { if (typeof __ajaxUpdater__[n] == "string"';
+				$out .= ' && $(n)) Element.update($(n), unescape(decodeURIComponent(';
+				$out .= '__ajaxUpdater__[n]))); }';
+				e($this->Javascript->codeBlock($out, false));
+			}
+			$scripts = $this->Javascript->getCache();
+
+			if (!empty($scripts)) {
+				e($this->Javascript->codeBlock($scripts, false));
 			}
 
-			$out  = 'var __ajaxUpdater__ = {' . join(', ', $data) . '};' . "\n";
-			$out .= 'for (n in __ajaxUpdater__) { if (typeof __ajaxUpdater__[n] == "string" && $(n)) Element.update($(n), unescape(decodeURIComponent(__ajaxUpdater__[n]))); }';
-
-			@ob_end_clean();
-			e($this->Javascript->codeBlock($out));
-			exit();
-		}
-	}
-/**
- * Replaced by AjaxHelper::link()
- *
- * @deprecated will not be avialable after 1.1.x.x
- */
-	function linkToRemote($title, $options = array(), $html_options = array()) {
-		trigger_error('Deprecated function: use AjaxHelper::link', E_USER_WARNING);
-		$href = '#';
-
-		if (!empty($options['fallback']) && isset($options['fallback'])) {
-			$href = $options['fallback'];
-		}
-
-		if (isset($html_options['id'])) {
-				return $this->Html->link($title, $href, $html_options) .
-						$this->Javascript->event("$('{$html_options['id']}')", "click", $this->remoteFunction($options));
-		} else {
-			$html_options['onclick'] = $this->remoteFunction($options) . "; return false;";
-			return $this->Html->link($title, $href, $html_options);
+			$this->_stop();
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: sanitize.php 5317 2007-06-20 08:28:35Z phpnut $ */
+/* SVN FILE: $Id: sanitize.php 7945 2008-12-19 02:16:01Z gwoo $ */
 /**
  * Washes strings from unwanted noise.
  *
@@ -7,24 +7,22 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs
- * @since			CakePHP(tm) v 0.10.0.1076
- * @version			$Revision: 5317 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-06-20 03:28:35 -0500 (Wed, 20 Jun 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs
+ * @since         CakePHP(tm) v 0.10.0.1076
+ * @version       $Revision: 7945 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2008-12-18 18:16:01 -0800 (Thu, 18 Dec 2008) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  * Data Sanitization.
@@ -32,16 +30,17 @@
  * Removal of alpahnumeric characters, SQL-safe slash-added strings, HTML-friendly strings,
  * and all of the above on arrays.
  *
- * @package		cake
- * @subpackage	cake.cake.libs
+ * @package       cake
+ * @subpackage    cake.cake.libs
  */
-class Sanitize{
+class Sanitize {
 /**
  * Removes any non-alphanumeric characters.
  *
- * @param string $string
- * @return string
+ * @param string $string String to sanitize
+ * @return string Sanitized string
  * @access public
+ * @static
  */
 	function paranoid($string, $allowed = array()) {
 		$allow = null;
@@ -52,34 +51,41 @@ class Sanitize{
 		}
 
 		if (is_array($string)) {
+			$cleaned = array();
 			foreach ($string as $key => $clean) {
-				$cleaned[$key] = preg_replace("/[^{$allow}a-zA-Z0-9]/", "", $clean);
+				$cleaned[$key] = preg_replace("/[^{$allow}a-zA-Z0-9]/", '', $clean);
 			}
 		} else {
-			$cleaned = preg_replace("/[^{$allow}a-zA-Z0-9]/", "", $string);
+			$cleaned = preg_replace("/[^{$allow}a-zA-Z0-9]/", '', $string);
 		}
 		return $cleaned;
 	}
 /**
- * Makes a string SQL-safe by adding slashes (if needed).
+ * Makes a string SQL-safe.
  *
- * @param string $string
- * @return string
+ * @param string $string String to sanitize
+ * @param string $connection Database connection being used
+ * @return string SQL safe string
  * @access public
+ * @static
  */
-	function sql($string) {
-		if (!ini_get('magic_quotes_gpc')) {
-			$string = addslashes($string);
+	function escape($string, $connection = 'default') {
+		$db =& ConnectionManager::getDataSource($connection);
+		if (is_numeric($string) || $string === null || is_bool($string)) {
+			return $string;
 		}
+		$string = substr($db->value($string), 1);
+		$string = substr($string, 0, -1);
 		return $string;
 	}
 /**
  * Returns given string safe for display as HTML. Renders entities.
  *
- * @param string $string
+ * @param string $string String from where to strip tags
  * @param boolean $remove If true, the string is stripped of all HTML tags
- * @return string
+ * @return string Sanitized string
  * @access public
+ * @static
  */
 	function html($string, $remove = false) {
 		if ($remove) {
@@ -92,95 +98,152 @@ class Sanitize{
 		return $string;
 	}
 /**
- * Recursively sanitizes given array of data for safe input.
+ * Strips extra whitespace from output
  *
- * @param mixed $toClean
- * @return mixed
+ * @param string $str String to sanitize
+ * @return string whitespace sanitized string
  * @access public
+ * @static
  */
-	function cleanArray(&$toClean) {
-		return $this->cleanArrayR($toClean);
+	function stripWhitespace($str) {
+		$r = preg_replace('/[\n\r\t]+/', '', $str);
+		return preg_replace('/\s{2,}/', ' ', $r);
 	}
 /**
- * Method used for recursively sanitizing arrays of data
- * for safe input
+ * Strips image tags from output
  *
- * @param array $toClean
- * @return array The clean array
+ * @param string $str String to sanitize
+ * @return string Sting with images stripped.
+ * @access public
+ * @static
+ */
+	function stripImages($str) {
+		$str = preg_replace('/(<a[^>]*>)(<img[^>]+alt=")([^"]*)("[^>]*>)(<\/a>)/i', '$1$3$5<br />', $str);
+		$str = preg_replace('/(<img[^>]+alt=")([^"]*)("[^>]*>)/i', '$2<br />', $str);
+		$str = preg_replace('/<img[^>]*>/i', '', $str);
+		return $str;
+	}
+/**
+ * Strips scripts and stylesheets from output
+ *
+ * @param string $str String to sanitize
+ * @return string String with <script>, <style>, <link> elements removed.
+ * @access public
+ * @static
+ */
+	function stripScripts($str) {
+		return preg_replace('/(<link[^>]+rel="[^"]*stylesheet"[^>]*>|<img[^>]*>|style="[^"]*")|<script[^>]*>.*?<\/script>|<style[^>]*>.*?<\/style>|<!--.*?-->/i', '', $str);
+	}
+/**
+ * Strips extra whitespace, images, scripts and stylesheets from output
+ *
+ * @param string $str String to sanitize
+ * @return string sanitized string
  * @access public
  */
-	function cleanArrayR(&$toClean) {
-		if (is_array($toClean)) {
-			while (list($k, $v) = each($toClean)) {
-				if (is_array($toClean[$k])) {
-					$this->cleanArray($toClean[$k]);
-				} else {
-					$toClean[$k] = $this->cleanValue($v);
-				}
+	function stripAll($str) {
+		$str = Sanitize::stripWhitespace($str);
+		$str = Sanitize::stripImages($str);
+		$str = Sanitize::stripScripts($str);
+		return $str;
+	}
+/**
+ * Strips the specified tags from output. First parameter is string from
+ * where to remove tags. All subsequent parameters are tags.
+ *
+ * @param string $str String to sanitize
+ * @param string $tag Tag to remove (add more parameters as needed)
+ * @return string sanitized String
+ * @access public
+ * @static
+ */
+	function stripTags() {
+		$params = params(func_get_args());
+		$str = $params[0];
+
+		for ($i = 1; $i < count($params); $i++) {
+			$str = preg_replace('/<' . $params[$i] . '\b[^>]*>/i', '', $str);
+			$str = preg_replace('/<\/' . $params[$i] . '[^>]*>/i', '', $str);
+		}
+		return $str;
+	}
+/**
+ * Sanitizes given array or value for safe input. Use the options to specify
+ * the connection to use, and what filters should be applied (with a boolean
+ * value). Valid filters: odd_spaces, encode, dollar, carriage, unicode,
+ * escape, backslash.
+ *
+ * @param mixed $data Data to sanitize
+ * @param mixed $options If string, DB connection being used, otherwise set of options
+ * @return mixed Sanitized data
+ * @access public
+ * @static
+ */
+	function clean($data, $options = array()) {
+		if (empty($data)) {
+			return $data;
+		}
+
+		if (is_string($options)) {
+			$options = array('connection' => $options);
+		} else if (!is_array($options)) {
+			$options = array();
+		}
+
+		$options = array_merge(array(
+			'connection' => 'default',
+			'odd_spaces' => true,
+			'encode' => true,
+			'dollar' => true,
+			'carriage' => true,
+			'unicode' => true,
+			'escape' => true,
+			'backslash' => true
+		), $options);
+
+		if (is_array($data)) {
+			foreach ($data as $key => $val) {
+				$data[$key] = Sanitize::clean($val, $options);
 			}
+			return $data;
 		} else {
-			return null;
-		}
-	}
-/**
- * Do we really need to sanitize array keys? If so, we can use this code...
-	function cleanKey($key) {
-		if ($key == "")
-		{
-			return "";
-		}
-		//URL decode and convert chars to HTML entities
-		$key = htmlspecialchars(urldecode($key));
-		//Remove ..
-		$key = preg_replace( "/\.\./", "", $key );
-		//Remove __FILE__, etc.
-		$key = preg_replace( "/\_\_(.+?)\_\_/", "", $key );
-		//Trim word chars, '.', '-', '_'
-		$key = preg_replace( "/^([\w\.\-\_]+)$/", "$1", $key );
-		return $key;
-	}
- */
+			if ($options['odd_spaces']) {
+				$data = str_replace(chr(0xCA), '', str_replace(' ', ' ', $data));
+			}
+			if ($options['encode']) {
+				$data = Sanitize::html($data);
+			}
+			if ($options['dollar']) {
+				$data = str_replace("\\\$", "$", $data);
+			}
+			if ($options['carriage']) {
+				$data = str_replace("\r", "", $data);
+			}
 
-/**
- * Method used by cleanArray() to sanitize array nodes.
- *
- * @param string $val
- * @return string
- * @access public
- */
-	function cleanValue($val) {
-		if ($val == "") {
-			return "";
-		}
-		//Replace odd spaces with safe ones
-		$val = str_replace(" ", " ", $val);
-		$val = str_replace(chr(0xCA), "", $val);
-		//Encode any HTML to entities.
-		$val = $this->html($val);
-		//Double-check special chars and replace carriage returns with new lines
-		$val = preg_replace("/\\\$/", "$", $val);
-		$val = preg_replace("/\r\n/", "\n", $val);
-		$val = str_replace("!", "!", $val);
-		$val = str_replace("'", "'", $val);
-		//Allow unicode (?)
-		$val = preg_replace("/&amp;#([0-9]+);/s", "&#\\1;", $val);
-		//Add slashes for SQL
-		$val = $this->sql($val);
-		//Swap user-inputted backslashes (?)
-		$val = preg_replace("/\\\(?!&amp;#|\?#)/", "\\", $val);
-		return $val;
-	}
+			$data = str_replace("'", "'", str_replace("!", "!", $data));
 
+			if ($options['unicode']) {
+				$data = preg_replace("/&amp;#([0-9]+);/s", "&#\\1;", $data);
+			}
+			if ($options['escape']) {
+				$data = Sanitize::escape($data, $options['connection']);
+			}
+			if ($options['backslash']) {
+				$data = preg_replace("/\\\(?!&amp;#|\?#)/", "\\", $data);
+			}
+			return $data;
+		}
+	}
 /**
  * Formats column data from definition in DBO's $columns array
  *
  * @param Model $model The model containing the data to be formatted
- * @return void
  * @access public
+ * @static
  */
 	function formatColumns(&$model) {
 		foreach ($model->data as $name => $values) {
-			if ($name == $model->name) {
+			if ($name == $model->alias) {
 				$curModel =& $model;
 			} elseif (isset($model->{$name}) && is_object($model->{$name}) && is_subclass_of($model->{$name}, 'Model')) {
 				$curModel =& $model->{$name};
@@ -202,7 +265,7 @@ class Sanitize{
 
 						if (isset($colData['formatter']) || isset($colData['format'])) {
 
-							switch(strtolower($colData['formatter'])) {
+							switch (strtolower($colData['formatter'])) {
 								case 'date':
 									$data = date($colData['format'], strtotime($data));
 								break;
@@ -219,7 +282,7 @@ class Sanitize{
 						}
 						$model->data[$name][$column]=$data;
 						/*
-						switch($colType) {
+						switch ($colType) {
 							case 'integer':
 							case 'int':
 								return  $data;

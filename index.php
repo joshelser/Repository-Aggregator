@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: index.php 4409 2007-02-02 13:20:59Z phpnut $ */
+/* SVN FILE: $Id: index.php 7945 2008-12-19 02:16:01Z gwoo $ */
 /**
  * Requests collector.
  *
@@ -9,23 +9,21 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) : Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) : Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @since			CakePHP(tm) v 0.2.9
- * @version			$Revision: 4409 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-02-02 07:20:59 -0600 (Fri, 02 Feb 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision: 7945 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2008-12-18 18:16:01 -0800 (Thu, 18 Dec 2008) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  *  Get Cake's root directory
@@ -52,11 +50,13 @@
 		define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
 	}
 	require CORE_PATH . 'cake' . DS . 'basics.php';
-	require APP_PATH . 'config' . DS . 'core.php';
+	$TIME_START = getMicrotime();
 	require CORE_PATH . 'cake' . DS . 'config' . DS . 'paths.php';
-	$bootstrap=true;
-	$uri      =setUri();
+	require LIBS . 'object.php';
+	require LIBS . 'inflector.php';
+	require LIBS . 'configure.php';
 
-require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
-
+	$bootstrap = true;
+	$url = null;
+	require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
 ?>

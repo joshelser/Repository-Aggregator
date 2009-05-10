@@ -1,146 +1,227 @@
 <?php
-/* SVN FILE: $Id: core.php 4409 2007-02-02 13:20:59Z phpnut $ */
+/* SVN FILE: $Id: core.php 7945 2008-12-19 02:16:01Z gwoo $ */
 /**
  * This is core configuration file.
  *
- * Use it to configure core behaviour ofCake.
+ * Use it to configure core behavior of Cake.
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.app.config
- * @since			CakePHP(tm) v 0.2.9
- * @version			$Revision: 4409 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-02-02 07:20:59 -0600 (Fri, 02 Feb 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.app.config
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision: 7945 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2008-12-18 18:16:01 -0800 (Thu, 18 Dec 2008) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
- * If you do not have mod rewrite on your system
- * or if you prefer to use CakePHP pretty urls.
- * uncomment the line below.
- * Note: If you do have mod rewrite but prefer the
- * CakePHP pretty urls, you also have to remove the
- * .htaccess files
- * release/.htaccess
- * release/app/.htaccess
- * release/app/webroot/.htaccess
- */
-//	define ('BASE_URL', env('SCRIPT_NAME'));
-/**
- * Set debug level here:
- * - 0: production
- * - 1: development
- * - 2: full debug with sql
- * - 3: full debug with sql and dump of the current object
+ * CakePHP Debug Level:
  *
- * In production, the "flash messages" redirect after a time interval.
- * With the other debug levels you get to click the "flash message" to continue.
+ * Production Mode:
+ * 	0: No error messages, errors, or warnings shown. Flash messages redirect.
+ *
+ * Development Mode:
+ * 	1: Errors and warnings shown, model caches refreshed, flash messages halted.
+ * 	2: As in 1, but also with full debug messages and SQL output.
+ * 	3: As in 2, but also with full controller dump.
+ *
+ * In production mode, flash messages redirect after a time interval.
+ * In development mode, you need to click the flash message to continue.
+ */
+	Configure::write('debug', 2);
+/**
+ * Application wide charset encoding
+ */
+	Configure::write('App.encoding', 'UTF-8');
+/**
+ * To configure CakePHP *not* to use mod_rewrite and to
+ * use CakePHP pretty URLs, remove these .htaccess
+ * files:
+ *
+ * /.htaccess
+ * /app/.htaccess
+ * /app/webroot/.htaccess
+ *
+ * And uncomment the App.baseUrl below:
+ */
+	//Configure::write('App.baseUrl', env('SCRIPT_NAME'));
+/**
+ * Uncomment the define below to use CakePHP admin routes.
+ *
+ * The value of the define determines the name of the route
+ * and its associated controller actions:
+ *
+ * 'admin' 		-> admin_index() and /admin/controller/index
+ * 'superuser' -> superuser_index() and /superuser/controller/index
+ */
+	//Configure::write('Routing.admin', 'admin');
+
+/**
+ * Turn off all caching application-wide.
  *
  */
-	define('DEBUG', 1);
+	//Configure::write('Cache.disable', true);
 /**
- * Turn of caching checking wide.
- * You must still use the controller var cacheAction inside you controller class.
- * You can either set it controller wide, or in each controller method.
- * use var $cacheAction = true; or in the controller method $this->cacheAction = true;
+ * Enable cache checking.
+ *
+ * If set to true, for view caching you must still use the controller
+ * var $cacheAction inside your controllers to define caching settings.
+ * You can either set it controller-wide by setting var $cacheAction = true,
+ * or in each action using $this->cacheAction = true.
+ *
  */
-	define('CACHE_CHECK', false);
+	//Configure::write('Cache.check', true);
 /**
- * Error constant. Used for differentiating error logging and debugging.
- * Currently PHP supports LOG_DEBUG
+ * Defines the default error type when using the log() function. Used for
+ * differentiating error logging and debugging. Currently PHP supports LOG_DEBUG.
  */
 	define('LOG_ERROR', 2);
 /**
- * CakePHP includes 3 types of session saves
- * database or file. Set this to your preferred method.
- * If you want to use your own save handler place it in
- * app/config/name.php DO NOT USE file or database as the name.
- * and use just the name portion below.
+ * The preferred session handling method. Valid values:
  *
- * Setting this to cake will save files to /cakedistro/tmp directory
- * Setting it to php will use the php default save path
- * Setting it to database will use the database
+ * 'php'	 		Uses settings defined in your php.ini.
+ * 'cake'		Saves session files in CakePHP's /tmp directory.
+ * 'database'	Uses CakePHP's database sessions.
  *
- */
-	define('CAKE_SESSION_SAVE', 'php');
-/**
- * If using you own table name for storing sessions
- * set the table name here.
- * DO NOT INCLUDE PREFIX IF YOU HAVE SET ONE IN database.php
+ * To define a custom session handler, save it at /app/config/<name>.php.
+ * Set the value of 'Session.save' to <name> to utilize it in CakePHP.
+ *
+ * To use database sessions, execute the SQL file found at /app/config/sql/sessions.sql.
  *
  */
-	define('CAKE_SESSION_TABLE', 'cake_sessions');
+	Configure::write('Session.save', 'php');
 /**
- * Set a random string of used in session.
+ * The name of the table used to store CakePHP database sessions.
+ *
+ * 'Session.save' must be set to 'database' in order to utilize this constant.
+ *
+ * The table name set here should *not* include any table prefix defined elsewhere.
+ */
+	//Configure::write('Session.table', 'cake_sessions');
+/**
+ * The DATABASE_CONFIG::$var to use for database session handling.
+ *
+ * 'Session.save' must be set to 'database' in order to utilize this constant.
+ */
+	//Configure::write('Session.database', 'default');
+/**
+ * The name of CakePHP's session cookie.
+ */
+	Configure::write('Session.cookie', 'CAKEPHP');
+/**
+ * Session time out time (in seconds).
+ * Actual value depends on 'Security.level' setting.
+ */
+	Configure::write('Session.timeout', '120');
+/**
+ * If set to false, sessions are not automatically started.
+ */
+	Configure::write('Session.start', true);
+/**
+ * When set to false, HTTP_USER_AGENT will not be checked
+ * in the session
+ */
+	Configure::write('Session.checkAgent', true);
+/**
+ * The level of CakePHP security. The session timeout time defined
+ * in 'Session.timeout' is multiplied according to the settings here.
+ * Valid values:
+ *
+ * 'high'	Session timeout in 'Session.timeout' x 10
+ * 'medium'	Session timeout in 'Session.timeout' x 100
+ * 'low'		Session timeout in 'Session.timeout' x 300
+ *
+ * CakePHP session IDs are also regenerated between requests if
+ * 'Security.level' is set to 'high'.
+ */
+	Configure::write('Security.level', 'high');
+/**
+ * A random string used in security hashing methods.
+ */
+	Configure::write('Security.salt', 'ohwhy19501ohwhydoi1351havetodothistoyou.whydonotyoujustdosomethinglikethisyourselfkthanksbye00958248757109812387951');
+/**
+ * Compress CSS output by removing comments, whitespace, repeating tags, etc.
+ * This requires a/var/cache directory to be writable by the web server for caching.
+ * and /vendors/csspp/csspp.php
+ *
+ * To use, prefix the CSS link URL with '/ccss/' instead of '/css/' or use HtmlHelper::css().
+ */
+	//Configure::write('Asset.filter.css', 'css.php');
+/**
+ * Plug in your own custom JavaScript compressor by dropping a script in your webroot to handle the
+ * output, and setting the config below to the name of the script.
+ *
+ * To use, prefix your JavaScript link URLs with '/cjs/' instead of '/js/' or use JavaScriptHelper::link().
+ */
+	//Configure::write('Asset.filter.js', 'custom_javascript_output_filter.php');
+/**
+ * The classname and database used in CakePHP's
+ * access control lists.
+ */
+	Configure::write('Acl.classname', 'DbAcl');
+	Configure::write('Acl.database', 'default');
+/**
+ *
+ * Cache Engine Configuration
+ * Default settings provided below
+ *
+ * File storage engine.
+ *
+ * 	 Cache::config('default', array(
+ *		'engine' => 'File', //[required]
+ *		'duration'=> 3600, //[optional]
+ *		'probability'=> 100, //[optional]
+ * 		'path' => CACHE, //[optional] use system tmp directory - remember to use absolute path
+ * 		'prefix' => 'cake_', //[optional]  prefix every cache file with this string
+ * 		'lock' => false, //[optional]  use file locking
+ * 		'serialize' => true, [optional]
+ *	));
+ *
+ *
+ * APC (http://pecl.php.net/package/APC)
+ *
+ * 	 Cache::config('default', array(
+ *		'engine' => 'Apc', //[required]
+ *		'duration'=> 3600, //[optional]
+ *		'probability'=> 100, //[optional]
+ * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
+ *	));
+ *
+ * Xcache (http://xcache.lighttpd.net/)
+ *
+ * 	 Cache::config('default', array(
+ *		'engine' => 'Xcache', //[required]
+ *		'duration'=> 3600, //[optional]
+ *		'probability'=> 100, //[optional]
+ * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional] prefix every cache file with this string
+ *		'user' => 'user', //user from xcache.admin.user settings
+ *      'password' => 'password', //plaintext password (xcache.admin.pass)
+ *	));
+ *
+ *
+ * Memcache (http://www.danga.com/memcached/)
+ *
+ * 	 Cache::config('default', array(
+ *		'engine' => 'Memcache', //[required]
+ *		'duration'=> 3600, //[optional]
+ *		'probability'=> 100, //[optional]
+ * 		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
+ * 		'servers' => array(
+ * 			'127.0.0.1:11211' // localhost, default port 11211
+ * 		), //[optional]
+ * 		'compress' => false, // [optional] compress data in Memcache (slower, but uses less memory)
+ *	));
  *
  */
-	define('CAKE_SESSION_STRING', 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi');
-/**
- * Set the name of session cookie
- *
- */
-	define('CAKE_SESSION_COOKIE', 'CAKEPHP');
-/**
- * Set level of Cake security.
- *
- */
-	define('CAKE_SECURITY', 'high');
-/**
- * Set Cake Session time out.
- * If CAKE_SECURITY define is set
- * high: multiplied by 10
- * medium: is multiplied by 100
- * low is: multiplied by 300
- *
- *  Number below is seconds.
- */
-	define('CAKE_SESSION_TIMEOUT', '120');
-/**
- * Uncomment the define below to use cake built in admin routes.
- * You can set this value to anything you want.
- * All methods related to the admin route should be prefixed with the
- * name you set CAKE_ADMIN to.
- * For example: admin_index, admin_edit
- */
-//	define('CAKE_ADMIN', 'admin');
-/**
- *  The define below is used to turn cake built webservices
- *  on or off. Default setting is off.
- */
-	define('WEBSERVICES', 'off');
-/**
- * Compress output CSS (removing comments, whitespace, repeating tags etc.)
- * This requires a/var/cache directory to be writable by the web server (caching).
- * To use, prefix the CSS link URL with '/ccss/' instead of '/css/' or use Controller::cssTag().
- */
-	define('COMPRESS_CSS', false);
-/**
- * If set to true, helpers would output data instead of returning it.
- */
-	define('AUTO_OUTPUT', false);
-/**
- * If set to false, session would not automatically be started.
- */
-	define('AUTO_SESSION', true);
-/**
- * Set the max size of file to use md5() .
- */
-	define('MAX_MD5SIZE', (5 * 1024) * 1024);
-/**
- * To use Access Control Lists with Cake...
- */
-	define('ACL_CLASSNAME', 'DB_ACL');
-	define('ACL_FILENAME', 'dbacl' . DS . 'db_acl');
+	Cache::config('default', array('engine' => 'File'));
 ?>

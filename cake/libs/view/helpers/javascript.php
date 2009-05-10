@@ -1,94 +1,308 @@
 <?php
-/* SVN FILE: $Id: javascript.php 5421 2007-07-09 04:58:57Z phpnut $ */
+/* SVN FILE: $Id: javascript.php 8166 2009-05-04 21:17:19Z gwoo $ */
 /**
  * Javascript Helper class file.
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs.view.helpers
- * @since			CakePHP(tm) v 0.10.0.1076
- * @version			$Revision: 5421 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-07-08 23:58:57 -0500 (Sun, 08 Jul 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs.view.helpers
+ * @since         CakePHP(tm) v 0.10.0.1076
+ * @version       $Revision: 8166 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2009-05-04 14:17:19 -0700 (Mon, 04 May 2009) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  * Javascript Helper class for easy use of JavaScript.
  *
  * JavascriptHelper encloses all methods needed while working with JavaScript.
  *
- * @package		cake
- * @subpackage	cake.cake.libs.view.helpers
+ * @package       cake
+ * @subpackage    cake.cake.libs.view.helpers
  */
-class JavascriptHelper extends Helper{
+class JavascriptHelper extends AppHelper {
+/**
+ * Determines whether native JSON extension is used for encoding.  Set by object constructor.
+ *
+ * @var boolean
+ * @access public
+ */
+	var $useNative = false;
+/**
+ * If true, automatically writes events to the end of a script or to an external JavaScript file
+ * at the end of page execution
+ *
+ * @var boolean
+ * @access public
+ */
+	var $enabled = true;
+/**
+ * Indicates whether <script /> blocks should be written 'safely,' i.e. wrapped in CDATA blocks
+ *
+ * @var boolean
+ * @access public
+ */
+	var $safe = false;
+/**
+ * HTML tags used by this helper.
+ *
+ * @var array
+ * @access public
+ */
+	var $tags = array(
+		'javascriptblock' => '<script type="text/javascript">%s</script>',
+		'javascriptstart' => '<script type="text/javascript">',
+		'javascriptlink' => '<script type="text/javascript" src="%s"></script>',
+		'javascriptend' => '</script>'
+	);
+/**
+ * Holds options passed to codeBlock(), saved for when block is dumped to output
+ *
+ * @var array
+ * @access protected
+ * @see JavascriptHelper::codeBlock()
+ */
+	var $_blockOptions = array();
+/**
+ * Caches events written by event() for output at the end of page execution
+ *
+ * @var array
+ * @access protected
+ * @see JavascriptHelper::event()
+ */
 	var $_cachedEvents = array();
+/**
+ * Indicates whether generated events should be cached for later output (can be written at the
+ * end of the page, in the <head />, or to an external file).
+ *
+ * @var boolean
+ * @access protected
+ * @see JavascriptHelper::event()
+ * @see JavascriptHelper::writeEvents()
+ */
 	var $_cacheEvents = false;
+/**
+ * Indicates whether cached events should be written to an external file
+ *
+ * @var boolean
+ * @access protected
+ * @see JavascriptHelper::event()
+ * @see JavascriptHelper::writeEvents()
+ */
 	var $_cacheToFile = false;
+/**
+ * Indicates whether *all* generated JavaScript should be cached for later output
+ *
+ * @var boolean
+ * @access protected
+ * @see JavascriptHelper::codeBlock()
+ * @see JavascriptHelper::blockEnd()
+ */
 	var $_cacheAll = false;
+/**
+ * Contains event rules attached with CSS selectors.  Used with the event:Selectors JavaScript
+ * library.
+ *
+ * @var array
+ * @access protected
+ * @see JavascriptHelper::event()
+ * @link          http://alternateidea.com/event-selectors/
+ */
 	var $_rules = array();
+/**
+ * @var string
+ * @access private
+ */
+	var $__scriptBuffer = null;
+/**
+ * Constructor. Checks for presence of native PHP JSON extension to use for object encoding
+ *
+ * @access public
+ */
+	function __construct($options = array()) {
+		if (!empty($options)) {
+			foreach ($options as $key => $val) {
+				if (is_numeric($key)) {
+					$key = $val;
+					$val = true;
+				}
+				switch ($key) {
+					case 'cache':
+
+					break;
+					case 'safe':
+						$this->safe = $val;
+					break;
+				}
+			}
+		}
+		$this->useNative = function_exists('json_encode');
+		return parent::__construct($options);
+	}
 /**
  * Returns a JavaScript script tag.
  *
- * @param  string $script The JavaScript to be wrapped in SCRIPT tags.
- * @param  boolean $allowCache Allows the script to be cached if non-event caching is active
- * @return string The full SCRIPT element, with the JavaScript inside it.
- * @access public
+ * Options:
+ *
+ *  - allowCache: boolean, designates whether this block is cacheable using the
+ * current cache settings.
+ *  - safe: boolean, whether this block should be wrapped in CDATA tags.  Defaults
+ * to helper's object configuration.
+ *  - inline: whether the block should be printed inline, or written
+ * to cached for later output (i.e. $scripts_for_layout).
+ *
+ * @param string $script The JavaScript to be wrapped in SCRIPT tags.
+ * @param array $options Set of options:
+ * @return string The full SCRIPT element, with the JavaScript inside it, or null,
+ *   if 'inline' is set to false.
  */
-	function codeBlock($script, $allowCache = true) {
-		if ($this->_cacheEvents && $this->_cacheAll && $allowCache) {
+	function codeBlock($script = null, $options = array()) {
+		if (!empty($options) && !is_array($options)) {
+			$options = array('allowCache' => $options);
+		} elseif (empty($options)) {
+			$options = array();
+		}
+		$defaultOptions = array('allowCache' => true, 'safe' => true, 'inline' => true);
+		$options = array_merge($defaultOptions, compact('safe'), $options);
+
+		if ($this->_cacheEvents && $this->_cacheAll && $options['allowCache'] && $script !== null) {
 			$this->_cachedEvents[] = $script;
 		} else {
-			return sprintf($this->tags['javascriptblock'], $script);
+			$block = ($script !== null);
+			$safe = ($options['safe'] || $this->safe);
+			if ($safe && !($this->_cacheAll && $options['allowCache'])) {
+				$script  = "\n" . '//<![CDATA[' . "\n" . $script;
+				if ($block) {
+					$script .= "\n" . '//]]>' . "\n";
+				}
+			}
+
+			if ($script === null) {
+				$this->__scriptBuffer = @ob_get_contents();
+				$this->_blockOptions = $options;
+				$this->inBlock = true;
+				@ob_end_clean();
+				ob_start();
+				return null;
+			} else if (!$block) {
+				$this->_blockOptions = $options;
+			}
+
+			if ($options['inline']) {
+				if ($block) {
+					return sprintf($this->tags['javascriptblock'], $script);
+				} else {
+					$safe = ($safe ? "\n" . '//<![CDATA[' . "\n" : '');
+					return $this->tags['javascriptstart'] . $safe;
+				}
+			} elseif ($block) {
+				$view =& ClassRegistry::getObject('view');
+				$view->addScript(sprintf($this->tags['javascriptblock'], $script));
+			}
 		}
 	}
 /**
- * Returns a JavaScript include tag (SCRIPT element)
+ * Ends a block of cached JavaScript code
  *
- * @param  string $url URL to JavaScript file.
- * @return string
- * @access public
+ * @return mixed
  */
-	function link($url) {
-		if (strpos($url, '.js') === false) {
-			$url .= ".js";
+	function blockEnd() {
+		$script = @ob_get_contents();
+		@ob_end_clean();
+		ob_start();
+		echo $this->__scriptBuffer;
+		$this->__scriptBuffer = null;
+		$options = $this->_blockOptions;
+		$safe = ((isset($options['safe']) && $options['safe']) || $this->safe);
+		$this->_blockOptions = array();
+		$this->inBlock = false;
+
+		if (isset($options['inline']) && !$options['inline']) {
+			$view =& ClassRegistry::getObject('view');
+			$view->addScript(sprintf($this->tags['javascriptblock'], $script));
 		}
-		return sprintf($this->tags['javascriptlink'], $this->webroot . $this->themeWeb . JS_URL . $url);
+
+		if (!empty($script) && $this->_cacheAll && $options['allowCache']) {
+			$this->_cachedEvents[] = $script;
+			return null;
+		}
+		return ife($safe, "\n" . '//]]>' . "\n", '').$this->tags['javascriptend'];
 	}
 /**
- * Returns a JavaScript include tag for an externally-hosted script
+ * Returns a JavaScript include tag (SCRIPT element).  If the filename is prefixed with "/",
+ * the path will be relative to the base path of your application.  Otherwise, the path will
+ * be relative to your JavaScript path, usually webroot/js.
  *
- * @param  string $url URL to JavaScript file.
+ * @param mixed $url String URL to JavaScript file, or an array of URLs.
+ * @param boolean $inline If true, the <script /> tag will be printed inline,
+ *   otherwise it will be printed in the <head />, using $scripts_for_layout
+ * @see JS_URL
  * @return string
- * @access public
  */
-	function linkOut($url) {
-		if (strpos($url, '.js') === false && strpos($url, '?') === false) {
-			$url .= '.js';
+	function link($url, $inline = true) {
+		if (is_array($url)) {
+			$out = '';
+			foreach ($url as $i) {
+				$out .= "\n\t" . $this->link($i, $inline);
+			}
+			if ($inline)  {
+				return $out . "\n";
+			}
+			return;
 		}
-		return sprintf($this->tags['javascriptlink'], $url);
+
+		if (strpos($url, '://') === false) {
+			if ($url[0] !== '/') {
+				$url = JS_URL . $url;
+			}
+			if (strpos($url, '?') === false) {
+				if (strpos($url, '.js') === false) {
+					$url .= '.js';
+				}
+			}
+
+			$url = $this->webroot($url);
+			$timestampEnabled = (
+				(Configure::read('Asset.timestamp') === true && Configure::read() > 0) ||
+				Configure::read('Asset.timestamp') === 'force'
+			);
+
+			if (strpos($url, '?') === false && $timestampEnabled) {
+				$url .= '?' . @filemtime(WWW_ROOT . str_replace('/', DS, $url));
+			}
+
+			if (Configure::read('Asset.filter.js')) {
+				$url = str_replace(JS_URL, 'cjs/', $url);
+			}
+		}
+		$out = $this->output(sprintf($this->tags['javascriptlink'], $url));
+
+		if ($inline) {
+			return $out;
+		} else {
+			$view =& ClassRegistry::getObject('view');
+			$view->addScript($out);
+		}
 	}
 /**
  * Escape carriage returns and single and double quotes for JavaScript segments.
  *
  * @param string $script string that might have javascript elements
  * @return string escaped string
- * @access public
  */
 	function escapeScript($script) {
-		$script = r(array("\r\n", "\n", "\r"), '\n', $script);
-		$script = r(array('"', "'"), array('\"', "\\'"), $script);
+		$script = str_replace(array("\r\n", "\n", "\r"), '\n', $script);
+		$script = str_replace(array('"', "'"), array('\"', "\\'"), $script);
 		return $script;
 	}
 /**
@@ -103,11 +317,10 @@ class JavascriptHelper extends Helper{
  *
  * @param  string $script String that needs to get escaped.
  * @return string Escaped string.
- * @access public
  */
 	function escapeString($string) {
-		$escape = array("\r\n" => '\n', "\r" => '\n', "\n" => '\n', '"' => '\"', "'" => "\\'");
-		return r(array_keys($escape), array_values($escape), $string);
+		$escape = array('\n' => '\\\n', "\r\n" => '\n', "\r" => '\n', "\n" => '\n', '"' => '\"', "'" => "\\'");
+		return str_replace(array_keys($escape), array_values($escape), $string);
 	}
 /**
  * Attach an event to an element. Used with the Prototype library.
@@ -115,20 +328,36 @@ class JavascriptHelper extends Helper{
  * @param string $object Object to be observed
  * @param string $event event to observe
  * @param string $observer function to call
- * @param boolean $useCapture default true
+ * @param array $options Set options: useCapture, allowCache, safe
  * @return boolean true on success
- * @access public
  */
-	function event($object, $event, $observer = null, $useCapture = false) {
-
-		if ($useCapture == true) {
-			$useCapture = "true";
-		} else {
-			$useCapture = "false";
+	function event($object, $event, $observer = null, $options = array()) {
+		if (!empty($options) && !is_array($options)) {
+			$options = array('useCapture' => $options);
+		} else if (empty($options)) {
+			$options = array();
 		}
 
-		if ($object == 'window' || strpos($object, '$(') !== false || strpos($object, '"') !== false || strpos($object, '\'') !== false) {
-			$b = "Event.observe($object, '$event', function(event) { $observer }, $useCapture);";
+		$defaultOptions = array('useCapture' => false);
+		$options = array_merge($defaultOptions, $options);
+
+		if ($options['useCapture'] == true) {
+			$options['useCapture'] = 'true';
+		} else {
+			$options['useCapture'] = 'false';
+		}
+		$isObject = (
+			strpos($object, 'window') !== false || strpos($object, 'document') !== false ||
+			strpos($object, '$(') !== false || strpos($object, '"') !== false ||
+			strpos($object, '\'') !== false
+		);
+
+		if ($isObject) {
+			$b = "Event.observe({$object}, '{$event}', function(event) { {$observer} }, ";
+			$b .= "{$options['useCapture']});";
+		} elseif ($object[0] == '\'') {
+			$b = "Event.observe(" . substr($object, 1) . ", '{$event}', function(event) { ";
+			$b .= "{$observer} }, {$options['useCapture']});";
 		} else {
 			$chars = array('#', ' ', ', ', '.', ':');
 			$found = false;
@@ -141,7 +370,8 @@ class JavascriptHelper extends Helper{
 			if ($found) {
 				$this->_rules[$object] = $event;
 			} else {
-				$b = "Event.observe(\$('$object'), '$event', function(event) { $observer }, $useCapture);";
+				$b = "Event.observe(\$('{$object}'), '{$event}', function(event) { ";
+				$b .= "{$observer} }, {$options['useCapture']});";
 			}
 		}
 
@@ -150,7 +380,7 @@ class JavascriptHelper extends Helper{
 				$this->_cachedEvents[] = $b;
 				return;
 			} else {
-				return $this->codeBlock($b);
+				return $this->codeBlock($b, array_diff_key($options, $defaultOptions));
 			}
 		}
 	}
@@ -159,8 +389,7 @@ class JavascriptHelper extends Helper{
  *
  * @param boolean $file If true, code will be written to a file
  * @param boolean $all If true, all code written with JavascriptHelper will be sent to a file
- * @return void
- * @access public
+ * @return null
  */
 	function cacheEvents($file = false, $all = false) {
 		$this->_cacheEvents = true;
@@ -168,44 +397,69 @@ class JavascriptHelper extends Helper{
 		$this->_cacheAll = $all;
 	}
 /**
- * Write cached JavaScript events
+ * Gets (and clears) the current JavaScript event cache
  *
+ * @param boolean $clear
  * @return string
- * @access public
  */
-	function writeEvents() {
-
+	function getCache($clear = true) {
+		$out = '';
 		$rules = array();
+
 		if (!empty($this->_rules)) {
 			foreach ($this->_rules as $sel => $event) {
 				$rules[] = "\t'{$sel}': function(element, event) {\n\t\t{$event}\n\t}";
 			}
-			$this->_cacheEvents = true;
+		}
+		$data = implode("\n", $this->_cachedEvents);
+
+		if (!empty($rules)) {
+			$data .= "\nvar Rules = {\n" . implode(",\n\n", $rules) . "\n}";
+			$data .= "\nEventSelectors.start(Rules);\n";
+		}
+		if ($clear) {
+			$this->_rules = array();
+			$this->_cacheEvents = false;
+			$this->_cachedEvents = array();
+		}
+		return $data;
+	}
+/**
+ * Write cached JavaScript events
+ *
+ * @param boolean $inline If true, returns JavaScript event code.  Otherwise it is added to the
+ *                        output of $scripts_for_layout in the layout.
+ * @param array $options Set options for codeBlock
+ * @return string
+ */
+	function writeEvents($inline = true, $options = array()) {
+		$out = '';
+		$rules = array();
+
+		if (!$this->_cacheEvents) {
+			return;
+		}
+		$data = $this->getCache();
+
+		if (empty($data)) {
+			return;
 		}
 
-		if ($this->_cacheEvents) {
-
-			$this->_cacheEvents = false;
-			$events = $this->_cachedEvents;
-			$data = implode("\n", $events);
-			$this->_cachedEvents = array();
-
-			if (!empty($rules)) {
-				$data .= "\n\nvar SelectorRules = {\n" . implode(",\n\n", $rules) . "\n}\n";
-				$data .= "\nEventSelectors.start(SelectorRules);\n";
+		if ($this->_cacheToFile) {
+			$filename = md5($data);
+			if (!file_exists(JS . $filename . '.js')) {
+				cache(str_replace(WWW_ROOT, '', JS) . $filename . '.js', $data, '+999 days', 'public');
 			}
+			$out = $this->link($filename);
+		} else {
+			$out = $this->codeBlock("\n" . $data . "\n", $options);
+		}
 
-			if (!empty($events) || !empty($rules)) {
-				if ($this->_cacheToFile) {
-					$filename = md5($data);
-					if (!file_exists(JS . $filename . '.js')) {
-						cache(r(WWW_ROOT, '', JS) . $filename . '.js', $data, '+999 days', 'public');
-					}
-					return $this->link($filename);
-				} else {
-					return $this->codeBlock("\n" . $data . "\n");
-				}
-			}
+		if ($inline) {
+			return $out;
+		} else {
+			$view =& ClassRegistry::getObject('view');
+			$view->addScript($out);
 		}
 	}
 /**
@@ -216,11 +470,11 @@ class JavascriptHelper extends Helper{
  * public/javascripts/ directory, and use @see javascriptIncludeTag() to
  * create remote script links.
  *
- * @param string $script name of script to include
+ * @param string $script Script file to include
+ * @param array $options Set options for codeBlock
  * @return string script with all javascript in/javascripts folder
- * @access public
  */
-	function includeScript($script = "") {
+	function includeScript($script = "", $options = array()) {
 		if ($script == "") {
 			$files = scandir(JS);
 			$javascript = '';
@@ -233,82 +487,134 @@ class JavascriptHelper extends Helper{
 		} else {
 			$javascript = file_get_contents(JS . "$script.js") . "\n\n";
 		}
-		return $this->codeBlock("\n\n" . $javascript);
+		return $this->codeBlock("\n\n" . $javascript, $options);
 	}
 /**
  * Generates a JavaScript object in JavaScript Object Notation (JSON)
  * from an array
  *
  * @param array $data Data to be converted
- * @param boolean $block Wraps return value in a <script/> block if true
- * @param string $prefix Prepends the string to the returned data
- * @param string $postfix Appends the string to the returned data
- * @param array $stringKeys A list of array keys to be treated as a string
- * @param boolean $quoteKeys If false, treats $stringKey as a list of keys *not* to be quoted
- * @param string $q The type of quote to use
+ * @param array $options Set of options: block, prefix, postfix, stringKeys, quoteKeys, q
+ * @param string $prefix DEPRECATED, use $options['prefix'] instead. Prepends the string to the returned data
+ * @param string $postfix DEPRECATED, use $options['postfix'] instead. Appends the string to the returned data
+ * @param array $stringKeys DEPRECATED, use $options['stringKeys'] instead. A list of array keys to be treated as a string
+ * @param boolean $quoteKeys DEPRECATED, use $options['quoteKeys'] instead. If false, treats $stringKey as a list of keys *not* to be quoted
+ * @param string $q DEPRECATED, use $options['q'] instead. The type of quote to use
  * @return string A JSON code block
- * @access public
  */
-	function object($data = array(), $block = false, $prefix = '', $postfix = '', $stringKeys = array(), $quoteKeys = true, $q = "\"") {
+	function object($data = array(), $options = array(), $prefix = null, $postfix = null, $stringKeys = null, $quoteKeys = null, $q = null) {
+		if (!empty($options) && !is_array($options)) {
+			$options = array('block' => $options);
+		} else if (empty($options)) {
+			$options = array();
+		}
+
+		$defaultOptions = array(
+			'block' => false, 'prefix' => '', 'postfix' => '',
+			'stringKeys' => array(), 'quoteKeys' => true, 'q' => '"'
+		);
+		$options = array_merge($defaultOptions, $options, array_filter(compact(array_keys($defaultOptions))));
+
 		if (is_object($data)) {
 			$data = get_object_vars($data);
 		}
 
-		$out = array();
-		$key = array();
-
-		if (is_array($data)) {
-			$keys = array_keys($data);
-		}
-
+		$out = $keys = array();
 		$numeric = true;
-		if (!empty($keys)) {
-			$numeric = (array_values($keys) === array_keys(array_values($keys)));
-		}
 
-		foreach ($data as $key => $val) {
-			if (is_array($val) || is_object($val)) {
-				$val = $this->object($val, false, '', '', $stringKeys, $quoteKeys, $q);
-			} else {
-				if ((!count($stringKeys) && !is_numeric($val) && !is_bool($val)) || ($quoteKeys && in_array($key, $stringKeys, true)) || (!$quoteKeys && !in_array($key, $stringKeys, true))) {
-					$val = $q . $this->escapeString($val) . $q;
+		if ($this->useNative) {
+			$rt = json_encode($data);
+		} else {
+			if (is_null($data)) {
+				return 'null';
+			}
+			if (is_bool($data)) {
+				return $data ? 'true' : 'false';
+			}
+
+			if (is_array($data)) {
+				$keys = array_keys($data);
+			}
+
+			if (!empty($keys)) {
+				$numeric = (array_values($keys) === array_keys(array_values($keys)));
+			}
+
+			foreach ($data as $key => $val) {
+				if (is_array($val) || is_object($val)) {
+					$val = $this->object($val, array_merge($options, array('block' => false)));
+				} else {
+					$quoteStrings = (
+						!count($options['stringKeys']) ||
+						($options['quoteKeys'] && in_array($key, $options['stringKeys'], true)) ||
+						(!$options['quoteKeys'] && !in_array($key, $options['stringKeys'], true))
+					);
+					$val = $this->value($val, $quoteStrings);
 				}
-				if ($val === null) {
-					$val = 'null';
+				if (!$numeric) {
+					$val = $options['q'] . $this->value($key, false) . $options['q'] . ':' . $val;
 				}
-				if (is_bool($val)) {
-					$val = ife($val, 'true', 'false');
-				}
+				$out[] = $val;
 			}
 
 			if (!$numeric) {
-				$val = $q . $key . $q . ':' . $val;
+				$rt = '{' . join(',', $out) . '}';
+			} else {
+				$rt = '[' . join(',', $out) . ']';
 			}
-
-			$out[] = $val;
 		}
+		$rt = $options['prefix'] . $rt . $options['postfix'];
 
-		if (!$numeric) {
-			$rt = '{' . join(', ', $out) . '}';
-		} else {
-			$rt = '[' . join(', ', $out) . ']';
-		}
-		$rt = $prefix . $rt . $postfix;
-
-		if ($block) {
-			$rt = $this->codeBlock($rt);
+		if ($options['block']) {
+			$rt = $this->codeBlock($rt, array_diff_key($options, $defaultOptions));
 		}
 
 		return $rt;
 	}
 /**
+ * Converts a PHP-native variable of any type to a JSON-equivalent representation
+ *
+ * @param mixed $val A PHP variable to be converted to JSON
+ * @param boolean $quoteStrings If false, leaves string values unquoted
+ * @return string a JavaScript-safe/JSON representation of $val
+ */
+	function value($val, $quoteStrings = true) {
+		switch (true) {
+			case (is_array($val) || is_object($val)):
+				$val = $this->object($val);
+			break;
+			case ($val === null):
+				$val = 'null';
+			break;
+			case (is_bool($val)):
+				$val = ife($val, 'true', 'false');
+			break;
+			case (is_int($val)):
+				$val = $val;
+			break;
+			case (is_float($val)):
+				$val = sprintf("%.11f", $val);
+			break;
+			default:
+				$val = $this->escapeString($val);
+				if ($quoteStrings) {
+					$val = '"' . $val . '"';
+				}
+			break;
+		}
+		return $val;
+	}
+/**
  * AfterRender callback.  Writes any cached events to the view, or to a temp file.
  *
- * @return void
- * @access public
+ * @return null
  */
 	function afterRender() {
-		echo $this->writeEvents();
+		if (!$this->enabled) {
+			return;
+		}
+		echo $this->writeEvents(true);
 	}
 }
+
 ?>

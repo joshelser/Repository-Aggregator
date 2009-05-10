@@ -1,5 +1,5 @@
 <?php
-/* SVN FILE: $Id: flay.php 5317 2007-06-20 08:28:35Z phpnut $ */
+/* SVN FILE: $Id: flay.php 7945 2008-12-19 02:16:01Z gwoo $ */
 /**
  * Text-to-HTML parser.
  *
@@ -7,57 +7,57 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) :  Rapid Development Framework <http://www.cakephp.org/>
- * Copyright 2005-2007, Cake Software Foundation, Inc.
- *								1785 E. Sahara Avenue, Suite 490-204
- *								Las Vegas, Nevada 89104
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
  * @filesource
- * @copyright		Copyright 2005-2007, Cake Software Foundation, Inc.
- * @link				http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @package			cake
- * @subpackage		cake.cake.libs
- * @since			CakePHP(tm) v 0.2.9
- * @version			$Revision: 5317 $
- * @modifiedby		$LastChangedBy: phpnut $
- * @lastmodified	$Date: 2007-06-20 03:28:35 -0500 (Wed, 20 Jun 2007) $
- * @license			http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision: 7945 $
+ * @modifiedby    $LastChangedBy: gwoo $
+ * @lastmodified  $Date: 2008-12-18 18:16:01 -0800 (Thu, 18 Dec 2008) $
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 /**
  * Included libraries.
  *
  */
-	if (!class_exists('Object')) {
-		 uses ('object');
-	}
+if (!class_exists('Object')) {
+	uses('object');
+}
 /**
  * Text-to-HTML parser.
  *
  * Text-to-html parser, similar to Textile or RedCloth, only with a little different syntax.
  *
- * @package		cake
- * @subpackage	cake.cake.libs
+ * @package       cake
+ * @subpackage    cake.cake.libs
  */
 class Flay extends Object{
 /**
  * Text to be parsed.
  *
  * @var string
+ * @access public
  */
 	var $text = null;
 /**
  * Set this to allow HTML in the markup.
  *
  * @var boolean
+ * @access public
  */
 	var $allow_html = false;
 /**
  * Constructor.
  *
- * @param string $text
+ * @param string $text Text to transform
  */
 	function __construct($text = null) {
 		$this->text = $text;
@@ -70,6 +70,7 @@ class Flay extends Object{
  * @param boolean $bare	Set this to only do <p> transforms and > to &gt;, no typography additions.
  * @param boolean $allowHtml Set this to trim whitespace and disable all HTML
  * @return string Formatted text
+ * @access public
  */
 	function toHtml($text = null, $bare = false, $allowHtml = false) {
 		if (empty($text) && empty($this->text)) {
@@ -140,8 +141,8 @@ class Flay extends Object{
 						}
 					}
 
-					if (count($links)) {
-						for ($ii = 0; $ii < count($links); $ii++) {
+					if ($count = count($links)) {
+						for ($ii = 0; $ii < $count; $ii++) {
 							if (preg_match("#^(http|https|ftp|nntp)://#", $links[$ii])) {
 								$prefix = null;
 							} else {
@@ -184,6 +185,7 @@ class Flay extends Object{
  *
  * @param string $string
  * @return array Array of words
+ * @access public
  */
 	function extractWords($string) {
 		$split = preg_split('/[\s,\.:\/="!\(\)<>~\[\]]+/', $string);
@@ -195,8 +197,9 @@ class Flay extends Object{
  * @param array $words			Words to look for and markup
  * @param string $string		String to look in
  * @param integer $max_snippets	Max number of snippets to extract
- * @return string
+ * @return string String with words marked
  * @see colorMark
+ * @access public
  */
 	function markedSnippets($words, $string, $max_snippets = 5) {
 		$string = strip_tags($string);
@@ -223,7 +226,8 @@ class Flay extends Object{
  *
  * @param array $words Array of words to be colorized
  * @param string $string Text in which the words might be found
- * @return string
+ * @return string String with words colorized
+ * @access public
  */
 	function colorMark($words, $string) {
 		$colors=array('yl', 'gr', 'rd', 'bl', 'fu', 'cy');
@@ -237,8 +241,9 @@ class Flay extends Object{
 /**
  * Returns given text with tags stripped out.
  *
- * @param string $text
- * @return string
+ * @param string $text Text to clean
+ * @return string Cleaned text
+ * @access public
  */
 	function toClean($text) {
 		$strip = strip_tags(html_entity_decode($text, ENT_QUOTES));
@@ -247,8 +252,9 @@ class Flay extends Object{
 /**
  * Return parsed text with tags stripped out.
  *
- * @param string $text
- * @return string
+ * @param string $text Text to parse and clean
+ * @return string Cleaned text
+ * @access public
  */
 	function toParsedAndClean($text) {
 		return $this->toClean(Flay::toHtml($text));
@@ -259,7 +265,8 @@ class Flay extends Object{
  * @param string $text		Text to be truncated.
  * @param integer $length	Max length of text.
  * @param string $ellipsis	Sign to print after truncated text.
- * @return string
+ * @return string Fragment
+ * @access public
  */
 	function fragment($text, $length, $ellipsis = '...') {
 		$soft = $length - 5;
