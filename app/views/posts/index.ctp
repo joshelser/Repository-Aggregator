@@ -7,6 +7,7 @@
 	<tr>
 		<th>Id</th>
 		<th>Title</th>
+		<th>Action</th>
 		<th>Created</th>
 	</tr>
 
@@ -16,8 +17,11 @@
 	<tr>
 		<td><?php echo $post['Post']['id']; ?></td>
 		<td>
-			<?php echo $html->link($post['Post']['title'], 
-"/posts/view/".$post['Post']['id']); ?>
+			<?php echo $html->link($post['Post']['title'], "/posts/view/".$post['Post']['id']); ?>
+		</td>
+		<td>
+			<?php echo $html->link( 'Delete', array( 'action' => 'delete', 'id' => $post['Post']['id'] ), null, 'Are you sure?') ?>
+			<?php echo $html->link('Edit', array('action'=>'edit', 'id'=>$post['Post']['id']));?>
 		</td>
 		<td><?php echo $post['Post']['created']; ?></td>
 	</tr>
