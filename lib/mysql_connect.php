@@ -1,3 +1,3 @@
 <?php
-$dbc = db_connect ('localhost', 'db','user','password');
+$dbc = db_connect ('localhost', 'aggregator','aggregator','password');
 ?>

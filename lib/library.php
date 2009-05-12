@@ -58,7 +58,7 @@ include $rel_addr.'/sessions/session.php';
 	}
 	function relative_address(){
 		// Or whatever your server points to
-		return '/var/www';
+		return '/var/www/localhost/htdocs/aggregator';
 	}
 
 	// For cheap CSS hacks
