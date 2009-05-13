@@ -9,7 +9,7 @@ ob_start();
 /*
 **  S I T E   V A R I A B L E S
 */
-$SITE_NAME = 'Site Name';
+$SITE_NAME = 'Repository Aggregator';
 
 /*
 **   S E S S I O N S
@@ -118,9 +118,9 @@ include $rel_addr.'/sessions/session.php';
 
 	function title ($title){
 		if(!empty($title)){
-			return '<TITLE>'.$title.' - '.$GLOBALS['SITE_NAME'].'</TITLE>';
+			return '<title>'.$title.' - '.$GLOBALS['SITE_NAME'].'</title>';
 		}else{
-			return '<TITLE>'.$GLOBALS['SITE_NAME'].'</TITLE>';
+			return '<title>'.$GLOBALS['SITE_NAME'].'</title>';
 		}
 	}
 
@@ -129,8 +129,8 @@ include $rel_addr.'/sessions/session.php';
 		$style 	 = '/style/style.css';
 
 		return '
-			<link type="text/css" rel="stylesheet" href="'.address().$reset.'">
-			<link type="text/css" rel="stylesheet" href="'.address().$style.'">
+			<link type="text/css" rel="stylesheet" href="'.address().$reset.'" />
+			<link type="text/css" rel="stylesheet" href="'.address().$style.'" />
 		';
 	}
 
@@ -157,57 +157,50 @@ include $rel_addr.'/sessions/session.php';
 */
 	function head ($title, $style, $scripts){
 		
-		$return ='
-		<html>
-		<head>
-
-		'.title($title).'
-
-		'.style($style).'
-				
-		'.$scripts.'
-		
-		</head>
-		';
+	  $return = 
+'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    '.title($title).'
+    '.style($style).'
+    '.$scripts.'
+  </head>
+';
 		
 		echo $return;
 	}
 
 function body ($header,$subtitle=' ',$content,$navigation){
-		$return .= '
-		<body>
-		
-			<div id="header">
-				<div onclick="homeFunction()" id="title">'.headCheck($header).'</div>
-				<div id="personal">'.$personal.'</div>
-			</div>
+		$return .= 
+'  <body>
+    <div id="header">
+      <div id="personal">'.$personal.'</div>
+    </div>
 			
-			<div id="nav">'.navigation($navigation).'</div>
+    <div id="nav">'.navigation($navigation).'</div>
 	
-			<div id="content">
-				<div id="side">
-				'.$side.'
-				</div>
-				<h1>'.$subtitle.'</h1>
-				'.$content.'
-			</div>
-			';
+    <div id="content">
+      <div id="side">
+	 '.$side.'
+      </div>
+
+      <h1>'.$subtitle.'</h1>
+      '.$content.'
+      </div>
+';
 		echo $return;
 	}
 
 	function foot ($footer = 'All Rights Reserved',$dbc){
-		$date = date("m/d/Y");
-
-			$return = '
-			<div id="footer">
-			'.$footer.'
-			</div>
+		$return = 
+'   <div id="footer">
+      '.$footer.'
+    </div>
 			
-			</body>
-	
-		
-			</html>
-			';
+  </body>
+</html>';
 		
 		echo $return;
 		
