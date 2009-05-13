@@ -125,13 +125,15 @@ include $rel_addr.'/sessions/session.php';
 	}
 
 	function style ($style){
-		$reset 	 = '/style/reset.css';
-		$style 	 = '/style/style.css';
+	  $fnAddress = 'address';
 
-		return '
-			<link type="text/css" rel="stylesheet" href="'.address().$reset.'" />
-			<link type="text/css" rel="stylesheet" href="'.address().$style.'" />
-		';
+	  $reset = '/style/reset.css';
+	  $style = '/style/style.css';
+	  
+	  return <<<EOT
+    <link type="text/css" rel="stylesheet" href="{$fnAddress()}$reset" />
+    <link type="text/css" rel="stylesheet" href="{$fnAddress()}$style" />
+EOT;
 	}
 
 	function navigation ($nav){
@@ -156,56 +158,68 @@ include $rel_addr.'/sessions/session.php';
 **      C R E A T I O N
 */
 	function head ($title, $style, $scripts){
-		
-	  $return = 
-'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	  /* Functions for heredoc */
+	  $fnTitle = 'title';
+	  $fnStyle = 'style';
+
+	  $return = <<<EOT
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-    '.title($title).'
-    '.style($style).'
-    '.$scripts.'
+    {$fnTitle($title)}
+{$fnStyle($style)}
+    $scripts
   </head>
-';
-		
-		echo $return;
+EOT;
+
+	  echo $return;
 	}
 
-function body ($header,$subtitle=' ',$content,$navigation){
-		$return .= 
-'  <body>
+        function body ($header,$subtitle=' ',$content,$navigation){
+	  /* Functions for heredoc */
+	  $fnNavigation = 'navigation';
+
+	  /* HTML output */
+	  $return = <<<EOT
+\n
+  <body>
     <div id="header">
-      <div id="personal">'.$personal.'</div>
+      <div id="personal">$personal</div>
     </div>
 			
-    <div id="nav">'.navigation($navigation).'</div>
+    <div id="nav">
+      {$fnNavigation($navigation)}
+    </div>
 	
     <div id="content">
       <div id="side">
-	 '.$side.'
+        $side
       </div>
 
-      <h1>'.$subtitle.'</h1>
-      '.$content.'
-      </div>
-';
+      <h1>$subtitle</h1>
+        $content
+    </div>
+EOT;
 		echo $return;
 	}
 
 	function foot ($footer = 'All Rights Reserved',$dbc){
-		$return = 
-'   <div id="footer">
-      '.$footer.'
+	  $return = <<<EOT
+\n
+    <div id="footer">
+$footer
     </div>
 			
   </body>
-</html>';
+</html>
+EOT;
 		
-		echo $return;
-		
-		ob_end_flush();
-		mysql_close($dbc);
+	  echo $return;
+	  
+	  ob_end_flush();
+	  mysql_close($dbc);
 	}
 	
 ?>

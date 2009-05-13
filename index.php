@@ -4,10 +4,10 @@ include 'lib/library.php';
 
 $title = 'Home';
 $subtitle = 'Welcome to '.$GLOBALS['SITE_NAME'].'!';
-$content .= '
+/*$content .= '
 	<h1>This website is still under construction.</h1>
 	
-';
+	';*/
 
 /*
 **   P U T    V A R S
