@@ -45,6 +45,37 @@ class Repository {
     while( $row = mysql_fetch_array( $result ) ){
       $this->_commits[] = new Commit( $row['commitId'] );
     }
+
+    mysql_close( $link );
+  }
+
+  function update() {
+    $link = connect();
+
+    // Update the repository
+
+    $this->_dateUpdated = date( 'Y-m-d' ); /* Update date */
+
+    /* Update repository */
+    $sql = 'UPDATE repositories SET dateUpdated = \''. $this->_dateUpdated .'\' WHERE repoId = '. $this->_repoId;
+
+    if( !mysql_query( $sql, $link ) ){
+      die( 'Could not execute query' );
+    }
+
+    mysql_close( $link );
+  }
+
+  function delete() {
+    $link = connect();
+
+    $sql = 'DELETE FROM repositories WHERE repoId = '. $this->_repoId;
+
+    if( !mysql_query( $sql, $link ) ){
+      die( 'Could not execute query' );
+    }
+
+    mysql_close( $link );
   }
 
 }
