@@ -29,7 +29,29 @@ class Commit{
     mysql_close( $link );
   }
 
-  //function 
+  function __construct( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
+    $link = connect();
+
+    $sql = 'INSERT INTO commits VALUES ( NULL, '. $repoId .', "'. $commitVal .'", "'. $commitMessage .'", '. $commitDateTime .' )';
+
+    if( !mysql_query( $sql, $link ) ){
+      die( 'Could not execute query' );
+    }
+
+    $this->_commitId = mysql_insert_id( $link );
+    $this->_repoId = $repoId;
+    $this->_commitVal = $commitVal;
+    $this->_commitMessage = $commitMessage;
+    $this->_commitDateTime = $commitDateTime;
+
+    mysql_close( $link );
+  }
+
+  function getData() {
+    return array( $this->_commitVal,
+		  $this->_commitMessage,
+		  $this->_commitDateTime );
+  }
 }
 
 ?>

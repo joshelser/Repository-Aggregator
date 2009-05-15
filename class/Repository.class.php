@@ -7,6 +7,8 @@ class Repository {
   private $_dateAdded;
   private $_dateUpdated;
   private $_description;
+  private $_username;
+  private $_password;
 
   protected $_commits;
 
@@ -26,6 +28,8 @@ class Repository {
     $this->_dateAdded = $data->dateAdded;
     $this->_dateUpdated = $data->dateUpdated;
     $this->_description = $data->description;
+    $this->_username = $data->username;
+    $this->_password = $data->password;
 
     mysql_close( $link );
   }
