@@ -1,17 +1,18 @@
 CREATE TABLE repositories (
        repoId int(5) NOT NULL auto_increment,
-       url varchar(250) NOT NULL
+       url varchar(250) NOT NULL,
        dateAdded date NOT NULL,
        dateUpdated date NOT NULL,
        description varchar(250),
-       PRIMARY KEY (repo_id)
+       PRIMARY KEY (repoId)
 );
 
 CREATE TABLE commits (
        commitId int(11) NOT NULL auto_increment,
-       commit varchar(40) NOT NULL,
-       message varchar(500) NOT NULL,
-       commitDate datetime NOT NULL,
+       repoId int(5) NOT NULL,
+       commitVal varchar(40) NOT NULL,
+       commitMessage varchar(500) NOT NULL,
+       commitDateTime datetime NOT NULL,
        PRIMARY KEY (commitID)
 );
 

@@ -1,6 +1,6 @@
 <?php
 // Library File
-include 'lib/library.php';
+include 'framework/lib/library.php';
 
 $title = 'Home';
 $subtitle = 'Welcome to '.$GLOBALS['SITE_NAME'].'!';
