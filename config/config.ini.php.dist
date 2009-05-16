@@ -1,0 +1,25 @@
+;<?php exit(); ?>
+
+
+; Configuration file for the Acero-Framework
+
+; database server hostname
+dbHostname = localhost
+
+; username for database
+dbUsername = username
+
+; password for database user specified above
+; CHANGE THIS FROM THE DEFAULT!
+dbPassword = password
+
+; database name 
+dbName = aggregator
+
+; Name for the site
+siteName = Repository Aggregator
+
+; Location of framework direction, relative to the application installation
+; Do NOT include the trailing slash (i.e. 'framework', NOT 'framework/' )
+frameworkDirectory = framework
+

@@ -1,9 +1,7 @@
 <?php
 
 $addr = address();
-$rel_addr = relative_address();
-
-require_once( $rel_addr.'/framework/lib/config.class.php' );
+$rel_addr = relative_address() .'/'. Config::get( 'frameworkDirectory' );
 
 // OB_START
 ob_start();
@@ -17,7 +15,7 @@ $SITE_NAME = Config::get( 'siteName'); //'Repository Aggregator';
 **   S E S S I O N S
 * 		you can add lotsa separate session stuff here
 */
-include $rel_addr.'/framework/sessions/session.php';
+include $rel_addr.'/sessions/session.php';
 
 /*
 ** I N C L U D E   F I L E S
@@ -26,23 +24,20 @@ include $rel_addr.'/framework/sessions/session.php';
 //include $rel_addr.'/framework/lib/mysql_connect.php';
 
 // Header File
-include $rel_addr.'/framework/lib/header.php';
+include $rel_addr.'/lib/header.php';
 
 // Scripts File
-include $rel_addr.'/framework/lib/scripts.php';
+include $rel_addr.'/lib/scripts.php';
 
 // Navigation File
-include $rel_addr.'/framework/lib/navigation.php';
+include $rel_addr.'/lib/navigation.php';
 
 // Footer File
-include $rel_addr.'/framework/lib/footer.php';
+include $rel_addr.'/lib/footer.php';
 
 /*
 **   M Y S Q L 
 */
-/*function connect(){
-  return db_connect( 'localhost', 'aggregator','aggregator','vFsB69xNP2xE4tat');
-  }*/
 
 function db_connect ($db_url, $db, $user, $pw){
   if($dbc = @mysql_connect($db_url,$user,$pw)){

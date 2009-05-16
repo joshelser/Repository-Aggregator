@@ -1,13 +1,13 @@
 <?php
+require_once( 'config/config.class.php' );
+
 // Library File
 include 'framework/lib/library.php';
 
+
 $title = 'Home';
-$subtitle = 'Welcome to '.$GLOBALS['SITE_NAME'].'!';
-/*$content .= '
-	<h1>This website is still under construction.</h1>
-	
-	';*/
+$subtitle = $GLOBALS['SITE_NAME'];
+$content .= '';
 
 /*
 **   P U T    V A R S

@@ -11,7 +11,7 @@ class Config {
 
   // load - parse ini file and set configs
   public static function load() {
-    self::$configs = parse_ini_file('framework/config/config.ini.php');
+    self::$configs = parse_ini_file('config/config.ini.php');
   }
 
   // get - return the value of config option with given name
