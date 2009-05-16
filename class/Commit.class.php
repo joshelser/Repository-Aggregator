@@ -8,30 +8,39 @@ class Commit{
   private $_commitDateTime;
 
   /* Load a commit from the database */
-  function __construct( $commitId ) {
+  function __construct( $commitId = NULL ) {
     $link = connect();		/* Connect */
 
-    /* Get data */
-    $sql = 'SELECT * FROM commits WHERE commitId = ' . $commitId;
-
-    $result = mysql_query( $sql, $link ) or
-      die( 'Could not execute query' );
-
-    $data = mysql_fetch_object( $result );
-
-    /* Set variables */
-    $this->_commitId = $commitId;
-    $this->_repoId = $data->repoId;
-    $this->_commitVal = $data->commitVal;
-    $this->_commitMessage = $data->commitMessage;
-    $this->_commitDateTime = $data->commitDateTime;
+    if( !is_null( $commitId ) ){
+      /* Get data */
+      $sql = 'SELECT * FROM commits WHERE commitId = ' . $commitId;
+      
+      $result = mysql_query( $sql, $link ) or
+	die( 'Could not execute query' );
+      
+      $data = mysql_fetch_object( $result );
+      
+      /* Set variables */
+      $this->_commitId = $commitId;
+      $this->_repoId = $data->repoId;
+      $this->_commitVal = $data->commitVal;
+      $this->_commitMessage = $data->commitMessage;
+      $this->_commitDateTime = $data->commitDateTime;
+    }
+    else{
+      $this->_commitId = -1;
+      $this->_repoId = -1;
+      $this->_commitVal = '';
+      $this->_commitMessage = '';
+      $this->_commitDateTime = '';
+    }
 
     /* Close link */
     mysql_close( $link );
   }
 
   /* Create a new commit and add it to the database */
-  function __construct( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
+  function create( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
     $link = connect();
 
     $sql = 'INSERT INTO commits VALUES ( NULL, '. $repoId .', "'. $commitVal .'", "'. $commitMessage .'", '. $commitDateTime .' )';

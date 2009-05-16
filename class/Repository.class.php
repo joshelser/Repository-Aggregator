@@ -15,29 +15,40 @@ class Repository {
 
 
   /* Pulls the repository out of the database */
-  function __construct( $repoId ) {
+  function __construct( $repoId = NULL ) {
     $link = connect();
     
-    $sql = 'SELECT * FROM repositories WHERE repoId = ' . $repoId;
+    if( !is_null( $repoId  ) ){
+      $sql = 'SELECT * FROM repositories WHERE repoId = ' . $repoId;
+      
+      $result = mysql_query( $sql, $link ) or
+	die( 'Could not execute query' );
+      
+      $data = mysql_fetch_object( $result );
 
-    $result = mysql_query( $sql, $link ) or
-      die( 'Could not execute query' );
-
-    $data = mysql_fetch_object( $result );
-
-    $this->_repoId = $repoId;
-    $this->_url = $data->url;
-    $this->_dateAdded = $data->dateAdded;
-    $this->_dateUpdated = $data->dateUpdated;
-    $this->_description = $data->description;
-    $this->_username = $data->username;
-    $this->_password = $data->password;
-
+      $this->_repoId = $repoId;
+      $this->_url = $data->url;
+      $this->_dateAdded = $data->dateAdded;
+      $this->_dateUpdated = $data->dateUpdated;
+      $this->_description = $data->description;
+      $this->_username = $data->username;
+      $this->_password = $data->password;
+    }
+    else{
+      $this->_repoId = -1;
+      $this->_url = '';
+      $this->_dateAdded = '';
+      $this->_dateUpdated = '';
+      $this->_description = '';
+      $this->_username = '';
+      $this->_password = '';
+    }
+    
     mysql_close( $link );
   }
 
   /* Create a new repository in the database */
-  function __construct( $url, $description = '', $username = '', $password = '' ) {
+  function create( $url, $description = '', $username = '', $password = '' ) {
     $link = connect();
     
     $sql = 'INSERT INTO repositories VALUES ( NULL, "'. $url .'", "'. date( 'Y-m-d' ) .'", "'.  date( 'Y-m-d' ) .'", "'. $description .'", "'. $username .'", "'. $password .'")';

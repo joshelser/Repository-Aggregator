@@ -51,24 +51,6 @@ function db_connect ($db_url, $db, $user, $pw){
   }
 }
 
-function connect() {
-  $db_url = Config::get( 'dbHostname' );
-  $db = Config::get( 'dbName' );
-  $user = Config::get( 'dbUsername' );
-  $pw = Config::get( 'dbPassword' );
-
-  if($dbc = @mysql_connect($db_url,$user,$pw)){
-    if (!@mysql_select_db ($db)){
-      return die('<p>Could not select the database because: <B>' . mysql_error() . '');
-    }else{
-      return $dbc;
-    }
-  }else{
-    return die('<P>Could not connect to the MYSQL because: <B>' . mysql_error() . '');
-  }
-}
-
-
 /*
 **   P H P
 */
