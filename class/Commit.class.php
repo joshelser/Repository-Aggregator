@@ -7,6 +7,7 @@ class Commit{
   private $_commitMessage;
   private $_commitDateTime;
 
+  /* Load a commit from the database */
   function __construct( $commitId ) {
     $link = connect();		/* Connect */
 
@@ -29,6 +30,7 @@ class Commit{
     mysql_close( $link );
   }
 
+  /* Create a new commit and add it to the database */
   function __construct( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
     $link = connect();
 
@@ -47,6 +49,7 @@ class Commit{
     mysql_close( $link );
   }
 
+  /* Return the commit's data */
   function getData() {
     return array( $this->_commitVal,
 		  $this->_commitMessage,

@@ -1,18 +1,20 @@
 <?php
-require_once( 'framework/lib/library.php' );
+
+require_once( 'framework/lib/library.php' ); /* Necessary for connect() */
 
 class Repository {
   protected $_repoId;
   private $_url;
   private $_dateAdded;
   private $_dateUpdated;
-  private $_description;
-  private $_username;
-  private $_password;
+  private $_description;	/* Optional */
+  private $_username;		/* Optional */
+  private $_password;		/* Optional */
 
-  protected $_commits;
+  protected $_commits;		/* Array of commits for the repository */
 
 
+  /* Pulls the repository out of the database */
   function __construct( $repoId ) {
     $link = connect();
     
@@ -34,6 +36,28 @@ class Repository {
     mysql_close( $link );
   }
 
+  /* Create a new repository in the database */
+  function __construct( $url, $description = '', $username = '', $password = '' ) {
+    $link = connect();
+    
+    $sql = 'INSERT INTO repositories VALUES ( NULL, "'. $url .'", "'. date( 'Y-m-d' ) .'", "'.  date( 'Y-m-d' ) .'", "'. $description .'", "'. $username .'", "'. $password .'")';
+
+    if( !mysql_query( $sql, $link ) ){
+      die( 'Could not execute query' );
+    }
+
+    $this->_repoId = mysql_insert_id( $link );
+    $this->_url = $url;
+    $this->_dateAdded = date( 'Y-m-d' );
+    $this->_dateUpdated = date( 'Y-m-d' );
+    $this->_description = $description;
+    $this->_username = $username;
+    $this->_password = $password;
+
+    mysql_close( $link );
+  }
+
+  /* Populate the array of commits for the repository */
   function getCommits() {
     require_once( 'class/Commit.class.php' );
 
@@ -53,6 +77,7 @@ class Repository {
     mysql_close( $link );
   }
 
+  /* Update the repository */
   function update() {
     $link = connect();
 
@@ -70,6 +95,7 @@ class Repository {
     mysql_close( $link );
   }
 
+  /* Remove the repository from the database */
   function delete() {
     $link = connect();
 
