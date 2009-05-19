@@ -1,5 +1,7 @@
 <?php
 
+require_once( 'framework/lib/library.php' );
+
 class Commit{
   private $_commitId;
   private $_repoId;
@@ -9,15 +11,17 @@ class Commit{
 
   /* Load a commit from the database */
   function __construct( $commitId = NULL ) {
-    $link = connect();		/* Connect */
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+
+    $link = new Database;
+    $link->connect();		/* Connect */
 
     if( !is_null( $commitId ) ){
       /* Get data */
-      $sql = 'SELECT * FROM commits WHERE commitId = ' . $commitId;
+      $sql = 'SELECT * FROM commits WHERE commitId = %1 ';
       
-      $result = mysql_query( $sql, $link ) or
-	die( 'Could not execute query' );
-      
+      $result = $link->query( $sql, $commitId );
+
       $data = mysql_fetch_object( $result );
       
       /* Set variables */
@@ -36,16 +40,20 @@ class Commit{
     }
 
     /* Close link */
-    mysql_close( $link );
+    $link->disconnect();
   }
 
   /* Create a new commit and add it to the database */
   function create( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
-    $link = connect();
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
 
-    $sql = 'INSERT INTO commits VALUES ( NULL, '. $repoId .', "'. $commitVal .'", "'. $commitMessage .'", '. $commitDateTime .' )';
+    $link = new Database;
+    $link->connect();
 
-    if( !mysql_query( $sql, $link ) ){
+    $sql = 'INSERT INTO commits VALUES ( NULL, %1 , %2 , %3 , %4 )';
+
+    $result = $link->query( $sql, $repoId, $commitVal, $commitMessage, $commitDateTime );
+    if( !$result ){
       die( 'Could not execute query' );
     }
 
@@ -55,7 +63,7 @@ class Commit{
     $this->_commitMessage = $commitMessage;
     $this->_commitDateTime = $commitDateTime;
 
-    mysql_close( $link );
+    $link->disconnect();
   }
 
   /* Return the commit's data */

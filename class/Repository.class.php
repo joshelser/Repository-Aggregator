@@ -16,14 +16,15 @@ class Repository {
 
   /* Pulls the repository out of the database */
   function __construct( $repoId = NULL ) {
-    $link = connect();
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $link = new Database;
+    $link->connect();
     
     if( !is_null( $repoId  ) ){
-      $sql = 'SELECT * FROM repositories WHERE repoId = ' . $repoId;
+      $sql = 'SELECT * FROM repositories WHERE repoId = %1 ';
       
-      $result = mysql_query( $sql, $link ) or
-	die( 'Could not execute query' );
-      
+      $result = $link->query( $sql, $repoId );
+            
       $data = mysql_fetch_object( $result );
 
       $this->_repoId = $repoId;
@@ -44,16 +45,20 @@ class Repository {
       $this->_password = '';
     }
     
-    mysql_close( $link );
+    $link->disconnect();
   }
 
   /* Create a new repository in the database */
   function create( $url, $description = '', $username = '', $password = '' ) {
-    $link = connect();
-    
-    $sql = 'INSERT INTO repositories VALUES ( NULL, "'. $url .'", "'. date( 'Y-m-d' ) .'", "'.  date( 'Y-m-d' ) .'", "'. $description .'", "'. $username .'", "'. $password .'")';
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
 
-    if( !mysql_query( $sql, $link ) ){
+    $link = new Database;
+    $link->connect();
+    
+    $sql = 'INSERT INTO repositories VALUES ( NULL , %1 , %2 , %3 , %4 , %5 , %6 )';
+
+    $result = $link->query( $sql, $url, date( 'Y-m-d' ), date( 'Y-m-d' ), $description, $username, $password );
+    if( !result ){
       die( 'Could not execute query' );
     }
 
@@ -65,19 +70,20 @@ class Repository {
     $this->_username = $username;
     $this->_password = $password;
 
-    mysql_close( $link );
+    $link->disconnect();
   }
 
   /* Populate the array of commits for the repository */
   function getCommits() {
     require_once( 'class/Commit.class.php' );
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
 
-    $link = connect();
+    $link = new Database;
+    $link->connect();
 
-    $sql = 'SELECT commitId FROM commits WHERE repoId = ' . $this->_repoId;
+    $sql = 'SELECT commitId FROM commits WHERE repoId = %1 ';
 
-    $result = mysql_query( $sql, $link ) or
-      die( 'Could not execute query' );
+    $result = $link->query( $sql, $this->_repoId );
     
     $this->_commits = array();
 
@@ -85,38 +91,46 @@ class Repository {
       $this->_commits[] = new Commit( $row['commitId'] );
     }
 
-    mysql_close( $link );
+    //$link->disconnect();
   }
 
   /* Update the repository */
   function update() {
-    $link = connect();
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+
+    $link = new Database;
+    $link->connect();
 
     // Update the repository
 
     $this->_dateUpdated = date( 'Y-m-d' ); /* Update date */
 
     /* Update repository */
-    $sql = 'UPDATE repositories SET dateUpdated = \''. $this->_dateUpdated .'\' WHERE repoId = '. $this->_repoId;
+    $sql = 'UPDATE repositories SET dateUpdated = %1 WHERE repoId = %2 ';
 
-    if( !mysql_query( $sql, $link ) ){
+    $result = $link->query( $sql, $this->_dateUpdated, $this->_repoId );
+    if( !$result ){
       die( 'Could not execute query' );
     }
 
-    mysql_close( $link );
+    $link->disconnect();
   }
 
   /* Remove the repository from the database */
   function delete() {
-    $link = connect();
+    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
 
-    $sql = 'DELETE FROM repositories WHERE repoId = '. $this->_repoId;
+    $link = new Database;
+    $link->connect();
 
-    if( !mysql_query( $sql, $link ) ){
+    $sql = 'DELETE FROM repositories WHERE repoId = %1 ';
+
+    $result = $link->query( $sql, $this->_repoId );
+    if( !$result ){
       die( 'Could not execute query' );
     }
 
-    mysql_close( $link );
+    $link->disconnect();
   }
 
 }

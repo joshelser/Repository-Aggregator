@@ -20,12 +20,12 @@ class Database{
   function connect() {
     if( $this->_link = @mysql_connect( $this->_dbUrl, $this->_dbUsername, $this->_dbPassword ) ){
       if( !@mysql_select_db ( $this->_dbName ) ){
-	return die('<p>Could not select the database because: <B>' . mysql_error() . '');
+	return die('<p>Could not select the database because: <b>' . mysql_error() . '</b></p>');
       }else{
 	return;
       }
     }else{
-      return die('<P>Could not connect to the MYSQL because: <B>' . mysql_error() . '');
+      return die('<p>Could not connect to the MYSQL because: <b>' . mysql_error() . '</b></p>');
     }
   }
 
