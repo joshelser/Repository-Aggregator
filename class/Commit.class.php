@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'framework/lib/library.php' );
+require_once( 'lib/functions.lib.php' ); /* For the framework directory */
 
 class Commit{
   private $_commitId;
@@ -11,7 +11,8 @@ class Commit{
 
   /* Load a commit from the database */
   function __construct( $commitId = NULL ) {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();		/* Connect */
@@ -45,7 +46,8 @@ class Commit{
 
   /* Create a new commit and add it to the database */
   function create( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();

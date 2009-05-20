@@ -1,5 +1,5 @@
 <?php
-require_once( 'config/config.class.php' );
+require_once( 'config/Config.class.php' );
 
 // Library File
 include 'framework/lib/library.php';

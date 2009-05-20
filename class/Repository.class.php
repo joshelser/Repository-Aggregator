@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'framework/lib/library.php' ); /* Necessary for connect() */
+require_once( 'lib/functions.lib.php' );
 
 class Repository {
   protected $_repoId;
@@ -16,7 +16,9 @@ class Repository {
 
   /* Pulls the repository out of the database */
   function __construct( $repoId = NULL ) {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
+
     $link = new Database;
     $link->connect();
     
@@ -50,7 +52,8 @@ class Repository {
 
   /* Create a new repository in the database */
   function create( $url, $description = '', $username = '', $password = '' ) {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();
@@ -76,7 +79,8 @@ class Repository {
   /* Populate the array of commits for the repository */
   function getCommits() {
     require_once( 'class/Commit.class.php' );
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();
@@ -91,12 +95,13 @@ class Repository {
       $this->_commits[] = new Commit( $row['commitId'] );
     }
 
-    //$link->disconnect();
+    // No disconnect necessary as is handled by the commit constructor
   }
 
   /* Update the repository */
   function update() {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();
@@ -118,7 +123,8 @@ class Repository {
 
   /* Remove the repository from the database */
   function delete() {
-    require_once( $GLOBALS['rel_addr'].'/class/Database.class.php' );
+    $framework = frameworkDir(); /* Get the directory of the framework */
+    require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();
