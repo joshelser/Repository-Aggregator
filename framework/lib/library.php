@@ -6,8 +6,6 @@ $rel_addr = relative_address() .'/'. Config::get( 'frameworkDirectory' );
 // OB_START
 ob_start();
 
-session_start();
-
 /*
 **  S I T E   V A R I A B L E S
 */
@@ -36,6 +34,8 @@ include $rel_addr.'/lib/navigation.php';
 
 // Footer File
 include $rel_addr.'/lib/footer.php';
+
+require_once( $rel_addr.'/lib/authentication.php' );
 
 /*
 **   M Y S Q L 

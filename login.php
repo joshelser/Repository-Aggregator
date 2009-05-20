@@ -17,26 +17,16 @@ if( isset( $_SESSION['userId'] ) ){
 if( isset( $_POST['username'] ) && isset( $_POST['password'] ) ){
   require_once( $framework.'/class/Database.class.php' );
   
-  $link = new Database;
-  $link->connect();
-
-  $sql = 'SELECT * FROM users WHERE username = %1 AND password = %2 ';
-  
-  $result = $link->query( $sql, $_POST['username'], md5( $_POST['password'] ) );
-
-  if( mysql_num_rows( $result ) == 0 ){ /* On fail */
+  $data = authenticate( $_POST['username'], $_POST['password'] );
+  if( $data == false ){	/* On fail */
     logout();			/* Destroys session data */
 
     header( "Location: login.php?action=failed" );
     exit();
   }
 
-  $data = mysql_fetch_object( $result );
-
   $_SESSION['userId'] = $data->userId; /* Set user data in session variable */
   $_SESSION['username'] = $data->username;
-
-  $link->disconnect();
 
   header( "Location: index.php" ); /* Bounce to index.php */
   exit();

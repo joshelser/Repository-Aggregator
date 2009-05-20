@@ -1,11 +1,12 @@
 <?php
 
-session_start();
+require_once( 'lib/functions.lib.php' ); /* Load functions */
 
-require_once( 'lib/functions.lib.php' );
+$framework = frameworkDir();	/* Get framework directory */
+require_once( $framework.'/lib/authentication.php' );
 
-logout();
+logout();			/* Logout */
 
-header( 'Location: index.php' );
+header( 'Location: index.php' ); /* Bounce to homepage */
 
 ?>
