@@ -1,4 +1,5 @@
 <?php
+
 require_once( 'config/Config.class.php' );
 
 // Library File

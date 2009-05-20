@@ -6,6 +6,8 @@ $rel_addr = relative_address() .'/'. Config::get( 'frameworkDirectory' );
 // OB_START
 ob_start();
 
+session_start();
+
 /*
 **  S I T E   V A R I A B L E S
 */
@@ -15,7 +17,7 @@ $SITE_NAME = Config::get( 'siteName'); //'Repository Aggregator';
 **   S E S S I O N S
 * 		you can add lotsa separate session stuff here
 */
-include $rel_addr.'/sessions/session.php';
+//include $rel_addr.'/sessions/session.php';
 
 /*
 ** I N C L U D E   F I L E S
@@ -178,7 +180,7 @@ EOT;
   echo $return;
 }
 
-function body ($header,$subtitle=' ',$content,$navigation){
+function body( $header,$subtitle=' ', $content, $navigation ){
   /* Functions for heredoc */
   $fnNavigation = 'navigation';
   
@@ -206,7 +208,7 @@ EOT;
   echo $return;
 }
 
-function foot ($footer = 'All Rights Reserved',$dbc){
+function foot( $footer = 'All Rights Reserved' ){
   $return = <<<EOT
 \n
     <div id="footer">
@@ -220,7 +222,6 @@ EOT;
   echo $return;
   
   ob_end_flush();
-  //  mysql_close($dbc);
 }
 
 ?>
