@@ -23,6 +23,9 @@ $SITE_NAME = Config::get( 'siteName'); //'Repository Aggregator';
 // Database Connection
 //include $rel_addr.'/framework/lib/mysql_connect.php';
 
+/* User authentication file */
+require_once( $rel_addr.'/lib/authentication.php' );
+
 // Header File
 include $rel_addr.'/lib/header.php';
 
@@ -35,7 +38,6 @@ include $rel_addr.'/lib/navigation.php';
 // Footer File
 include $rel_addr.'/lib/footer.php';
 
-require_once( $rel_addr.'/lib/authentication.php' );
 
 /*
 **   M Y S Q L 
