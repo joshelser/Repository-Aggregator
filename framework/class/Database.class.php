@@ -36,9 +36,7 @@ class Database{
 
   /* Takes a variable number of arguments, sanitizes, and queries 
      First argument must be SQL - Variables are denoted by %1, %2... %13, etc
-     Subsequent arguments are variables to be substituted into the query 
-
-     NOTE: There must be a space trailing the %x variable*/
+     Subsequent arguments are variables to be substituted into the query */
   function query(){
     $numArgs = func_num_args();
 
@@ -61,7 +59,6 @@ class Database{
 
       $sql = preg_replace( '/\s?%'.$i.'\s/', ' '.$arg.' ', $sql ); /* Replacement */
     }
-    echo "'".$sql."'".'<br/>';
 
     $result = mysql_query( $sql, $this->_link ) or /* Execute the query */
       die( 'Could not execute query: '. mysql_error() );

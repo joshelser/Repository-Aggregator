@@ -33,6 +33,13 @@ function authenticate( $username, $password ){
   }
 }
 
+function authorize() {
+  if( !isset( $_SESSION['userId'] ) || !isset( $_SESSION['username'] ) ){
+    die( 'Access Denied. Please log in.' );
+  }
+}
+
+
 /* Logout the user */
 function logout(){
   unset( $_SESSION['userId'] );

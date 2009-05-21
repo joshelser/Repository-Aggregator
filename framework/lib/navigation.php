@@ -8,6 +8,7 @@ $login = '<li><a href="login.php">Login</a></li>';
 
 if( isset( $_SESSION['username'] ) ){
   $login = '<li><span>Welcome, '. $_SESSION['username'] .'</span></li>'."\n";
+  $login .= '<li><a href="viewRepositories.php">View Repositories</a></li>'."\n";
   $login .= '<li><a href="logout.php">Logout</a></li>';
 }
 

@@ -7,7 +7,7 @@ $framework = frameworkDir();
 require_once( $framework.'/lib/library.php' );
 
 /* Bounce already logged in users to index.php */
-if( isset( $_SESSION['userId'] ) ){
+if( isset( $_SESSION['userId'] ) && isset( $_SESSION['username'] ) ){
   header( 'Location: index.php' );
 
   exit();
@@ -17,7 +17,8 @@ if( isset( $_SESSION['userId'] ) ){
 if( isset( $_POST['username'] ) && isset( $_POST['password'] ) ){
   require_once( $framework.'/class/Database.class.php' );
   
-  $data = authenticate( $_POST['username'], $_POST['password'] );
+  $data = authenticate( $_POST['username'], $_POST['password'] ); /* Authenticates the user */
+
   if( $data == false ){	/* On fail */
     logout();			/* Destroys session data */
 

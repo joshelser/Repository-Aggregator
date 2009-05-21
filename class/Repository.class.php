@@ -139,6 +139,13 @@ class Repository {
     $link->disconnect();
   }
 
+  function getData() {
+    return array( 'url' =>$this->_url,
+		  'dateUpdate' => $this->_dateUpdated,
+		  'dateAdded' => $this->_dateAdded,
+		  'description' => $this->_description );
+  }
+
 }
 
 ?>

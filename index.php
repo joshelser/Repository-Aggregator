@@ -7,7 +7,7 @@ include 'framework/lib/library.php';
 
 
 $title = 'Home';
-$subtitle = $GLOBALS['SITE_NAME'];
+$subtitle = Config::get( 'siteName' );
 $content .= '';
 
 /*
