@@ -59,7 +59,8 @@ function db_connect ($db_url, $db, $user, $pw){
 **   P H P
 */
 function address (){
-  return 'http://'.$_SERVER['SERVER_NAME'].'';
+  require_once( 'lib/functions.lib.php' );
+  return 'http://'.$_SERVER['SERVER_NAME'].'/aggregator/'.frameworkDir();
 }
 
 function relative_address(){
@@ -135,9 +136,9 @@ function style ($style){
   
   $reset = '/style/reset.css';
   $style = '/style/style.css';
-	  
+	 
+  //   <link type="text/css" rel="stylesheet" href="{$fnAddress()}$reset" /> 
   return <<<EOT
-    <link type="text/css" rel="stylesheet" href="{$fnAddress()}$reset" />
     <link type="text/css" rel="stylesheet" href="{$fnAddress()}$style" />
 EOT;
 }

@@ -29,6 +29,10 @@ for( $i = 0; $i< count( $repos ); $i++ ) {
   <p>Date Added: {$data[dateAdded]}</p>
 </div>
 EOT;
+
+  if( $i != count( $repos ) -1 ){
+    $content .= "\n<br/>\n";
+  }
 }
   
 
