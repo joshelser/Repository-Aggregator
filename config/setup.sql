@@ -24,7 +24,7 @@ CREATE TABLE repositories (
        dateUpdated date NOT NULL,
        description varchar(250),
        username varchar(50),
-       password varchar(50),
+       password varchar(32),
        PRIMARY KEY (repoId)
 );
 

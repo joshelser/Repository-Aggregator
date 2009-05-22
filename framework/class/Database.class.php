@@ -61,7 +61,7 @@ class Database{
     }
 
     $result = mysql_query( $sql, $this->_link ) or /* Execute the query */
-      die( 'Could not execute query: '. mysql_error() );
+      die( 'Could not execute query: '. mysql_error() .'<br/>'."\nSQL: ".$sql );
 
     return $result;
   }

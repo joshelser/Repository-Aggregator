@@ -33,28 +33,61 @@ authorize();			/* Are you allowed here? */
 require_once( $framework.'/lib/library.php' );
 
 
-$title = 'View Repositories';
+$title = 'Add a Repository';
 $subtitle = Config::get( 'siteName' );
-$content = '<div id="repositories">'."\n";
+$content = <<<EOT
+<div id="addRepository">
+  <h3>Add a Repository</h3>
+  <form method="POST" action="insertRepository.php">
+    <table>
+      <tr>
+        <td>
+          <label for="url">Repository URL:</label>
+        </td>
+        <td>
+          <input type="text" id="url" name="url"/>
+        </td>
+      </tr>
 
-$repos = getRepositories();
+      <tr>
+        <td>
+          <label for="description">Description [optional]:</label>
+        </td>
+        <td>
+          <input type="text" id="description" name="description" />
+        </td>
+      </tr>
 
-for( $i = 0; $i< count( $repos ); $i++ ) {
-  $data = $repos[$i]->getData(); /* Get the data for the repository */
+      <tr>
+        <td>
+          <label for="username">Username [optional]:</label>
+        </td>
+        <td>
+          <input type="text" id="username" name="username" />
+        </td>
+      </tr>
 
-  $content .= <<<EOT
-<div id="{$i}">
-  <h3>{$data[url]}</h3>
-  <p>Description: {$data[description]}</p>
-  <p>Date Added: {$data[dateAdded]}</p>
+      <tr>
+        <td>
+          <label for="password">Password [optional]:</label>
+        </td>
+        <td>
+          <input type="password" id="password" name="password" />
+        </td>
+      </tr>
+  
+      <tr>
+        <td>
+          <input type="submit" value="Add" />
+        </td>
+      </tr>
+    </table>
+  </form>
 </div>
 EOT;
-
-  if( $i != count( $repos ) -1 ){
-    $content .= "\n<br/>\n";
-  }
-}
   
+
+/* TODO: Option to list repositories currently in the system */
 
 /*
 **   P U T    V A R S
