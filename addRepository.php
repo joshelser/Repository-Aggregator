@@ -88,11 +88,13 @@ $content = <<<EOT
   </form>
   <h3>Watch an existing repository</h3>
   <form method="POST" action="watchRepository.php">
-    <select>
+    <select name="repoId">
+
 EOT;
 
 for( $i = 0; $i < count( $existingRepos ); $i++ ) { /* List all the existing repositories */
-  $content .= '<option id="'. $existingRepos[$i]->getRepoId() .'">'. $existingRepos[$i]->getUrl() ."</option>\n";
+  $content .= '      ';				    /* Nice spacing in the HTML */
+  $content .= '<option value="'. $existingRepos[$i]->getRepoId() .'">'. $existingRepos[$i]->getUrl() ."</option>\n";
 }
 
 $content .= <<<EOT
