@@ -37,7 +37,7 @@ $title = 'View Repositories';
 $subtitle = Config::get( 'siteName' );
 $content = '<div id="repositories">'."\n";
 
-$repos = getRepositories();
+$repos = getUserRepositories( $_SESSION['userId'] );
 
 for( $i = 0; $i< count( $repos ); $i++ ) {
   $data = $repos[$i]->getData(); /* Get the data for the repository */

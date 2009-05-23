@@ -32,12 +32,15 @@ authorize();			/* Are you allowed here? */
 // Library File
 require_once( $framework.'/lib/library.php' );
 
-
 $title = 'Add a Repository';
 $subtitle = Config::get( 'siteName' );
+
+$existingRepos = getAllRepositories(); /* Get all the repositories in the database */
+
+/* HTML */
 $content = <<<EOT
 <div id="addRepository">
-  <h3>Add a Repository</h3>
+  <h3>Add a new repository</h3>
   <form method="POST" action="insertRepository.php">
     <table>
       <tr>
@@ -83,11 +86,21 @@ $content = <<<EOT
       </tr>
     </table>
   </form>
+  <h3>Watch an existing repository</h3>
+  <form method="POST" action="watchRepository.php">
+    <select>
+EOT;
+
+for( $i = 0; $i < count( $existingRepos ); $i++ ) { /* List all the existing repositories */
+  $content .= '<option id="'. $existingRepos[$i]->getRepoId() .'">'. $existingRepos[$i]->getUrl() ."</option>\n";
+}
+
+$content .= <<<EOT
+    </select>
+    <input type="submit" value="Watch" />
+  </form>
 </div>
 EOT;
-  
-
-/* TODO: Option to list repositories currently in the system */
 
 /*
 **   P U T    V A R S

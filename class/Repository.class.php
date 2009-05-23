@@ -166,6 +166,26 @@ class Repository {
 		  'description' => $this->_description );
   }
 
+  function getUrl() {
+    return $this->_url;
+  }
+
+  function getDateUpdated() {
+    return $this->_dateUpdated;
+  }
+
+  function getDateAdded() {
+    return $this->_dateAdded;
+  }
+  
+  function getDescription() {
+    return $this->_description;
+  }
+
+  function getRepoId(){
+    return $this->_repoId;
+  }
+
 }
 
 ?>

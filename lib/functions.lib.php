@@ -27,48 +27,75 @@ function frameworkDir() {
   return Config::get( 'frameworkDirectory' );
 }
 
-/* Returns an array of repositories that the current user is watching */
-function getRepositories() {
+/* Returns an array of repositories in the system */
+function getAllRepositories() {
   require_once( 'class/Repository.class.php' );
 
-  $repoIds = getUserRepositories( $_SESSION['userId'] ); /* Get the ids */
-
-  $repos = array();
-
-  if( count( $repoIds ) == 0 ) {
-    return $repos;
-  }
-  
-  /* Get the entire repo data for all ids */
-  for( $i = 0; $i < count( $repoIds ); $i++ ) { 
-    $repo = new Repository( $repoIds[$i] );
-
-    $repos[] = $repo;
-  }
-
-  return $repos;
-}
-
-/* Returns an array of repository ids that the give userId is watching */
-function getUserRepositories( $userId ) {
   $framework = frameworkDir();
 
+  /* Database */
   require_once( $framework.'/class/Database.class.php' );
 
   $link = new Database;
   $link->connect();
 
+  /* Query */
+  $sql = 'SELECT repoId FROM repositories';
+
+  $result = $link->query( $sql, $userId );
+
+  $repoIds = array();
+
+  /* Get Ids */
+  while( $row = mysql_fetch_array( $result ) ){
+    $repoIds[] = $row['repoId'];
+  }
+
+  return getRepositoriesFromIds( $repoIds ); /* Return the actual repositories */
+}
+
+/* Returns an array of repositories that the give userId is watching */
+function getUserRepositories( $userId ) {
+  require_once( 'class/Repository.class.php' );
+  $framework = frameworkDir();
+
+  /* Database */
+  require_once( $framework.'/class/Database.class.php' );
+
+  $link = new Database;
+  $link->connect();
+
+  /* Query */
   $sql = 'SELECT * FROM watch WHERE userId = %1';
 
   $result = $link->query( $sql, $userId );
 
   $repoIds = array();
 
+  /* Get Ids */
   while( $row = mysql_fetch_array( $result ) ){
     $repoIds[] = $row['repoId'];
   }
 
-  return $repoIds;
-}  
+  return getRepositoriesFromIds( $repoIds ); /* Return the actual repositories */
+}
+
+/* Given a list of ids, will return an array of Repository Objects */
+function getRepositoriesFromIds( &$repoIds ){
+  if( count( $repoIds ) == 0 ) {
+    return array();
+  }
+						
+  $repos = array();
+
+  /* Get the entire repo data for all ids */
+  for( $i = 0; $i < count( $repoIds ); $i++ ) { 
+    $repo = new Repository( $repoIds[$i] );
+    
+    $repos[] = $repo;
+  }
+
+  return $repos;
+}
 
 ?>
