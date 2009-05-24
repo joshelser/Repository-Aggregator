@@ -35,9 +35,22 @@ require_once( $framework.'/lib/library.php' );
 
 $title = 'View Repositories';
 $subtitle = Config::get( 'siteName' );
-$content = '<div id="repositories">'."\n";
+$content = '';
+if( isset( $_GET['action'] ) ){
+  switch( $_GET['action'] ){
+  case 'added':
+    $content .= '<h3>Repository Added Successfully</h3>';
+    break;
+    
+  case 'watched':
+    $content .= '<h3>Now Watching the New Repository</h3>';
+    break;
+  }  
+}
 
-$repos = getUserRepositories( $_SESSION['userId'] );
+$content .= '<div id="repositories">'."\n";
+
+$repos = getUserRepositories( $_SESSION['userId'] ); /* Get all the user's repositories */
 
 for( $i = 0; $i< count( $repos ); $i++ ) {
   $data = $repos[$i]->getData(); /* Get the data for the repository */

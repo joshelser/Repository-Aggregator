@@ -64,6 +64,6 @@ if( !$result ) {
   die( 'Watch query failed' );
 }
 
-header( 'location: viewRepositories.php?action=added' );
+header( 'location: viewRepositories.php?action=watched' );
 
 ?>
