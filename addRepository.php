@@ -36,11 +36,12 @@ $title = 'Add a Repository';
 $subtitle = Config::get( 'siteName' );
 
 $existingRepos = getAllRepositories(); /* Get all the repositories in the database */
+$userRepos = getUserRepositoryIds( $_SESSION['userId'] ); /* Get all the repositories of the user */
 
 /* HTML */
 $content = <<<EOT
 <div id="addRepository">
-  <h3>Add a new repository</h3>
+  <h3>Add a new repository to watch</h3>
   <form method="POST" action="insertRepository.php">
     <table>
       <tr>
@@ -87,30 +88,51 @@ $content = <<<EOT
     </table>
   </form>
   <h3>Watch an existing repository</h3>
+EOT;
+
+$watchNew = false;
+
+$i = 0;
+/* Make sure we don't give the option to watch new repos if they don't have any to watch */
+while( !$watchNew && $i < count( $existingRepos ) ){
+  if( !in_array( $existingRepos[$i]->getRepoId(), $userRepos ) ) {
+    $watchNew = true;
+  }
+
+  $i++;
+}
+
+if( $watchNew ){		/* We have at least one new repository to watch */
+  $content .= <<<EOT
   <form method="POST" action="watchRepository.php">
     <select name="repoId">
 
 EOT;
 
-for( $i = 0; $i < count( $existingRepos ); $i++ ) { /* List all the existing repositories */
-  $content .= '      ';				    /* Nice spacing in the HTML */
-  $content .= '<option value="'. $existingRepos[$i]->getRepoId() .'">'. $existingRepos[$i]->getUrl() ."</option>\n";
-}
+  for( $i = 0; $i < count( $existingRepos ); $i++ ) { /* List all the existing repositories */
+    if( !in_array( $existingRepos[$i]->getRepoId(), $userRepos ) ) {
+      $content .= '      ';				    /* Nice spacing in the HTML */
+      $content .= '<option value="'. $existingRepos[$i]->getRepoId() .'">'. $existingRepos[$i]->getUrl() ."</option>\n"; 
+    }
+  }
 
-$content .= <<<EOT
+  $content .= <<<EOT
     </select>
     <input type="submit" value="Watch" />
   </form>
-</div>
 EOT;
+}
+else{				/* All repositories are being watched */
+  $content .= <<<EOT
+    <span>Sorry, there are no existing repositories to watch</span>
+EOT;
+}
 
-/*
-**   P U T    V A R S
-**    O N    P A G E
-*/
-	head($title,$style,$scripts);
-	body($header,$subtitle,$content,$navigation);
-	foot($footer,$dbc);
+$content .= '</div>';
 
+/* Generate Page */
+head($title,$style,$scripts);
+body($header,$subtitle,$content,$navigation);
+foot( $footer );
 
 ?>

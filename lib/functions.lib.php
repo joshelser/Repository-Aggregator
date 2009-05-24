@@ -98,4 +98,30 @@ function getRepositoriesFromIds( &$repoIds ){
   return $repos;
 }
 
+function getUserRepositoryIds( $userId ) {
+  require_once( 'class/Repository.class.php' );
+  $framework = frameworkDir();
+
+  /* Database */
+  require_once( $framework.'/class/Database.class.php' );
+
+  $link = new Database;
+  $link->connect();
+
+  /* Query */
+  $sql = 'SELECT * FROM watch WHERE userId = %1';
+
+  $result = $link->query( $sql, $userId );
+
+  $repoIds = array();
+
+  /* Get Ids */
+  while( $row = mysql_fetch_array( $result ) ){
+    $repoIds[] = $row['repoId'];
+  }
+
+  return $repoIds;		/* Return the repository Ids */
+}
+
+
 ?>
