@@ -167,7 +167,7 @@ function head ($title, $style, $scripts){
   /* Functions for heredoc */
   $fnTitle = 'title';
   $fnStyle = 'style';
-  $fnScripts = 'script';
+  $fnScripts = 'scripts';
 
   $return = <<<EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -177,6 +177,7 @@ function head ($title, $style, $scripts){
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     {$fnTitle($title)}
 {$fnStyle($style)}
+{$fnScripts()}
   </head>
 EOT;
 

@@ -81,3 +81,13 @@
     border: solid black;
     padding-left: 10px;
 }
+    
+#repositorySubMenu {
+    display: none;
+}
+
+.headerSubMenu {
+    border: solid thin black;
+    padding: 5px;
+    width: 175px;
+}

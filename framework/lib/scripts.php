@@ -1,8 +1,15 @@
 <?php
 
 function scripts() {
-  // Clicking on title takes you to home page
-  include relative_address().'/framework/scripts/goHome.js';
+  require_once( 'lib/functions.lib.php' );
+  $framework = frameworkDir();
+
+  return <<<EOT
+<script src="{$framework}/scripts/script.js" language="javascript" type="text/javascript"></script>
+EOT;
+    /*
+  include relative_address().'/'.frameworkDir().'/scripts/goHome.js';
+  include relative_address().'/'.frameworkDir().'/scripts/script.js';*/
 }
 
 ?>
