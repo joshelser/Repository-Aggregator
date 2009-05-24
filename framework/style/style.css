@@ -81,6 +81,10 @@
     border: solid black;
     padding-left: 10px;
 }
+
+#repositoryMenu {
+    font-weight: bold;
+}
     
 #repositorySubMenu {
     display: none;

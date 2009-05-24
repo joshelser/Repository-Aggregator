@@ -9,7 +9,7 @@ $login = '<li><a href="login.php">Login</a></li>';
 if( isset( $_SESSION['username'] ) ){
   $login = <<<EOT
 <li><span>Welcome, {$_SESSION['username']}</span></li>
-<li id="repositoryMenu" onclick="showMenu()">Repositories</li>
+<li id="repositoryMenu" onclick="showMenu( 'repository' )">Repositories</li>
 <div id="repositorySubMenu" class="headerSubMenu">
 <a href="viewRepositories.php">View Repositories</a>
 <br />
