@@ -49,7 +49,7 @@ if( isset( $_POST['username'] ) && isset( $_POST['password'] ) ){
   $_SESSION['userId'] = $data->userId; /* Set user data in session variable */
   $_SESSION['username'] = $data->username;
 
-  header( "Location: index.php" ); /* Bounce to index.php */
+  header( "Location: viewRepositories.php" ); /* Bounce to index.php */
   exit();
 }
 
