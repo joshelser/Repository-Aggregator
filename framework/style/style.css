@@ -88,7 +88,6 @@
     margin:0px;
     padding:0px;
     font-weight:bold;
-    color:8e8e8e;
 }
 
 #nav #repositoryMenu:hover ul {
@@ -101,8 +100,27 @@
     height: 43px;
 }
 
+#nav ul li a {
+    font-style: normal;
+    text-decoration: none;
+    color: black;
+}
+
+#nav ul li  {
+    text-align: center;
+}
+
+#nav ul li a:hover {
+    color: gray;
+}
+
+#nav ul li:hover {
+    color: gray;
+}
+
 #nav ul li {
-    padding-right: 25px;
+    color: black;
+    width: 150px;
 }
 
 #nav li {
@@ -112,11 +130,6 @@
 #nav li li {
     display: block;
     float: none;
-}
-
-#nav li ul {
-    list-style-position: outside;
-    list-style-image: none;
 }
 
 #nav li ul li {
@@ -134,16 +147,16 @@
 #nav li ul a:hover {
     background: #949494;
     color: #000000;
-    opacity: 1.0;
-    filter: alpha( opacity = 100 );
 }
 
-#nav li ul {
-    border:2px solid black;
+#nav ul li ul {
+    padding: 10px;
+    text-align: center;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
     display:none;
     height:auto;
-    filter:alpha(opacity=95);
-    opacity:0.95;
     position:absolute;
     z-index:200;
 }
