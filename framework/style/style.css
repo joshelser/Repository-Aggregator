@@ -82,16 +82,68 @@
     padding-left: 10px;
 }
 
-#repositoryMenu {
-    font-weight: bold;
-}
-    
-#repositorySubMenu {
-    display: none;
+#nav {
+    border:none;
+    border:0px;
+    margin:0px;
+    padding:0px;
+    font-weight:bold;
+    color:8e8e8e;
 }
 
-.headerSubMenu {
-    border: solid thin black;
-    padding: 5px;
-    width: 175px;
+#nav #repositoryMenu:hover ul {
+    list-style-type: none;
+    display: block;
+}
+
+#nav ul {
+    list-style-type: none;
+    height: 43px;
+}
+
+#nav ul li {
+    padding-right: 25px;
+}
+
+#nav li {
+    float: left;
+}
+
+#nav li li {
+    display: block;
+    float: none;
+}
+
+#nav li ul {
+    list-style-position: outside;
+    list-style-image: none;
+}
+
+#nav li ul li {
+    display: block;
+}
+
+#nav li ul a {
+    display: block;
+    font-size: 12px;
+    font-style: normal;
+    padding: 0px 10px 0px 10px;
+    text-align: left;
+}
+
+#nav li ul a:hover {
+    background: #949494;
+    color: #000000;
+    opacity: 1.0;
+    filter: alpha( opacity = 100 );
+}
+
+#nav li ul {
+    border:2px solid black;
+    display:none;
+    height:auto;
+    filter:alpha(opacity=95);
+    opacity:0.95;
+    position:absolute;
+    z-index:200;
 }
