@@ -22,3 +22,6 @@ siteName = Repository Aggregator
 ; Do NOT include the trailing slash (i.e. 'framework', NOT 'framework/' )
 frameworkDirectory = framework
 
+; Location of a directory, writable by the webserver, to store repository information
+; Do NOT include the trailing slash (i.e. '/var/repositories', NOT '/var/repositories/' )
+repositoryDirectory = /var/repositories
