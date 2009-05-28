@@ -20,6 +20,7 @@
 CREATE TABLE repositories (
        repoId int(5) NOT NULL auto_increment,
        url varchar(250) NOT NULL,
+       localDir varchar(250) NOT NULL,
        dateAdded date NOT NULL,
        dateUpdated date NOT NULL,
        description varchar(250),
@@ -51,7 +52,7 @@ CREATE TABLE users (
        PRIMARY KEY (userId )
 );
 
-CREATE TABLE watch (
+CREATE TABLE watches (
        userId int(5) NOT NULL,
        repoId int(5) NOT NULL,
        PRIMARY KEY (userId, repoId )

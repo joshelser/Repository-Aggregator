@@ -39,7 +39,7 @@ require_once( $framework.'/class/Database.class.php' );
 $link = new Database;
 $link->connect();
 
-$sql = 'SELECT repoId FROM watch WHERE userId = %1 ';
+$sql = 'SELECT repoId FROM watches WHERE userId = %1 ';
 
 $result = $link->query( $sql, $_SESSION['userId'] );
 
@@ -56,7 +56,7 @@ if( in_array( (int)$_POST['repoId'], $repos ) ) { /* Don't re-add a repository *
 
 
 /* SQL to watch the repository*/
-$sql = 'INSERT INTO watch VALUES ( %1 , %2 )';
+$sql = 'INSERT INTO watches VALUES ( %1 , %2 )';
 
 $result = $link->query( $sql, $_SESSION['userId'], (int)$_POST['repoId'] );
 

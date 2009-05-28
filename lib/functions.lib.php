@@ -66,7 +66,7 @@ function getUserRepositories( $userId ) {
   $link->connect();
 
   /* Query */
-  $sql = 'SELECT * FROM watch WHERE userId = %1';
+  $sql = 'SELECT * FROM watches WHERE userId = %1';
 
   $result = $link->query( $sql, $userId );
 
@@ -109,7 +109,7 @@ function getUserRepositoryIds( $userId ) {
   $link->connect();
 
   /* Query */
-  $sql = 'SELECT * FROM watch WHERE userId = %1';
+  $sql = 'SELECT * FROM watches WHERE userId = %1';
 
   $result = $link->query( $sql, $userId );
 

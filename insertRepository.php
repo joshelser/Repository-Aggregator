@@ -66,7 +66,7 @@ if( !$result ){
 
 $repoId = mysql_insert_id();
 
-$sql = 'INSERT INTO watch VALUES ( %1 , %2 )';
+$sql = 'INSERT INTO watches VALUES ( %1 , %2 )';
 
 $result = $link->query( $sql, $_SESSION['userId'], $repoId );
 
