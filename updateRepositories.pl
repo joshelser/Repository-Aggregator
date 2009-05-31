@@ -2,6 +2,9 @@
 
 use strict;
 use warnings;
+
+use Git::Wrapper;
+
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
 
@@ -24,11 +27,40 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 		       }) 
     or die "Can't connect to the database: $DBI::errstr\n";
 
-my $sth = $dbh->prepare( 'SELECT * from repositories' );
+my $baseUrl = $values{ 'respositoryDirectory' };
+
+my $sth = $dbh->prepare( 'SELECT type, localDir, username, password FROM repositories' );
 
 $sth->execute();
 
 my @row;
 while(@row = $sth->fetchrow_array()) {
-    print "$row[0]: $row[1] $row[2] $row[3] $row[4]\n";
+  SWITCH:{
+      if( $row[0] == 0 ) {	# Git Repository
+	  updateGitRepository( @row );
+	  last SWITCH;
+      }
+      if( $row[0] == 1 ) {	# Subversion Repository
+	  updateSubversionRepository( @row );
+	  last SWITCH;
+      }
+      die 'Invalid repository type';
+    }
+
+    print "$row[0]: $row[1]\n";
 } 
+
+
+
+
+
+
+sub updateGitRepository {
+    my @data = @_;		# Get the data
+    
+    my $git = Git::Wrapper->new( $data[1] );
+}
+
+sub updateSubversionRepository {
+    ;
+}
