@@ -4,16 +4,13 @@ use strict;
 use warnings;
 
 use Git::Wrapper;
+use Git::PurePerl;
 
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
 
 my $ini = new Config::Abstract::Ini( 'config/config.ini.php' );
 my %values = $ini->get_entry( '' ); # Must supply '' because there are no "entries", only settings
-
-foreach ( keys %values ) {
-    print "'$_' => '$values{$_}'\n";
-}
 
 # Assign values
 my $data_source = 'dbi:mysql:'. $values{'dbName'} .':'. $values{'dbHostname'};
@@ -27,7 +24,7 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 		       }) 
     or die "Can't connect to the database: $DBI::errstr\n";
 
-my $baseUrl = $values{ 'respositoryDirectory' };
+my $baseDir = $values{ 'repositoryDirectory' };
 
 my $sth = $dbh->prepare( 'SELECT type, localDir, username, password FROM repositories' );
 
@@ -37,7 +34,7 @@ my @row;
 while(@row = $sth->fetchrow_array()) {
   SWITCH:{
       if( $row[0] == 0 ) {	# Git Repository
-	  updateGitRepository( @row );
+	  updateGitRepository( \@row, $baseDir );
 	  last SWITCH;
       }
       if( $row[0] == 1 ) {	# Subversion Repository
@@ -47,7 +44,6 @@ while(@row = $sth->fetchrow_array()) {
       die 'Invalid repository type';
     }
 
-    print "$row[0]: $row[1]\n";
 } 
 
 
@@ -56,9 +52,11 @@ while(@row = $sth->fetchrow_array()) {
 
 
 sub updateGitRepository {
-    my @data = @_;		# Get the data
-    
-    my $git = Git::Wrapper->new( $data[1] );
+    my $data = shift;		# Get the data
+    my $baseDir = shift;
+
+#    my $git = Git::Wrapper->new( $data[1] );
+    my $git = Git::PurePerl->new( directory => $baseDir.'/'.$data[1] );
 }
 
 sub updateSubversionRepository {
