@@ -44,7 +44,7 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 
 my $baseDir = $values{ 'repositoryDirectory' };
 
-my $sth = $dbh->prepare( 'SELECT type, localDir, username, password FROM repositories' );
+my $sth = $dbh->prepare( 'SELECT localDir FROM repositories' );
 
 $sth->execute();
 
@@ -52,11 +52,11 @@ my @row;
 while(@row = $sth->fetchrow_array()) {
   SWITCH:{
       if( $row[0] == 0 ) {	# Git Repository
-	  updateGitRepository( \@row, $baseDir );
+	  storeGitCommits( \@row, $baseDir );
 	  last SWITCH;
       }
       if( $row[0] == 1 ) {	# Subversion Repository
-	  updateSubversionRepository( \@row, $baseDir );
+	  storeSubversionCommits( \@row, $baseDir );
 	  last SWITCH;
       }
       die 'Invalid repository type';
@@ -69,7 +69,7 @@ while(@row = $sth->fetchrow_array()) {
 
 
 
-sub updateGitRepository {
+sub storeGitCommits {
     my $data = shift;		# Get the data
     my $baseDir = shift;
 
@@ -78,6 +78,6 @@ sub updateGitRepository {
     $git->pull;			# Update
 }
 
-sub updateSubversionRepository {
+sub storeSubversionCommits {
     ;
 }
