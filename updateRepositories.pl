@@ -55,8 +55,9 @@ sub updateGitRepository {
     my $data = shift;		# Get the data
     my $baseDir = shift;
 
-#    my $git = Git::Wrapper->new( $data[1] );
-    my $git = Git::PurePerl->new( directory => $baseDir.'/'.$data[1] );
+    my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] );
+
+    $git->pull;
 }
 
 sub updateSubversionRepository {
