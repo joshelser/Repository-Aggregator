@@ -20,6 +20,8 @@
 
 use strict;
 use warnings;
+use Date::Parse;
+use POSIX qw(strftime);
 
 use Git::Wrapper;
 use Git::PurePerl;
@@ -44,7 +46,7 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 
 my $baseDir = $values{ 'repositoryDirectory' };
 
-my $sth = $dbh->prepare( 'SELECT type, localDir FROM repositories' );
+my $sth = $dbh->prepare( 'SELECT type, localDir, repoId FROM repositories' );
 
 $sth->execute();
 
@@ -52,7 +54,7 @@ my @row;
 while(@row = $sth->fetchrow_array()) {
   SWITCH:{
       if( $row[0] == 0 ) {	# Git Repository
-	  storeGitCommits( \@row, $baseDir );
+	  storeGitCommits( $dbh, \@row, $baseDir );
 	  last SWITCH;
       }
       if( $row[0] == 1 ) {	# Subversion Repository
@@ -70,16 +72,31 @@ while(@row = $sth->fetchrow_array()) {
 
 
 sub storeGitCommits {
-    my $data = shift;		# Get the data
-    my $baseDir = shift;
+    my ( $dbh, $data, $baseDir, $sql ) = @_;		# Get the data
 
     my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
 
     my @logs = $git->log;
 
     foreach my $log ( @logs ){
-	foreach my $val ( keys %{$log} ){
-	    print "$val => ${$log}{$val}\n";
+	# Find out if the commit already exists
+	$sql = "SELECT COUNT(*) FROM commits WHERE repoId = @{$data}[2] AND commitVal = \"${$log}{id}\" LIMIT 1";
+	
+	my $sth = $dbh->prepare( $sql ); # Prepare and execute
+	$sth->execute();
+	
+	my @row = $sth->fetchrow_array();
+	
+	if( $row[0] == 0 ) { # Only enter if it's not already there    
+	    my $datetime = getTime( ${$log}{attr}{date} );
+
+	    chomp( ${$log}{message} ); # Remove the trailing newline
+
+	    # Insert into database
+	    $sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{id}\", \"${$log}{message}\", \"$datetime\" )";
+
+	    $sth = $dbh->prepare( $sql );
+	    $sth->execute();
 	}
     }
     
@@ -87,4 +104,15 @@ sub storeGitCommits {
 
 sub storeSubversionCommits {
     ;
+}
+
+
+# Format the date for mysql datetime
+sub getTime{
+    my $time = shift;		# Get the time
+
+    $time =~ m/(\w+)\s(\w+)\s(\d+)\s(.*?)\s-/; # Match the parts we need
+
+    # Format into Unix timestamp, then to datetime
+    return strftime( "%Y-%m-%d %H:%M:%S", localtime( str2time( "$1 $3 $2 $4" ) ) );
 }
