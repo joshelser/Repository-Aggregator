@@ -44,7 +44,7 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 
 my $baseDir = $values{ 'repositoryDirectory' };
 
-my $sth = $dbh->prepare( 'SELECT localDir FROM repositories' );
+my $sth = $dbh->prepare( 'SELECT type, localDir FROM repositories' );
 
 $sth->execute();
 
@@ -75,7 +75,14 @@ sub storeGitCommits {
 
     my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
 
-    $git->pull;			# Update
+    my @logs = $git->log;
+
+    foreach my $log ( @logs ){
+	foreach my $val ( keys %{$log} ){
+	    print "$val => ${$log}{$val}\n";
+	}
+    }
+    
 }
 
 sub storeSubversionCommits {
