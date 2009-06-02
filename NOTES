@@ -1,0 +1,6 @@
+Perl Modules Used:
+     Git::Wrapper <-- Hack upon
+     Date::Parse
+     DBI
+     Config::Abstract::Ini
+     POSIX qw(strftime)

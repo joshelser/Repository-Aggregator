@@ -24,7 +24,6 @@ use Date::Parse;
 use POSIX qw(strftime);
 
 use Git::Wrapper;
-use Git::PurePerl;
 
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
@@ -51,7 +50,7 @@ my $sth = $dbh->prepare( 'SELECT type, localDir, repoId FROM repositories' );
 $sth->execute();
 
 my @row;
-while(@row = $sth->fetchrow_array()) {
+while(@row = $sth->fetchrow_array()) { # Get all of the repositories
   SWITCH:{
       if( $row[0] == 0 ) {	# Git Repository
 	  storeGitCommits( $dbh, \@row, $baseDir );
@@ -70,7 +69,7 @@ while(@row = $sth->fetchrow_array()) {
 
 
 
-
+# Store a Git commit in the database
 sub storeGitCommits {
     my ( $dbh, $data, $baseDir, $sql ) = @_;		# Get the data
 
