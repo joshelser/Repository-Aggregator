@@ -100,18 +100,20 @@ sub log {
   $opt->{no_color} = 1;
   my @out = $self->_cmd(log => $opt, @_);
 
-  my @logs;
+  my (@logs, @filechanges);
   while (@out) {
     local $_ = shift @out;
 
-    if( $_ eq '' ){
+    if( $_ eq '' ){		# Skip if we get a blank string, not sure where this comes from
       ;
     }
     elsif( !/^commit (\S+)/ ){	# Hack to get numstat working
       if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
-	push @logs, { 'insertions' => $1,
-		      'deletions' => $2,
-		      'filechanged' => $3 };
+	my $current = Git::Wrapper::FileChange->new( { 'insertions' => $1,
+						      'deletions' => $2,
+						      'file' => $3 } );
+
+	push @filechanges, $current;
       }
       else{
 	die "unhandled: $_" unless /^commit (\S+)/;
@@ -136,7 +138,7 @@ sub log {
     }
   }
 
-  return @logs;
+  return { logs => \@logs, filechanges => \@filechanges };
 }
 
 package Git::Wrapper::Exception;
@@ -172,6 +174,26 @@ sub message { @_ > 1 ? ($_[0]->{message} = $_[1]) : $_[0]->{message} }
 sub date { shift->attr->{date} }
 
 sub author { shift->attr->{author} }
+
+
+# Class to store changes to files under VC
+package Git::Wrapper::FileChange;
+
+sub new {
+  my ($class, $arg) = @_;
+#  print ${$arg}{insertions}."\n\n";
+  return bless {
+    insertions => ${$arg}{insertions},
+    deletions => ${$arg}{deletions},
+    file => ${$arg}{file}
+  } => $class;
+}
+
+sub insertions { shift->{insertions} }
+
+sub deletions { shift->{deletions} }
+
+sub file { shift->{file} }
 
 1;
 __END__
