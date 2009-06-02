@@ -45,6 +45,7 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 
 my $baseDir = $values{ 'repositoryDirectory' };
 
+# Get all the repositories
 my $sth = $dbh->prepare( 'SELECT type, localDir, repoId FROM repositories' );
 
 $sth->execute();
