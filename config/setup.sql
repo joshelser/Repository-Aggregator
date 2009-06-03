@@ -43,6 +43,8 @@ CREATE TABLE fileChanges (
        fileChangeId int(11) NOT NULL auto_increment,
        commitId int(11) NOT NULL,
        file varchar(100) NOT NULL,
+       insertions int(5) NOT NULL,
+       deletions int(5) NOT NULL,
        PRIMARY KEY (fileChangeId)
 );
 
