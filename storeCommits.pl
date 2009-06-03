@@ -72,34 +72,41 @@ while(@row = $sth->fetchrow_array()) { # Get all of the repositories
 
 # Store a Git commit in the database
 sub storeGitCommits {
-    my ( $dbh, $data, $baseDir, $sql ) = @_;		# Get the data
-
-    my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
-
-    my @logs = $git->log;
-
-    foreach my $log ( @logs ){
-	# Find out if the commit already exists
-	$sql = "SELECT COUNT(*) FROM commits WHERE repoId = @{$data}[2] AND commitVal = \"${$log}{id}\" LIMIT 1";
+	my ( $dbh, $data, $baseDir, $sql ) = @_;		# Get the data
 	
-	my $sth = $dbh->prepare( $sql ); # Prepare and execute
-	$sth->execute();
+  my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
+
+	my @logs = $git->log;
+
+	foreach my $log ( @logs ){
+		# Find out if the commit already exists
+		$sql = "SELECT COUNT(*) FROM commits WHERE repoId = @{$data}[2] AND commitVal = \"${$log}{id}\" LIMIT 1";
 	
-	my @row = $sth->fetchrow_array();
+		my $sth = $dbh->prepare( $sql ); # Prepare and execute
+		$sth->execute();
 	
-	if( $row[0] == 0 ) { # Only enter if it's not already there    
-	    my $datetime = getTime( ${$log}{attr}{date} );
+		my @row = $sth->fetchrow_array();
+		
+		$sql = "INSERT INTO fileChanges VALUES ( NULL, id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
+		print "'$sql'\n";
 
-	    chomp( ${$log}{message} ); # Remove the trailing newline
+		if( $row[0] == 0 ) { # Only enter if it's not already there    
+			my $datetime = getTime( ${$log}{attr}{date} );
 
-	    # Insert into database
-	    $sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{id}\", \"${$log}{message}\", \"$datetime\" )";
+			chomp( ${$log}{message} ); # Remove the trailing newline
 
-	    $sth = $dbh->prepare( $sql );
-	    $sth->execute();
-	}
-    }
-    
+		 	# Insert into database
+	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{logs}{id}\", \"${$log}{logs}{message}\", \"$datetime\" )";
+
+		  $sth = $dbh->prepare( $sql );
+			$sth->execute();
+	
+			my $id = $dbh->last_insert_id( undef, undef, 'commits', undef );
+
+			$sql = "INSERT INTO fileChanges VALUES ( NULL, $id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
+			print "'$sql'\n";
+		}
+	}  
 }
 
 sub storeSubversionCommits {

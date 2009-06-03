@@ -99,46 +99,58 @@ sub log {
   my $opt  = ref $_[0] eq 'HASH' ? shift : {};
   $opt->{no_color} = 1;
   my @out = $self->_cmd(log => $opt, @_);
+	my ($currentLog, $currentFileChange);
+	my $total = 0;
 
   my (@logs, @filechanges);
-  while (@out) {
-    local $_ = shift @out;
+	while (@out) {
+		$total++;
+		local $_ = shift @out;
 
-    if( $_ eq '' ){		# Skip if we get a blank string, not sure where this comes from
-      ;
-    }
+    if( $_ eq '' ){	
+			$currentLog->filechanges( \@filechanges );
+			foreach( @filechanges ){
+				print "$_\n";
+			}
+			push @logs, $currentLog;
+			@filechanges = [];
+		}
     elsif( !/^commit (\S+)/ ){	# Hack to get numstat working
-      if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
-	my $current = Git::Wrapper::FileChange->new( { 'insertions' => $1,
-						      'deletions' => $2,
-						      'file' => $3 } );
+			if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
+				my $currentFileChange = Git::Wrapper::FileChange->new( { 'insertions' => $1,
+						'deletions' => $2,
+						'file' => $3 } );
 
-	push @filechanges, $current;
-      }
-      else{
-	die "unhandled: $_" unless /^commit (\S+)/;
-      }
-    }
-    else{
-      my $current = Git::Wrapper::Log->new($1);
-      $_ = shift @out;
-      
-      while (/^(\S+):\s+(.+)$/) {
-	$current->attr->{lc $1} = $2;
-	$_ = shift @out;
-      }
-      die "no blank line separating head from message" if $_;
-      my $message = '';
-      while (@out and length($_ = shift @out)) {
-	s/^\s+//;
-	$message .= "$_\n";
-      }
-      $current->message($message);
-      push @logs, $current;
+				push @filechanges, $currentFileChange;
+			}
+			else{
+				die "unhandled: $_" unless /^commit (\S+)/;
+			}
+		}
+		else{
+			$currentLog = Git::Wrapper::Log->new($1);
+			$_ = shift @out;
+
+			while (/^(\S+):\s+(.+)$/) {
+				$currentLog->attr->{lc $1} = $2;
+				$_ = shift @out;
+			}
+			die "no blank line separating head from message" if $_;
+			my $message = '';
+			while (@out and length($_ = shift @out)) {
+				s/^\s+//;
+				$message .= "$_\n";
+			}
+			$currentLog->message($message);
     }
   }
+	$currentLog->filechanges( \@filechanges );
+	foreach( @filechanges ){
+				print "$_\n";
+	}
+	push @logs, $currentLog;
 
-  return { logs => \@logs, filechanges => \@filechanges };
+  return @logs;
 }
 
 package Git::Wrapper::Exception;
@@ -157,11 +169,12 @@ sub status { shift->{status} }
 package Git::Wrapper::Log;
 
 sub new { 
-  my ($class, $id, %arg) = @_;
+  my ($class, $id, $filechange, %arg) = @_;
   return bless {
     id => $id,
     attr => {},
-    %arg,
+		filechanges => [],
+		%arg,
   } => $class;
 }
 
@@ -175,13 +188,14 @@ sub date { shift->attr->{date} }
 
 sub author { shift->attr->{author} }
 
+sub filechanges { @_ > 1 ? ($_[0]->{filechanges} = $_[1] ): $_[0]->{filechanges} }
 
 # Class to store changes to files under VC
 package Git::Wrapper::FileChange;
 
 sub new {
   my ($class, $arg) = @_;
-#  print ${$arg}{insertions}."\n\n";
+#  print ${$arg}{file}."\n\n";
   return bless {
     insertions => ${$arg}{insertions},
     deletions => ${$arg}{deletions},
