@@ -87,10 +87,6 @@ sub storeGitCommits {
 		}
 		print "After attrs\n";
 		foreach my $key ( @{$log->filechanges} ){
-			print "hi$key\n";
-			foreach ( $key ){
-				print "$_\n";
-				}
 			print "'".$key->insertions."'\n";
 			print "'".$key->deletions."'\n";
 			print "'".$key->file."'\n";
