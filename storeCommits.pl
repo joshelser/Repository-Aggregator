@@ -23,7 +23,7 @@ use warnings;
 use Date::Parse;
 use POSIX qw(strftime);
 
-use Git::Wrapper;
+require Wrapper;
 
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
@@ -76,7 +76,7 @@ sub storeGitCommits {
 	
   my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
 
-	my @logs = $git->log;
+	my @logs = $git->log( { numstat => 1 } );
 
 	foreach my $log ( @logs ){
 		# Find out if the commit already exists
@@ -87,24 +87,25 @@ sub storeGitCommits {
 	
 		my @row = $sth->fetchrow_array();
 		
-		$sql = "INSERT INTO fileChanges VALUES ( NULL, id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
-		print "'$sql'\n";
-
 		if( $row[0] == 0 ) { # Only enter if it's not already there    
 			my $datetime = getTime( ${$log}{attr}{date} );
 
 			chomp( ${$log}{message} ); # Remove the trailing newline
 
 		 	# Insert into database
-	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{logs}{id}\", \"${$log}{logs}{message}\", \"$datetime\" )";
+	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"".$log->message."\", \"$datetime\" )";
 
 		  $sth = $dbh->prepare( $sql );
 			$sth->execute();
 	
 			my $id = $dbh->last_insert_id( undef, undef, 'commits', undef );
 
-			$sql = "INSERT INTO fileChanges VALUES ( NULL, $id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
-			print "'$sql'\n";
+			foreach my $filechange ( @{$log->filechanges} ){
+				$sql = "INSERT INTO fileChanges VALUES ( NULL, $id, \"".$filechange->file."\", ".$filechange->insertions.", ".$filechange->deletions.")";
+
+				$sth = $dbh->prepare( $sql );
+				$sth->execute();
+			}	
 		}
 	}  
 }
