@@ -7,6 +7,7 @@ our $VERSION = '0.005';
 use IPC::Open3 () ;
 use Symbol;
 use File::pushd;
+use POSIX qw(isdigit);
 
 sub new {
   my ($class, $arg, %opt) = @_;
@@ -108,9 +109,7 @@ sub log {
 		local $_ = shift @out;
 
     if( $_ eq '' ){	
-#			$currentLog->filechanges( \@filechanges );
 			push @logs, $currentLog;
-#			@filechanges = ();
 		}
     elsif( !/^commit (\S+)/ ){	# Hack to get numstat working
 			if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
@@ -118,10 +117,6 @@ sub log {
 						'deletions' => $2,
 						'file' => $3 } );
 	
-#				print $currentFileChange->insertions."\n";
-#				print $currentFileChange->deletions."\n";
-#				print $currentFileChange->file."\n";
-#				push @filechanges, $currentFileChange;
 				$currentLog->filechanges( $currentFileChange );
 			}
 			else{
@@ -145,7 +140,6 @@ sub log {
 			$currentLog->message($message);
     }
   }
-#	$currentLog->filechanges( \@filechanges );
 	push @logs, $currentLog;
 
   return @logs;
@@ -167,13 +161,12 @@ sub status { shift->{status} }
 package Git::Wrapper::Log;
 
 sub new { 
-  my ($class, $id, $filechange, %arg) = @_;
-  return bless {
-    id => $id,
-    attr => {},
-		filechanges => (),
-		%arg,
-  } => $class;
+  my ($class, $id) = @_;
+	return bless {
+		id => $id,
+		filechanges => [],
+		attr => {} 
+	} => $class;
 }
 
 sub id { shift->{id} }
@@ -193,8 +186,10 @@ package Git::Wrapper::FileChange;
 
 sub new {
   my ($class, $arg) = @_;
-#  print ${$arg}{file}."\n\n";
-  return bless {
+	${$arg}{insertions} = 0 unless POSIX::isdigit (${$arg}{insertions});
+	${$arg}{deletions} = 0 unless POSIX::isdigit (${$arg}{deletions});
+
+	return bless {
     insertions => ${$arg}{insertions},
     deletions => ${$arg}{deletions},
     file => ${$arg}{file}
