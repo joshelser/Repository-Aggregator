@@ -23,7 +23,7 @@ use warnings;
 use Date::Parse;
 use POSIX qw(strftime);
 
-use Git::Wrapper;
+require Wrapper;
 
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
@@ -45,7 +45,6 @@ my $dbh = DBI->connect($data_source, $user, $pass, {
 
 my $baseDir = $values{ 'repositoryDirectory' };
 
-# Get all the repositories
 my $sth = $dbh->prepare( 'SELECT type, localDir, repoId FROM repositories' );
 
 $sth->execute();
@@ -73,41 +72,56 @@ while(@row = $sth->fetchrow_array()) { # Get all of the repositories
 # Store a Git commit in the database
 sub storeGitCommits {
 	my ( $dbh, $data, $baseDir, $sql ) = @_;		# Get the data
-	
-  my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
 
-	my @logs = $git->log;
+	my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
+
+	my @logs = $git->log( { numstat => 1 } );
 
 	foreach my $log ( @logs ){
-		# Find out if the commit already exists
-		$sql = "SELECT COUNT(*) FROM commits WHERE repoId = @{$data}[2] AND commitVal = \"${$log}{id}\" LIMIT 1";
-	
-		my $sth = $dbh->prepare( $sql ); # Prepare and execute
-		$sth->execute();
-	
-		my @row = $sth->fetchrow_array();
-		
-		$sql = "INSERT INTO fileChanges VALUES ( NULL, id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
-		print "'$sql'\n";
-
-		if( $row[0] == 0 ) { # Only enter if it's not already there    
-			my $datetime = getTime( ${$log}{attr}{date} );
-
-			chomp( ${$log}{message} ); # Remove the trailing newline
-
-		 	# Insert into database
-	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{logs}{id}\", \"${$log}{logs}{message}\", \"$datetime\" )";
-
-		  $sth = $dbh->prepare( $sql );
-			$sth->execute();
-	
-			my $id = $dbh->last_insert_id( undef, undef, 'commits', undef );
-
-			$sql = "INSERT INTO fileChanges VALUES ( NULL, $id, ${$log}{filechanges}->file, ${$log}{filechanges}->insertions, ${$log}{filechanges}->deletions)";
-			print "'$sql'\n";
+		print "'".$log->id."'\n";
+		print "'".$log->message."'\n";
+		print "'".$log->date."'\n";
+		print "'".$log->author."'\n";
+		foreach my $key ( keys %{$log->attr} ){
+			print "'$key'=> '${$log->attr}{$key}'\n";
 		}
-	}  
-}
+		print "After attrs\n";
+		foreach my $key ( @{$log->filechanges} ){
+			print "hi$key\n";
+			foreach ( $key ){
+				print "$_\n";
+				}
+			print "'".$key->insertions."'\n";
+			print "'".$key->deletions."'\n";
+			print "'".$key->file."'\n";
+		}
+	}
+
+	# Find out if the commit already exists
+#	$sql = "SELECT COUNT(*) FROM commits WHERE repoId = @{$data}[2] AND commitVal = \"${$log}{id}\" LIMIT 1";
+	
+#	my $sth = $dbh->prepare( $sql ); # Prepare and execute
+#	$sth->execute();
+	
+#	my @row = $sth->fetchrow_array();
+
+#	foreach my $key( keys %{$log} ){
+#	    print "'$key' => '${$log}{$key}'\n";
+#	}
+	
+	if( $row[0] == 0 ) { # Only enter if it's not already there    
+#	    my $datetime = getTime( ${$log}{attr}{date} );
+
+#	    chomp( ${$log}{message} ); # Remove the trailing newline
+
+	    # Insert into database
+#	    $sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"${$log}{id}\", \"${$log}{message}\", \"$datetime\" )";
+
+#	    $sth = $dbh->prepare( $sql );
+#	    $sth->execute();
+	}
+    }
+    
 
 sub storeSubversionCommits {
     ;
