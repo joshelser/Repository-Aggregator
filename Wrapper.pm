@@ -102,23 +102,27 @@ sub log {
 	my ($currentLog, $currentFileChange);
 	my $total = 0;
 
-  my (@logs, @filechanges);
+  my @logs;
 	while (@out) {
 		$total++;
 		local $_ = shift @out;
 
     if( $_ eq '' ){	
-			$currentLog->filechanges( \@filechanges );
+#			$currentLog->filechanges( \@filechanges );
 			push @logs, $currentLog;
-			@filechanges = ();
+#			@filechanges = ();
 		}
     elsif( !/^commit (\S+)/ ){	# Hack to get numstat working
 			if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
 				my $currentFileChange = Git::Wrapper::FileChange->new( { 'insertions' => $1,
 						'deletions' => $2,
 						'file' => $3 } );
-
-				push @filechanges, $currentFileChange;
+	
+#				print $currentFileChange->insertions."\n";
+#				print $currentFileChange->deletions."\n";
+#				print $currentFileChange->file."\n";
+#				push @filechanges, $currentFileChange;
+				$currentLog->filechanges( $currentFileChange );
 			}
 			else{
 				die "unhandled: $_" unless /^commit (\S+)/;
@@ -141,7 +145,7 @@ sub log {
 			$currentLog->message($message);
     }
   }
-	$currentLog->filechanges( \@filechanges );
+#	$currentLog->filechanges( \@filechanges );
 	push @logs, $currentLog;
 
   return @logs;
@@ -167,7 +171,7 @@ sub new {
   return bless {
     id => $id,
     attr => {},
-		filechanges => [],
+		filechanges => (),
 		%arg,
   } => $class;
 }
@@ -182,7 +186,7 @@ sub date { shift->attr->{date} }
 
 sub author { shift->attr->{author} }
 
-sub filechanges { @_ > 1 ? ($_[0]->{filechanges} = $_[1] ): $_[0]->{filechanges} }
+sub filechanges { @_ > 1 ? ( push @{$_[0]->{filechanges}}, $_[1] ): $_[0]->{filechanges} }
 
 # Class to store changes to files under VC
 package Git::Wrapper::FileChange;
