@@ -109,11 +109,8 @@ sub log {
 
     if( $_ eq '' ){	
 			$currentLog->filechanges( \@filechanges );
-			foreach( @filechanges ){
-				print "$_\n";
-			}
 			push @logs, $currentLog;
-			@filechanges = [];
+			@filechanges = ();
 		}
     elsif( !/^commit (\S+)/ ){	# Hack to get numstat working
 			if( /^(\d+|-)\s(\d+|-)\s(\S+)$/ ){
@@ -145,9 +142,6 @@ sub log {
     }
   }
 	$currentLog->filechanges( \@filechanges );
-	foreach( @filechanges ){
-				print "$_\n";
-	}
 	push @logs, $currentLog;
 
   return @logs;
