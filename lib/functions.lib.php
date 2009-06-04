@@ -27,6 +27,13 @@ function frameworkDir() {
   return Config::get( 'frameworkDirectory' );
 }
 
+/* Abstraction to return one repository given a repoId */
+function getRepository( $repoId ) {
+	$arr = getRepositoriesFromIds( array( (int)$repoId ) );
+
+	return $arr[0];
+}
+
 /* Returns an array of repositories in the system */
 function getAllRepositories() {
   require_once( 'class/Repository.class.php' );
