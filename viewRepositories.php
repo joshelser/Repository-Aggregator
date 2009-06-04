@@ -57,7 +57,7 @@ for( $i = 0; $i< count( $repos ); $i++ ) {
 
   $content .= <<<EOT
 <div id="{$i}">
-  <h3>{$data[url]}</h3>
+  <h3><a href="viewCommits?id={$data[repoId]}">{$data[url]}</a></h3>
   <p>Description: {$data[description]}</p>
   <p>Date Added: {$data[dateAdded]}</p>
 </div>
