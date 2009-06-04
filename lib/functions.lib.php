@@ -172,6 +172,6 @@ function getCommits( $repoId ) {
 	}
 
   return $commits;		/* Return the repository Ids */
-
+}
 
 ?>
