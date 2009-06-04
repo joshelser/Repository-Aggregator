@@ -137,6 +137,7 @@ sub log {
 				s/^\s+//;
 				$message .= "$_\n";
 			}
+			$message =~ s/\"/\\"/g;
 			$currentLog->message($message);
     }
   }
