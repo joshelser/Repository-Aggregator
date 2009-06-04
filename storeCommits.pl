@@ -95,7 +95,7 @@ sub storeGitCommits {
 		 	# Insert into database
 	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"".$log->message."\", \"$datetime\" )";
 
-		  $sth = $dbh->prepare( $sql );
+			$sth = $dbh->prepare( $sql );
 			$sth->execute();
 	
 			my $id = $dbh->last_insert_id( undef, undef, 'commits', undef );
