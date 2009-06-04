@@ -142,7 +142,7 @@ function getCommits( $repoId ) {
   $link->connect();
 
   /* Query */
-  $sql = 'SELECT * FROM commits WHERE repoId = %1 ORDER BY commitId DESC';
+  $sql = 'SELECT * FROM commits WHERE repoId = %1 ORDER BY commitDateTime DESC';
 
   $result = $link->query( $sql, $repoId );
 
