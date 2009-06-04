@@ -130,5 +130,48 @@ function getUserRepositoryIds( $userId ) {
   return $repoIds;		/* Return the repository Ids */
 }
 
+/* Return the commits associated with a repository */
+function getCommits( $repoId ) {
+	require_once( 'class/Repository.class.php' );
+  $framework = frameworkDir();
+
+  /* Database */
+  require_once( $framework.'/class/Database.class.php' );
+
+  $link = new Database;
+  $link->connect();
+
+  /* Query */
+  $sql = 'SELECT * FROM commits WHERE repoId = %1';
+
+  $result = $link->query( $sql, $repoId );
+
+  $commits = array();
+	$files = array();
+
+  /* Get Ids */
+  while( $row = mysql_fetch_array( $result ) ){
+  	$sql = 'SELECT * FROM fileChanges WHERE commitId = %1'; /* Get the changes for the commit */
+
+		$fileResult = $link->query( $sql, $row['commitId'] );
+
+		/* Fetch all the changes */
+		while( $fileRow = mysql_fetch_array( $fileResult ) ) {
+			$files[] = array( 'file' => $fileRow['file'],
+												'insertions' => $fileRow['insertions'],
+												'deletions' => $fileRow['deletions'] );
+		}
+
+		/* Store the commit data and the changes */
+		$commits[] = array( 'commitVal' => $row['commitVal'],
+											'commitMessage' => $row['commitMessage'],
+											'commitDateTime' => $row['commitDateTime'],
+											'fileChanges' => $files );
+
+		$files = array();
+	}
+
+  return $commits;		/* Return the repository Ids */
+
 
 ?>
