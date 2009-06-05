@@ -86,8 +86,8 @@ sub storeGitCommits {
 		$sth->execute();
 	
 		my @row = $sth->fetchrow_array();
-		
 		if( $row[0] == 0 ) { # Only enter if it's not already there    
+
 			my $datetime = getTime( ${$log}{attr}{date} );
 
 			chomp( ${$log}{message} ); # Remove the trailing newline
