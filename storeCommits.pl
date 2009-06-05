@@ -87,11 +87,6 @@ sub storeGitCommits {
 	
 		my @row = $sth->fetchrow_array();
 		
-		if( ${$log}{id} eq '73a90461ce49cf66b0950153aa9e220c8482d541' ){
-			print $row[0]."\n";
-			die();
-			}
-
 		if( $row[0] == 0 ) { # Only enter if it's not already there    
 			my $datetime = getTime( ${$log}{attr}{date} );
 
