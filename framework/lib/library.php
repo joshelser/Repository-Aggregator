@@ -196,11 +196,11 @@ function body( $header,$subtitle=' ', $content, $navigation ){
       <div id="personal">$personal</div>
     </div>
 			
-    <div id="nav">
+    <div id="nav" class="curved">
       {$fnNavigation($navigation)}
     </div>
 	
-    <div id="content">
+    <div id="content" class="curved">
       <div id="side">
         $side
       </div>
@@ -215,7 +215,7 @@ EOT;
 function foot( $footer = 'All Rights Reserved' ){
   $return = <<<EOT
 \n
-    <div id="footer">
+    <div id="footer" class="curved">
 $footer
     </div>
 			

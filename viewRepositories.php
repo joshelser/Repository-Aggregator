@@ -56,16 +56,19 @@ for( $i = 0; $i< count( $repos ); $i++ ) {
   $data = $repos[$i]->getData(); /* Get the data for the repository */
 
   $content .= <<<EOT
-<div id="{$i}" class="repository">
+<div id="repo{$i}" class="repository">
   <h3><a href="viewCommits.php?id={$data[repoId]}">{$data[url]}</a></h3>
-  <p>Description: {$data[description]}</p>
-  <p>Date Added: {$data[dateAdded]}</p>
+  <p><span class="descriptor">Description:</span> {$data[description]}</p>
+  <p><span class="descriptor">Date Added:</span> {$data[dateAdded]}</p>
 </div>
 EOT;
 
   if( $i != count( $repos ) -1 ){
     $content .= "\n<br/>\n";
   }
+	else {
+		$content .= "\n</div>\n";
+	}
 }
   
 

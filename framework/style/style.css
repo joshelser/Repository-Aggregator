@@ -76,6 +76,19 @@
 /* 		font:11pt arial; */
 /* 	} */
 
+body {
+	background-color: lightblue;
+}
+
+#content {
+	background-color: white;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1024px;
+	padding-left: 50px;
+	padding-bottom: 25px;
+	margin-bottom: 25px;
+}
 
 #repositories div.repository {
 		display: inline-block;
@@ -106,26 +119,39 @@
 		text-align: left;
 }
 
-#content div.commit div.filechange .descriptor {
+.descriptor {
 		font-weight: bold;
 }
 
 #nav {
-    border:none;
-    border:0px;
-    margin:0px;
-    padding:0px;
+#    border:none;
+#    border:0px;
+#    margin:0px;
+#    padding:0px;
+		margin-bottom: 25px;
+		padding-top: 1px;
+		background-color: white;
     font-weight:bold;
+		width: 1024px;
+		margin-left: auto;
+		margin-right: auto;
 }
 
 #nav #repositoryMenu:hover ul {
     list-style-type: none;
-    display: block;
+    display: inline;
+		width: auto;
+		margin-left: auto;
+		margin-right: auto;
 }
 
 #nav ul {
     list-style-type: none;
     height: 43px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 1024px;
+		text-align: center;
 }
 
 #nav ul li a {
@@ -146,18 +172,19 @@
     color: gray;
 }
 
-#nav ul li {
-    color: black;
-    width: 150px;
-}
-
 #nav li {
-    float: left;
+    display: inline;
+/*		padding-left: 20px;*/
+		padding-right: 20px;
+		font-weight: bold;
+		text-align: center;
+		color: black;
+    width: 150px;
+
 }
 
 #nav li li {
     display: block;
-    float: none;
 }
 
 #nav li ul li {
@@ -168,7 +195,7 @@
     display: block;
     font-size: 12px;
     font-style: normal;
-    padding: 0px 10px 0px 10px;
+/*    padding: 0px 10px 0px 10px;*/
     text-align: left;
 }
 
@@ -178,7 +205,7 @@
 }
 
 #nav ul li ul {
-    padding: 10px;
+/*    padding: 10px;*/
     text-align: center;
     border-left: 2px solid black;
     border-right: 2px solid black;
@@ -186,5 +213,22 @@
     display:none;
     height:auto;
     position:absolute;
+		background-color: white;
+		top: 45px;
+		left: 47%;
     z-index:200;
+}
+
+#footer {
+		padding-top: 1px;
+		padding-bottom: 1px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 1024px;
+		background-color: white;
+}
+
+.curved {
+		-moz-border-radius: 2em;
+		border-radius: 2em;
 }
