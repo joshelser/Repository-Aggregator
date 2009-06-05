@@ -43,10 +43,10 @@ for( $i = 0; $i < count( $commits ); $i++ ) {
   $content .= <<<EOT
 <div id="{$i}" class="commit">
   <h3>{$commits[$i][commitMessage]}</h3>
-  <p>Commit: {$commits[$i][commitVal]}</p>
-  <p>Date: {$commits[$i][commitDateTime]}</p>
+  <p><span class="descriptor">Commit:</span> {$commits[$i][commitVal]}</p>
+  <p><span class="descriptor">Date:</span> {$commits[$i][commitDateTime]}</p>
 	<div id="files{$i}">
-		<p>Files changed:</p>
+		<p class="descriptor">Files changed:</p>
 		
 		<table class="filechange">
 			<tr>
