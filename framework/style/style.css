@@ -77,9 +77,36 @@
 /* 	} */
 
 
-#repositories div{
-    border: solid black;
-    padding-left: 10px;
+#repositories div.repository {
+		display: inline-block;
+		border: solid black;
+    padding-left: 20px;
+		width: auto;
+}
+
+#content div.commit {
+		display: inline-block;
+#		float: left;
+	  border: solid black;
+		padding-left: 20px;
+		padding-right: 20px;
+		width: auto;
+}
+
+#content div.commit table.filechange {
+		min-width: 600px;
+		position: relative;
+		left: 30px;
+		margin-bottom: 20px;
+}
+
+#content div.commit table.filechange th{
+		width: auto;
+		text-align: left;
+}
+
+#content div.commit div.filechange .descriptor {
+		font-weight: bold;
 }
 
 #nav {

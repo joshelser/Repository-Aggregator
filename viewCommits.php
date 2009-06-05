@@ -41,27 +41,34 @@ $commits = getCommits( $_GET['id'] ); /* Get commits */
 
 for( $i = 0; $i < count( $commits ); $i++ ) {
   $content .= <<<EOT
-<div id="{$i}">
+<div id="{$i}" class="commit">
   <h3>{$commits[$i][commitMessage]}</h3>
   <p>Commit: {$commits[$i][commitVal]}</p>
   <p>Date: {$commits[$i][commitDateTime]}</p>
 	<div id="files{$i}">
-		<p>Files changed</p>
+		<p>Files changed:</p>
+		
+		<table class="filechange">
+			<tr>
+				<th>Filename:</th><th>Insertions:</th><th>Deletions:</th>
+			</tr>
 EOT;
 
 	for( $j = 0; $j < count( $commits[$i][fileChanges] ); $j++ ){
 		$content .= <<<EOT
-		  <div class="file">
-				<p>Filename: {$commits[$i][fileChanges][$j][file]}</p>
-				<p>Insertions: {$commits[$i][fileChanges][$j][insertions]}</p>
-				<p>Deletions: {$commits[$i][fileChanges][$j][deletions]}</p>
-			</div>
+				<tr>
+					<td>{$commits[$i][fileChanges][$j][file]}</td>
+					<td>{$commits[$i][fileChanges][$j][insertions]}</td>
+					<td>{$commits[$i][fileChanges][$j][deletions]}</td>
+				</tr>
 EOT;
 		}
 	
 	$content .= <<<EOT
+		</table>
 	</div>
 </div>
+<br />
 EOT;
 
   if( $i != count( $commits ) -1 ){
