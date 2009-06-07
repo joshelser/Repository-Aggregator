@@ -86,13 +86,23 @@ body {
 	margin-right: auto;
 	width: 1024px;
 	padding-top: 5px;
-/*	padding-left: 50px;*/
 	padding-bottom: 25px;
-/*	padding-right: 25px;*/
 	margin-bottom: 25px;
 }
 
 #content h1 {
+		padding-left: 25px;
+}
+
+#content h3 {
+		padding-left: 25px;
+}
+
+#content span {
+		padding-left: 25px;
+}
+
+#content form {
 		padding-left: 25px;
 }
 
@@ -112,11 +122,13 @@ body {
 #content div.commit {
 		display: inline-block;
 	  border: solid black;
-		padding-left: 20px;
-		padding-right: 20px;
 		width: auto;
-		padding-left: 25px;
 		padding-right: 25px;
+		margin-left: 25px;
+}
+
+#content div.commit div p {
+		margin-left: 25px;
 }
 
 #content div.commit table.filechange {
@@ -124,6 +136,7 @@ body {
 		position: relative;
 		left: 30px;
 		margin-bottom: 20px;
+		margin-left: 25px;
 }
 
 #content div.commit table.filechange th{
