@@ -37,6 +37,7 @@ $title = 'View Commits';
 $subtitle = Config::get( 'siteName' );
 $content = '<div id="pagination" class="pagination"></div>'."\n<br /><br />";
 $content .= '<div id="commits"></div>'."\n";
+$content .= '<div id="paginationbottom" class="pagination"></div>'."\n";
 
 $commits = getCommits( $_GET['id'] ); /* Get commits */
 

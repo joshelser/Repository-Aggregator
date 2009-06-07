@@ -1,6 +1,8 @@
 function handlePaginationClick( new_page_index, pagination_container ) {
+	var items_per_page = 10;
+	var max_elem = Math.min( ( new_page_index + 1 ) * items_per_page, commits.length );
 	var content = '';
-	for( var i=new_page_index; i < commits.length; i++ ) {
+	for( var i=new_page_index*items_per_page; i < max_elem; i++ ) {
 		content += '<div id="commit' + i + '" class="commit">';
 		content += '<h3>'+ commits[i]['commitMessage'] + '</h3>';
 		content += '<p><span class="descriptor">Commit:</span>' + commits[i]['commitVal'] + '</p>';
@@ -36,6 +38,10 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 
 $(document).ready(function() {
 	$("#pagination").pagination( commits.length, {
-		items_per_page:25,
 		callback:handlePaginationClick } );
-});
+
+
+	$("#paginationbottom").pagination( commits.length, {
+		callback:handlePaginationClick } );
+	}
+);
