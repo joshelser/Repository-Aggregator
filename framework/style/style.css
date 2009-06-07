@@ -90,19 +90,7 @@ body {
 	margin-bottom: 25px;
 }
 
-#content h1 {
-		padding-left: 25px;
-}
-
-#content h3 {
-		padding-left: 25px;
-}
-
-#content span {
-		padding-left: 25px;
-}
-
-#content form {
+#content span, #content form, #content h1, #content h3, #content p{
 		padding-left: 25px;
 }
 
@@ -268,7 +256,11 @@ body {
 .pagination {
 	font-size: 80%;
 }
-        
+
+#paginationbottom{
+	margin-bottom: 25px;
+}
+
 .pagination a {
 	text-decoration: none;
 	border: solid 1px #AAE;
@@ -276,22 +268,22 @@ body {
 }
 
 .pagination a, .pagination span {
-display: block;
-float: left;
-padding: 0.3em 0.5em;
-				 margin-right: 5px;
-				 margin-bottom: 5px;
+	display: block;
+	float: left;
+	padding: 0.3em 0.5em;
+	margin-right: 5px;
+	margin-bottom: 5px;
 }
 
 .pagination .current {
-background: #26B;
-color: #fff;
-border: solid 1px #AAE;
+	background: #26B;
+	color: #fff;
+	border: solid 1px #AAE;
 }
 
 .pagination .current.prev, .pagination .current.next{
-color:#999;
-			border-color:#999;
-background:#fff;
+	color:#999;
+	border-color:#999;
+	background:#fff;
 }
 
