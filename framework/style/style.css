@@ -86,10 +86,19 @@ body {
 	margin-right: auto;
 	width: 1024px;
 	padding-top: 5px;
-	padding-left: 50px;
+/*	padding-left: 50px;*/
 	padding-bottom: 25px;
-	padding-right: 25px;
+/*	padding-right: 25px;*/
 	margin-bottom: 25px;
+}
+
+#content h1 {
+		padding-left: 25px;
+}
+
+#repositories {
+		padding-left: 25px;
+		padding-right: 25px;
 }
 
 #repositories div.repository {
@@ -102,11 +111,12 @@ body {
 
 #content div.commit {
 		display: inline-block;
-#		float: left;
 	  border: solid black;
 		padding-left: 20px;
 		padding-right: 20px;
 		width: auto;
+		padding-left: 25px;
+		padding-right: 25px;
 }
 
 #content div.commit table.filechange {
@@ -126,10 +136,6 @@ body {
 }
 
 #nav {
-#    border:none;
-#    border:0px;
-#    margin:0px;
-#    padding:0px;
 		margin-bottom: 25px;
 		padding-top: 1px;
 		background-color: white;
@@ -176,7 +182,6 @@ body {
 
 #nav li {
     display: inline;
-/*		padding-left: 20px;*/
 		padding-right: 20px;
 		font-weight: bold;
 		text-align: center;
@@ -197,7 +202,6 @@ body {
     display: block;
     font-size: 12px;
     font-style: normal;
-/*    padding: 0px 10px 0px 10px;*/
     text-align: left;
 }
 
@@ -207,7 +211,6 @@ body {
 }
 
 #nav ul li ul {
-/*    padding: 10px;*/
     text-align: center;
     border-left: 2px solid black;
     border-right: 2px solid black;
@@ -228,6 +231,7 @@ body {
 		margin-right: auto;
 		width: 1024px;
 		background-color: white;
+		text-align: center;
 }
 
 .curved {

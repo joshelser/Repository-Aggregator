@@ -201,9 +201,9 @@ function body( $header,$subtitle=' ', $content, $navigation ){
     </div>
 	
     <div id="content" class="curved">
-      <div id="side">
+<!--      <div id="side">
         $side
-      </div>
+      </div>-->
 
       <h1>$subtitle</h1>
         $content
