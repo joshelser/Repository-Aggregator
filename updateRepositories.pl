@@ -22,7 +22,6 @@ use strict;
 use warnings;
 
 use Git::Wrapper;
-use Git::PurePerl;
 
 use DBI;			# Database
 use Config::Abstract::Ini;	# Parse the config file
