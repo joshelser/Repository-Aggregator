@@ -97,6 +97,8 @@ if( !$result ) {
   die( 'Watch query failed' );
 }
 
+exec( 'createRepository.pl', array( $_POST['type'], $localDir ) );
+
 header( 'location: viewRepositories.php?action=added' );
 
 ?>
