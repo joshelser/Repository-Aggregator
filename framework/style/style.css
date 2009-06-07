@@ -114,8 +114,7 @@ body {
 #repositories div.repository {
 		display: inline-block;
 		border: solid black;
-    padding-left: 20px;
-		padding-right: 20px;
+    padding-right: 20px;
 		width: auto;
 }
 
@@ -123,8 +122,9 @@ body {
 		display: inline-block;
 	  border: solid black;
 		width: auto;
-		padding-right: 25px;
+		margin-right: 25px;
 		margin-left: 25px;
+		padding-right: 25px;
 }
 
 #content div.commit div p {
