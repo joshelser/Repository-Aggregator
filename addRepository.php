@@ -44,6 +44,15 @@ $content = <<<EOT
   <h3>Add a new repository to watch</h3>
   <form method="POST" action="insertRepository.php">
     <table>
+			<tr>
+				<td>
+					<label for="name">Project Name:</label>
+				</td>
+				<td>
+					<input type="text" id="name" name="name" />
+				</td>
+			</tr>
+
       <tr>
         <td>
           <label for="url">Repository URL:</label>
@@ -52,6 +61,18 @@ $content = <<<EOT
           <input type="text" id="url" name="url"/>
         </td>
       </tr>
+
+			<tr>
+				<td>
+					<label for="type">Type of Repository:</label>
+				</td>
+				<td>
+					<select name="type">
+						<option value="0">Git</option>
+						<option value="1">SVN</option>
+					</select>
+				</td>
+			</tr>
 
       <tr>
         <td>

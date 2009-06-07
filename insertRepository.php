@@ -33,13 +33,36 @@ if( !isset( $_POST['url'] ) ){	/* Need to have a URL */
   die( 'Please enter a repository URL' );
 }
 
+if( !isset( $_POST['type'] ) ){ /* Need to have a type */
+	die( 'Please select a repository type' );
+}
+
+if( !isset( $_POST['name'] ) ){
+	die( 'Please enter a project name' );
+}
+
 require_once( $framework.'/class/Database.class.php' );
 
 $link = new Database;
 $link->connect();
 
 /* SQL */
-$sql = 'INSERT INTO repositories VALUES ( NULL, %1 , %2 , %3 , %4 , %5 , %6 )';
+$sql = 'INSERT INTO repositories VALUES ( NULL, %1 , %2 , %3 , %4 , %5 , %6 , %7 , %8 )';
+
+$localDir = Config::get( 'repositoryDirectory' ) .'/'. $_POST['name'];
+$extension = 0;
+
+while( file_exists( $localDir.(string)$extension ) ){ /* Tack on an extra extension if necessary */
+	$extension++;
+
+	if( $extension > 100 ) {
+		die( 'Common name chosen, select another project name' );
+	}
+}
+
+if( $extension > 0 ){ /* Save the extension */
+	$localDir .= (string)$extension;
+}
 
 $description = 'NULL';
 $username = 'NULL';
@@ -57,7 +80,7 @@ if( $_POST['password'] != '' ){
   $password = md5( $_POST['password'] );
 }
 
-$result = $link->query( $sql, $_POST['url'], date( 'Y-m-d' ), date( 'Y-m-d' ),
+$result = $link->query( $sql, $_POST['url'], (int)$_POST['type'], $localDir, date( 'Y-m-d' ), date( 'Y-m-d' ),
 			$description, $username, $password );
 
 if( !$result ){
