@@ -10,7 +10,7 @@ function scripts( $js = '' ) {
 		$return .= <<<EOT
 <script src="{$framework}/scripts/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
 <script src="{$framework}/scripts/jquery/jquery.pagination.js" language="javascript" type="text/javascript"></script>
-<script scr="{$framework}/scripts/pagination.js" language="javascript" type="text/javascript"></script>
+<script src="{$framework}/scripts/pagination.js" language="javascript" type="text/javascript"></script>
 EOT;
 	}
 
