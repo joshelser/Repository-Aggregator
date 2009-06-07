@@ -71,7 +71,7 @@ while(@row = $sth->fetchrow_array()) {
 sub updateGitRepository {
     my $data = shift;		# Get the data
     my $baseDir = shift;
-
+		print "$baseDir/@{$data}[1]\n";
     my $git = Git::Wrapper->new( $baseDir.'/'.@{$data}[1] ); # Create the Git Repo
 
     $git->pull;			# Update

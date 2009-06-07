@@ -119,7 +119,7 @@ sub storeSubversionCommits {
 sub getTime{
     my $time = shift;		# Get the time
 
-    $time =~ m/(\w+)\s(\w+)\s(\d+)\s(.*?)\s-/; # Match the parts we need
+    $time =~ m/(\w+)\s(\w+)\s(\d+)\s(.*?)\s/; # Match the parts we need
 
     # Format into Unix timestamp, then to datetime
     return strftime( "%Y-%m-%d %H:%M:%S", localtime( str2time( "$1 $3 $2 $4" ) ) );
