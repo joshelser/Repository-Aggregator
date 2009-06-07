@@ -22,6 +22,10 @@ use strict;
 use warnings;
 
 use Git::Wrapper;
+use Config::Abstract::Ini;
+
+my $ini = new Config::Abstract::Ini( 'config/config.ini.php' );
+my %values = $ini->get_entry( '' );
 
 if( @ARGV != 3 ) {
 	die( "Usage: ./createRepository type url path\n" );
@@ -29,7 +33,7 @@ if( @ARGV != 3 ) {
 
 my ( $type, $url, $repoDir ) = @ARGV;
 
-createGitRepository( $url, $repoDir );
+createGitRepository( $url, $values{'repositoryDirectory'}.$repoDir );
 
 sub createGitRepository {
 	my $url = shift;
