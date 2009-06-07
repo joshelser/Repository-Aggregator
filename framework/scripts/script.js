@@ -8,8 +8,8 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 		content += '<p><span class="descriptor">Commit:</span>' + commits[i]['commitVal'] + '</p>';
 		content += '<p><span class="descriptor">Date:</span>' + commits[i]['commitDateTime'] + '</p>';
 		content += '<div id="files' + i + '">';
-		content += '<p class="descriptor">Files changed:</p>';
-		content += '<table class="filechange">';
+		content += '<p class="descriptor" onclick="showFileChanges( ' + i + ' )">Files changed:</p>';
+		content += '<table id="filechange' + i + '" class="filechange" style="display:none">';
 		content += '<tr>';
 		content += '<th>Filename:</th><th>Insertions:</th><th>Deletions:</th>';
 		content += '</tr>';
@@ -36,6 +36,16 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 	return false;
 }
 
+function showFileChanges( id ) {
+	var name = '#filechange' + id;
+	if( $(name).css('display') == 'none' ) {
+		$(name).css( {'display': ''} );
+	}
+	else {
+		$(name).css( {'display': 'none'} );
+	}
+}
+
 $(document).ready(function() {
 	$("#pagination").pagination( commits.length, {
 		items_per_page:10,
@@ -51,3 +61,5 @@ $(document).ready(function() {
 		callback:handlePaginationClick } );
 	}
 );
+
+
