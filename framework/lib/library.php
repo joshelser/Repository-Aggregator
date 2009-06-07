@@ -136,10 +136,12 @@ function style ($style){
   
   $reset = '/style/reset.css';
   $style = '/style/style.css';
+	$jquery = '/style/pagination.css';
 	 
   //   <link type="text/css" rel="stylesheet" href="{$fnAddress()}$reset" /> 
   return <<<EOT
     <link type="text/css" rel="stylesheet" href="{$fnAddress()}$style" />
+	<link type="text/css" rel="stylesheet" href="{$fnAddress()}$jquery" />
 EOT;
 }
 
@@ -163,7 +165,7 @@ function headCheck ($header){
 **    P A G E 
 **      C R E A T I O N
 */
-function head ($title, $style, $scripts){
+function head ($title, $style, $scripts, $js = ''){
   /* Functions for heredoc */
   $fnTitle = 'title';
   $fnStyle = 'style';
@@ -177,7 +179,7 @@ function head ($title, $style, $scripts){
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     {$fnTitle($title)}
 {$fnStyle($style)}
-{$fnScripts()}
+{$fnScripts($js)}
   </head>
 EOT;
 

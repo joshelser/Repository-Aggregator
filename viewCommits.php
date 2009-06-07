@@ -35,11 +35,38 @@ require_once( $framework.'/lib/library.php' );
 
 $title = 'View Commits';
 $subtitle = Config::get( 'siteName' );
-$content = '';
+$content = '<div id="pagination" class="pagination"></div>';
 
 $commits = getCommits( $_GET['id'] ); /* Get commits */
 
+$js = 'var commits = new Array(';
+
 for( $i = 0; $i < count( $commits ); $i++ ) {
+	$js .= ' { "commitMessage": "'.$commits[$i]['commitMessage'].'",
+						 "commitVal": "'. $commits[$i]['commitVal'] .'",
+						 "commitDateTime": "'. $commits[$i]['commitDateTime'] .'",
+						 "filechanges": new Array( ';
+	
+	for( $j = 0; $j < count( $commits[$i]['fileChanges'] ); $j++ ) {
+		$js .= '{ "file": "'. $commits[$i]['fileChanges'][$j]['file'] .'",
+							"insertions": "'. $commits[$i]['fileChanges'][$j]['insertions'] .'",
+							"deletions": "'. $commits[$i]['fileChanges'][$j]['deletions'] .'" }';
+
+		if( $j != count( $commits[$i]['fileChanges'] ) - 1 ){
+			$js .= ",\n";
+		}
+	}
+
+	$js .= ') }';
+
+	if( $i != count( $commits ) - 1 ){
+		$js .= ",\n";
+	}
+}
+
+$js .= ");";
+
+/*for( $i = 0; $i < count( $commits ); $i++ ) {
   $content .= <<<EOT
 <div id="{$i}" class="commit">
   <h3>{$commits[$i][commitMessage]}</h3>
@@ -75,13 +102,13 @@ EOT;
     $content .= "\n<br/>\n";
   }
 }
-  
+*/
 
 /*
 **   P U T    V A R S
 **    O N    P A G E
 */
-	head($title,$style,$scripts);
+	head($title,$style,$scripts,$js);
 	body($header,$subtitle,$content,$navigation);
 	foot($footer,$dbc);
 
