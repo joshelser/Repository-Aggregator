@@ -68,44 +68,6 @@ for( $i = 0; $i < count( $commits ); $i++ ) {
 
 $js .= ");";
 
-/*for( $i = 0; $i < count( $commits ); $i++ ) {
-  $content .= <<<EOT
-<div id="{$i}" class="commit">
-  <h3>{$commits[$i][commitMessage]}</h3>
-  <p><span class="descriptor">Commit:</span> {$commits[$i][commitVal]}</p>
-  <p><span class="descriptor">Date:</span> {$commits[$i][commitDateTime]}</p>
-	<div id="files{$i}">
-		<p class="descriptor">Files changed:</p>
-		
-		<table class="filechange">
-			<tr>
-				<th>Filename:</th><th>Insertions:</th><th>Deletions:</th>
-			</tr>
-EOT;
-
-	for( $j = 0; $j < count( $commits[$i][fileChanges] ); $j++ ){
-		$content .= <<<EOT
-				<tr>
-					<td>{$commits[$i][fileChanges][$j][file]}</td>
-					<td>{$commits[$i][fileChanges][$j][insertions]}</td>
-					<td>{$commits[$i][fileChanges][$j][deletions]}</td>
-				</tr>
-EOT;
-		}
-	
-	$content .= <<<EOT
-		</table>
-	</div>
-</div>
-<br />
-EOT;
-
-  if( $i != count( $commits ) -1 ){
-    $content .= "\n<br/>\n";
-  }
-}
-*/
-
 /*
 **   P U T    V A R S
 **    O N    P A G E
