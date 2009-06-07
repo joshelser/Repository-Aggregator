@@ -64,7 +64,7 @@ for( $i = 0; $i< count( $repos ); $i++ ) {
 EOT;
 
   if( $i != count( $repos ) -1 ){
-    $content .= "\n<br/>\n";
+    $content .= "\n<br/>\n<br/>\n";
   }
 	else {
 		$content .= "\n</div>\n";
