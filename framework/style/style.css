@@ -127,6 +127,10 @@ body {
 		padding-right: 25px;
 }
 
+#content .pagination {
+		margin-left: 25px;
+}
+
 #content div.commit div p {
 		margin-left: 25px;
 }
