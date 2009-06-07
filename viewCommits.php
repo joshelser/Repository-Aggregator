@@ -35,14 +35,15 @@ require_once( $framework.'/lib/library.php' );
 
 $title = 'View Commits';
 $subtitle = Config::get( 'siteName' );
-$content = '<div id="pagination" class="pagination"></div>';
+$content = '<div id="pagination" class="pagination"></div>'."\n<br /><br />";
+$content .= '<div id="commits"></div>'."\n";
 
 $commits = getCommits( $_GET['id'] ); /* Get commits */
 
 $js = 'var commits = new Array(';
 
 for( $i = 0; $i < count( $commits ); $i++ ) {
-	$js .= ' { "commitMessage": "'.$commits[$i]['commitMessage'].'",
+	$js .= ' { "commitMessage": "'. addslashes( $commits[$i]['commitMessage'] ).'",
 						 "commitVal": "'. $commits[$i]['commitVal'] .'",
 						 "commitDateTime": "'. $commits[$i]['commitDateTime'] .'",
 						 "filechanges": new Array( ';

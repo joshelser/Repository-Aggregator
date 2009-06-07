@@ -92,9 +92,16 @@ sub storeGitCommits {
 
 			chomp( ${$log}{message} ); # Remove the trailing newline
 
-		 	# Insert into database
-	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"".$log->message."\", \"$datetime\" )";
+			${$log}{message} =~ s/\n/ /g;
+			${$log}{message} =~ s/'/\\'/g;
+			${$log}{message} =~ s/`/\\`/g;
+			${$log}{message} =~ s/"/\"/g;
 
+#			print ${$log}{message};
+
+		 	# Insert into database
+	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"". ${$log}{message} ."\", \"$datetime\" )";
+			print $sql."\n";
 			$sth = $dbh->prepare( $sql );
 			$sth->execute();
 	
