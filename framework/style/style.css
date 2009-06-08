@@ -77,11 +77,17 @@
 /* 	} */
 
 body {
-	background-color: lightblue;
+	background-color: #99ff77;
+	background-image: url('../../images/logo.png');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center left;
 }
 
 #content {
 	background-color: white;
+	opacity: 0.95;
+	filter:alpha(opacity=95);
 	margin-left: auto;
 	margin-right: auto;
 	width: 1024px;
@@ -91,7 +97,7 @@ body {
 }
 
 #content span, #content form, #content h1, #content h3, #content #welcomeText{
-		padding-left: 25px;
+	padding-left: 25px;
 }
 
 #repositories {
@@ -150,6 +156,7 @@ body {
 }
 
 #nav {
+		opacity:0.95;
 		margin-bottom: 25px;
 		padding-top: 1px;
 		background-color: white;
@@ -239,6 +246,7 @@ body {
 }
 
 #footer {
+		opacity: 0.95;
 		padding-top: 1px;
 		padding-bottom: 1px;
 		margin-left: auto;
