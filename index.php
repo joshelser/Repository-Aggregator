@@ -29,13 +29,15 @@ include 'framework/lib/library.php';
 $title = 'Home';
 $subtitle = Config::get( 'siteName' );
 $content = <<<EOT
-<p>
-Repository Aggregator brings a social aspect to coding. It allows you to follow your favorite 
+<div id="welcomeText">
+	Repository Aggregator brings a social aspect to coding. It allows you to follow your favorite 
   code projects, bringing updates on what is being done.
-</p>
-<p>
-Your repository isn't listed? Feel free to add any repository that you work on so that your fans can follow your work!
-</p>
+
+	<br />
+	<br />
+
+	Your repository isn't listed? Feel free to add any repository that you work on so that your fans can follow your work!
+</div>
 EOT;
 
 /*
