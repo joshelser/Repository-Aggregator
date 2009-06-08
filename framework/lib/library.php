@@ -203,11 +203,8 @@ function body( $header,$subtitle=' ', $content, $navigation ){
     </div>
 	
     <div id="content" class="curved">
-<!--      <div id="side">
-        $side
-      </div>-->
 
-      <h1>$subtitle</h1>
+      <h1 class="indent">$subtitle</h1>
         $content
     </div>
 EOT;

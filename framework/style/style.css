@@ -96,7 +96,7 @@ body {
 	margin-bottom: 25px;
 }
 
-#content span, #content form, #content h1, #content h3, #content #welcomeText{
+.indent {
 	padding-left: 25px;
 }
 

@@ -29,7 +29,7 @@ include 'framework/lib/library.php';
 $title = 'Home';
 $subtitle = Config::get( 'siteName' );
 $content = <<<EOT
-<div id="welcomeText">
+<div id="welcomeText" class="indent">
 	Repository Aggregator brings a social aspect to coding. It allows you to follow your favorite 
   code projects, bringing updates on what is being done.
 
