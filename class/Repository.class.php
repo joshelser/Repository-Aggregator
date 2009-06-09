@@ -24,7 +24,10 @@ require_once( 'lib/functions.lib.php' );
 
 class Repository {
   protected $_repoId;
+	private $_name;
   private $_url;
+	private $_type;
+	private $_localDir;
   private $_dateAdded;
   private $_dateUpdated;
   private $_description;	/* Optional */
@@ -50,7 +53,10 @@ class Repository {
       $data = mysql_fetch_object( $result );
 
       $this->_repoId = $repoId;
+			$this->_name = $data->name;
       $this->_url = $data->url;
+			$this->_type = $data->type;
+			$this->_localDir = $data->localDir;
       $this->_dateAdded = $data->dateAdded;
       $this->_dateUpdated = $data->dateUpdated;
       $this->_description = $data->description;
@@ -59,7 +65,10 @@ class Repository {
     }
     else{
       $this->_repoId = -1;
+			$this->_name = '';
       $this->_url = '';
+			$this->_type = -1;
+			$this->_localDir = '';
       $this->_dateAdded = '';
       $this->_dateUpdated = '';
       $this->_description = '';
@@ -161,15 +170,30 @@ class Repository {
 
   function getData() {
     return array( 'repoId' => $this->_repoId,
-		  'url' =>$this->_url,
+			'name' => $this->_name,
+		  'url' => $this->_url,
+			'type' => $this->_type,
+			'localDir' => $this->_localDir,
 		  'dateUpdate' => $this->_dateUpdated,
 		  'dateAdded' => $this->_dateAdded,
 		  'description' => $this->_description );
   }
 
+	function getName() {
+		return $this->_name;
+	}
+
   function getUrl() {
     return $this->_url;
   }
+
+	function getType() {
+		return $this->_type;
+	}
+
+	function getLocalDir() {
+		return $this->_localDir;
+	}
 
   function getDateUpdated() {
     return $this->_dateUpdated;
