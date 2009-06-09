@@ -35,53 +35,44 @@ require_once( $framework.'/lib/library.php' );
 
 $title = 'View Commits';
 $subtitle = Config::get( 'siteName' );
-$content = '';
+$content = '<div id="pagination" class="pagination"></div>'."\n<br /><br />";
+$content .= '<div id="commits"></div>'."\n";
+$content .= '<div id="paginationbottom" class="pagination"></div>'."\n";
 
 $commits = getCommits( $_GET['id'] ); /* Get commits */
 
+$js = 'var commits = new Array(';
+
 for( $i = 0; $i < count( $commits ); $i++ ) {
-  $content .= <<<EOT
-<div id="{$i}" class="commit">
-  <h3>{$commits[$i][commitMessage]}</h3>
-  <p><span class="descriptor">Commit:</span> {$commits[$i][commitVal]}</p>
-  <p><span class="descriptor">Date:</span> {$commits[$i][commitDateTime]}</p>
-	<div id="files{$i}">
-		<p class="descriptor">Files changed:</p>
-		
-		<table class="filechange">
-			<tr>
-				<th>Filename:</th><th>Insertions:</th><th>Deletions:</th>
-			</tr>
-EOT;
-
-	for( $j = 0; $j < count( $commits[$i][fileChanges] ); $j++ ){
-		$content .= <<<EOT
-				<tr>
-					<td>{$commits[$i][fileChanges][$j][file]}</td>
-					<td>{$commits[$i][fileChanges][$j][insertions]}</td>
-					<td>{$commits[$i][fileChanges][$j][deletions]}</td>
-				</tr>
-EOT;
-		}
+	$js .= ' { "commitMessage": "'. addslashes( $commits[$i]['commitMessage'] ).'",
+						 "commitVal": "'. $commits[$i]['commitVal'] .'",
+						 "commitDateTime": "'. $commits[$i]['commitDateTime'] .'",
+						 "filechanges": new Array( ';
 	
-	$content .= <<<EOT
-		</table>
-	</div>
-</div>
-<br />
-EOT;
+	for( $j = 0; $j < count( $commits[$i]['fileChanges'] ); $j++ ) {
+		$js .= '{ "file": "'. $commits[$i]['fileChanges'][$j]['file'] .'",
+							"insertions": "'. $commits[$i]['fileChanges'][$j]['insertions'] .'",
+							"deletions": "'. $commits[$i]['fileChanges'][$j]['deletions'] .'" }';
 
-  if( $i != count( $commits ) -1 ){
-    $content .= "\n<br/>\n";
-  }
+		if( $j != count( $commits[$i]['fileChanges'] ) - 1 ){
+			$js .= ",\n";
+		}
+	}
+
+	$js .= ') }';
+
+	if( $i != count( $commits ) - 1 ){
+		$js .= ",\n";
+	}
 }
-  
+
+$js .= ");";
 
 /*
 **   P U T    V A R S
 **    O N    P A G E
 */
-	head($title,$style,$scripts);
+	head($title,$style,$scripts,$js);
 	body($header,$subtitle,$content,$navigation);
 	foot($footer,$dbc);
 

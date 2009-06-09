@@ -41,8 +41,8 @@ $userRepos = getUserRepositoryIds( $_SESSION['userId'] ); /* Get all the reposit
 /* HTML */
 $content = <<<EOT
 <div id="addRepository">
-  <h3>Add a new repository to watch</h3>
-  <form method="POST" action="insertRepository.php">
+  <h3 class="indent">Add a new repository to watch</h3>
+  <form method="POST" action="insertRepository.php" class="indent">
     <table>
 			<tr>
 				<td>
@@ -108,7 +108,7 @@ $content = <<<EOT
       </tr>
     </table>
   </form>
-  <h3>Watch an existing repository</h3>
+  <h3 class="indent">Watch an existing repository</h3>
 EOT;
 
 $watchNew = false;
@@ -125,7 +125,7 @@ while( !$watchNew && $i < count( $existingRepos ) ){
 
 if( $watchNew ){		/* We have at least one new repository to watch */
   $content .= <<<EOT
-  <form method="POST" action="watchRepository.php">
+  <form method="POST" action="watchRepository.php" class="indent">
     <select name="repoId">
 
 EOT;
@@ -145,7 +145,7 @@ EOT;
 }
 else{				/* All repositories are being watched */
   $content .= <<<EOT
-    <span>Sorry, there are no existing repositories to watch</span>
+    <span class="indent">Sorry, there are no existing repositories to watch</span>
 EOT;
 }
 

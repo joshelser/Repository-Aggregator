@@ -77,11 +77,17 @@
 /* 	} */
 
 body {
-	background-color: lightblue;
+	background-color: #99ff77;
+	background-image: url('../../images/logo.png');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center left;
 }
 
 #content {
 	background-color: white;
+	opacity: 0.95;
+	filter:alpha(opacity=95);
 	margin-left: auto;
 	margin-right: auto;
 	width: 1024px;
@@ -90,20 +96,8 @@ body {
 	margin-bottom: 25px;
 }
 
-#content h1 {
-		padding-left: 25px;
-}
-
-#content h3 {
-		padding-left: 25px;
-}
-
-#content span {
-		padding-left: 25px;
-}
-
-#content form {
-		padding-left: 25px;
+.indent {
+	padding-left: 25px;
 }
 
 #repositories {
@@ -127,6 +121,10 @@ body {
 		padding-right: 25px;
 }
 
+#content .pagination {
+		margin-left: 25px;
+}
+
 #content div.commit div p {
 		margin-left: 25px;
 }
@@ -148,7 +146,17 @@ body {
 		font-weight: bold;
 }
 
+.link {
+		color: blue;
+		text-decoration: underline;
+}
+
+.link:hover {
+		cursor: pointer;
+}
+
 #nav {
+		opacity:0.95;
 		margin-bottom: 25px;
 		padding-top: 1px;
 		background-color: white;
@@ -238,6 +246,7 @@ body {
 }
 
 #footer {
+		opacity: 0.95;
 		padding-top: 1px;
 		padding-bottom: 1px;
 		margin-left: auto;
@@ -251,3 +260,38 @@ body {
 		-moz-border-radius: 2em;
 		border-radius: 2em;
 }
+
+.pagination {
+	font-size: 80%;
+}
+
+#paginationbottom{
+	margin-bottom: 25px;
+}
+
+.pagination a {
+	text-decoration: none;
+	border: solid 1px #AAE;
+	color: #15B;
+}
+
+.pagination a, .pagination span {
+	display: block;
+	float: left;
+	padding: 0.3em 0.5em;
+	margin-right: 5px;
+	margin-bottom: 5px;
+}
+
+.pagination .current {
+	background: #26B;
+	color: #fff;
+	border: solid 1px #AAE;
+}
+
+.pagination .current.prev, .pagination .current.next{
+	color:#999;
+	border-color:#999;
+	background:#fff;
+}
+
