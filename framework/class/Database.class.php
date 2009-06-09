@@ -68,9 +68,4 @@ class Database{
 
 }
 
-
-
-
-
-
 ?>
