@@ -47,7 +47,7 @@ $link = new Database;
 $link->connect();
 
 /* SQL */
-$sql = 'INSERT INTO repositories VALUES ( NULL, %1 , %2 , %3 , %4 , %5 , %6 , %7 , %8 )';
+$sql = 'INSERT INTO repositories VALUES ( NULL, %1 , %2 , %3 , %4 , %5 , %6 , %7 , %8 , %9 )';
 
 $baseName = $_POST['name'];
 $extension = 0;
@@ -80,7 +80,7 @@ if( $_POST['password'] != '' ){
   $password = md5( $_POST['password'] );
 }
 
-$result = $link->query( $sql, $_POST['url'], (int)$_POST['type'], $baseName, date( 'Y-m-d' ), date( 'Y-m-d' ),
+$result = $link->query( $sql, $_POST['name'], $_POST['url'], (int)$_POST['type'], $baseName, date( 'Y-m-d' ), date( 'Y-m-d' ),
 			$description, $username, $password );
 
 if( !$result ){

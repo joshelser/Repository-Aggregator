@@ -19,6 +19,7 @@
 
 CREATE TABLE repositories (
        repoId int(5) NOT NULL auto_increment,
+			 name varchar(25) NOT NULL,
        url varchar(250) NOT NULL,
        type int(5) NOT NULL,
        localDir varchar(250) NOT NULL,
