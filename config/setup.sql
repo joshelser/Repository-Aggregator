@@ -37,6 +37,7 @@ CREATE TABLE commits (
        commitVal varchar(40) NOT NULL,
        commitMessage varchar(500) NOT NULL,
        commitDateTime datetime NOT NULL,
+			 author varchar(250) NOT NULL,
        PRIMARY KEY (commitID)
 );
 
