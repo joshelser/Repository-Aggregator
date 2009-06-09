@@ -100,8 +100,8 @@ sub storeGitCommits {
 #			print ${$log}{message};
 
 		 	# Insert into database
-	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"". ${$log}{message} ."\", \"$datetime\" )";
-			print $sql."\n";
+	  	$sql = "INSERT INTO commits VALUES ( NULL, @{$data}[2], \"".$log->id."\", \"". ${$log}{message} ."\", \"$datetime\", \"". $log->author ."\" )";
+
 			$sth = $dbh->prepare( $sql );
 			$sth->execute();
 	

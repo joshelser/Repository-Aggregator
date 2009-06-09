@@ -41,6 +41,8 @@ if( !isset( $_POST['name'] ) ){
 	die( 'Please enter a project name' );
 }
 
+$repositoryDir = Config::get( 'repositoryDirectory' );
+
 require_once( $framework.'/class/Database.class.php' );
 
 $link = new Database;
@@ -106,7 +108,7 @@ if( !$result ) {
   die( 'Watch query failed' );
 }
 
-$data = array( $_POST['type'], $baseName );
+$data = array( $_POST['type'], $_POST['url'], $repositoryDir.'/'.$baseName );
 
 system( 'createRepository.pl', $data );
 
