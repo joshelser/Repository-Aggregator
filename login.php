@@ -62,11 +62,10 @@ $error = '';
 if( isset( $_GET['action'] ) && $_GET['action'] == 'failed' ){ /* Catch a failed login */
   $error = <<<EOT
 <tr>
-  <td colspan="2">
-    <span id="errorMessage">
+    <div id="errorMessage" class="bold indent">
       Incorrect username and password combination
-    </span>
-  </td>
+    </div>
+		<br />
 </tr>
 EOT;
 }
@@ -74,7 +73,7 @@ EOT;
 
 $content = <<<EOT
 <form method="post" action="login.php">
-  <table id="loginTable">
+  <table id="loginTable" class="indent">
     {$error}
     <tr>
       <td>
