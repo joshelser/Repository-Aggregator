@@ -46,6 +46,15 @@ require_once( $framework.'/class/Database.class.php' );
 $link = new Database;
 $link->connect();
 
+/* Make sure the repository does not exist */
+$sql = "SELECT repoId FROM repositories WHERE url = %1 ";
+
+$result = $link->query( $sql, $_POST['url'] );
+
+if( mysql_num_rows( $result ) != 0 ) {
+	die( "Sorry, that repository already exists" );
+}
+
 /* SQL */
 $sql = 'INSERT INTO repositories VALUES ( NULL, %1 , %2 , %3 , %4 , %5 , %6 , %7 , %8 , %9 )';
 
