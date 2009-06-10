@@ -73,12 +73,18 @@ body {
 }
 
 .link {
-		color: blue;
+		color: #339933;
+/*		color: blue;*/
 		text-decoration: underline;
 }
 
 .link:hover {
 		cursor: pointer;
+}
+
+.commitImage {
+	position: relative;
+	top: 5px;
 }
 
 #nav {
