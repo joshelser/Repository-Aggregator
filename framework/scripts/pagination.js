@@ -4,13 +4,6 @@ $(document).ready(function() {
 		num_display_entries:10,
 		num_edge_entries:2,
 		callback:handlePaginationClick } );
-
-
-	$("#paginationbottom").pagination( commits.length, {
-		items_per_page:10,
-		num_display_entries:10,
-		num_edge_entries:2,
-		callback:handlePaginationClick } );
 	}
 );
 
