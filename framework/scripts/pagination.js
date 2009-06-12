@@ -25,7 +25,7 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 
 		for( var j = 0; j < commits[i]['filechanges'].length; j++ ) {
 			content += '<tr>';
-			content += '<td>' + commits[i]['filechanges'][j]['file'] + '</td>';
+			content += '<td><a href="viewFileChange.php?id=' + commits[i]['commitId'] + '">' + commits[i]['filechanges'][j]['file'] + '</a></td>';
 			content += '<td>' + commits[i]['filechanges'][j]['insertions'] + '</td>';
 			content += '<td>' + commits[i]['filechanges'][j]['deletions'] + '</td>';
 			content += '</tr>';

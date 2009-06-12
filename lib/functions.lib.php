@@ -166,6 +166,7 @@ function getCommits( $repoId ) {
 		$commits[] = array( 'commitVal' => $row['commitVal'],
 											'commitMessage' => $row['commitMessage'],
 											'commitDateTime' => $row['commitDateTime'],
+											'commitId' => $row['commitId'],
 											'fileChanges' => $files );
 
 		$files = array();
