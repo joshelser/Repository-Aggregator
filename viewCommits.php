@@ -47,6 +47,7 @@ for( $i = 0; $i < count( $commits ); $i++ ) {
 						 "commitVal": "'. $commits[$i]['commitVal'] .'",
 						 "commitDateTime": "'. $commits[$i]['commitDateTime'] .'",
 						 "commitId": "'. $commits[$i]['commitId'] .'",
+						 "repoId": "'. $_GET['id'] .'",
 						 "filechanges": new Array( ';
 	
 	for( $j = 0; $j < count( $commits[$i]['fileChanges'] ); $j++ ) {
