@@ -39,11 +39,11 @@ $content = '';
 if( isset( $_GET['action'] ) ){
   switch( $_GET['action'] ){
   case 'added':
-    $content .= '<h3>Repository Added Successfully</h3>';
+    $content .= '<h3 class="indent">Repository Added Successfully</h3>';
     break;
     
   case 'watched':
-    $content .= '<h3>Now Watching the New Repository</h3>';
+    $content .= '<h3 class="indent">Now Watching the New Repository</h3>';
     break;
   }  
 }
