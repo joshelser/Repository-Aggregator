@@ -21,6 +21,7 @@
 use strict;
 use warnings;
 
+use DBI;
 use Git::Wrapper;
 use Config::Abstract::Ini;
 
@@ -32,6 +33,10 @@ if( @ARGV != 3 ) {
 }
 
 my ( $repoId, $revId, $filename ) = @ARGV;
+
+if( $revId !~ m/(\d|[a-z]){40}/ ){
+	die 'Invalid commit ID was given';
+}
 
 # Assign values
 my $data_source = 'dbi:mysql:'. $values{'dbName'} .':'. $values{'dbHostname'};
@@ -52,12 +57,7 @@ $sth->execute();
 
 my @row = $sth->fetchrow_array();
 
-my $output = `git show`;
-createGitRepository( $url, $values{'repositoryDirectory'}.$repoDir );
+my $repoDir = $values{ 'repositoryDirectory' } . '/' . $row[0];
+my $output = `cd $repoDir && git show $revId $filename`;
 
-sub createGitRepository {
-	my $url = shift;
-	my $dir = shift;
-
-	system( ( 'git', 'clone', $url, $repoDir ) );
-}
+print $output."\n";
