@@ -46,6 +46,7 @@ for( $i = 0; $i < count( $commits ); $i++ ) {
 	$js .= ' { "commitMessage": "'. addslashes( $commits[$i]['commitMessage'] ).'",
 						 "commitVal": "'. $commits[$i]['commitVal'] .'",
 						 "commitDateTime": "'. $commits[$i]['commitDateTime'] .'",
+						 "commitAuthor": "'. $commits[$i]['commitAuthor'] .'",
 						 "commitId": "'. $commits[$i]['commitId'] .'",
 						 "repoId": "'. $_GET['id'] .'",
 						 "filechanges": new Array( ';

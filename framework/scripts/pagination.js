@@ -15,6 +15,7 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 		content += '<div id="commit' + i + '" class="commit">';
 		content += '<h3 class="indent">'+ commits[i]['commitMessage'] + '</h3>';
 		content += '<p class="indent"><span class="descriptor">Commit:&nbsp;</span>' + commits[i]['commitVal'] + '</p>';
+		content += '<p class="indent"><span class="descriptor">Author:&nbsp;</span>' + commits[i]['commitAuthor'] + '</p>';
 		content += '<p class="indent"><span class="descriptor">Date:&nbsp;</span>' + commits[i]['commitDateTime'] + '</p>';
 		content += '<div id="files' + i + '">';
 		content += '<p class="descriptor"><span class="link" onclick="showFileChanges( ' + i + ' ) ">File changes</span> <img id="image' + i + '" onclick="showFileChanges( ' + i + ' ) " class="commitImage" src="images/plussign.png" /></span></p>';
