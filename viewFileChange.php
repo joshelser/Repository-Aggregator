@@ -52,10 +52,25 @@ $diff = nl2br( htmlspecialchars( $diff ) );
 $content = <<<EOT
 <div class="indent">
 	<h3 class="indent">{$data['commitMessage']}</h3>
-	<p><span class="indent">Commit:&nbsp;{$data['commitVal']}</span></p>
-	<p><span class="indent">Author:&nbsp;{$data['commitAuthor']}</span></p>
-	<p><span class="indent">Time:&nbsp;{$data['commitDateTime']}</span></p>
-	<p><span class="indent">File:&nbsp;{$file}</span></p>
+	<table class="indent">
+		<tr>
+			<td class="bold">Commit:</td>
+			<td>{$data['commitVal']}</td>
+		</tr>
+		<tr>
+			<td class="bold">Author:</td>
+			<td>{$data['commitAuthor']}</td>
+		</tr>
+		<tr>
+			<td class="bold">Time:</td>
+			<td>{$data['commitDateTime']}</td>
+		</tr>
+		<tr>
+			<td class="bold">File:</td>
+			<td>{$file}</td>
+		</tr>
+	</table>
+	<br />
 	<div id="code">
 		<code>
 			{$diff}
