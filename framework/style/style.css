@@ -86,6 +86,15 @@ body {
 	top: 5px;
 }
 
+#code {
+	margin-left: 50px;
+	border: solid thin black;
+	padding-left: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: 80%;
+}
+
 #nav {
 	opacity:0.95;
 	margin-bottom: 25px;

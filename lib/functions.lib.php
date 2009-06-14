@@ -157,15 +157,17 @@ function getCommits( $repoId ) {
 
 		/* Fetch all the changes */
 		while( $fileRow = mysql_fetch_array( $fileResult ) ) {
-			$files[] = array( 'file' => $fileRow['file'],
+			$files[] = array( 'file' => htmlspecialchars( $fileRow['file'] ),
 												'insertions' => $fileRow['insertions'],
 												'deletions' => $fileRow['deletions'] );
 		}
 
 		/* Store the commit data and the changes */
 		$commits[] = array( 'commitVal' => $row['commitVal'],
-											'commitMessage' => $row['commitMessage'],
+											'commitMessage' => htmlspecialchars( $row['commitMessage'] ),
 											'commitDateTime' => $row['commitDateTime'],
+											'commitId' => htmlspecialchars( $row['commitId'] ),
+											'commitAuthor' =>  htmlspecialchars( $row['commitAuthor'] ),
 											'fileChanges' => $files );
 
 		$files = array();

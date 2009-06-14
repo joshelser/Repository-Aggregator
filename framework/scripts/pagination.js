@@ -15,6 +15,7 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 		content += '<div id="commit' + i + '" class="commit">';
 		content += '<h3 class="indent">'+ commits[i]['commitMessage'] + '</h3>';
 		content += '<p class="indent"><span class="descriptor">Commit:&nbsp;</span>' + commits[i]['commitVal'] + '</p>';
+		content += '<p class="indent"><span class="descriptor">Author:&nbsp;</span>' + commits[i]['commitAuthor'] + '</p>';
 		content += '<p class="indent"><span class="descriptor">Date:&nbsp;</span>' + commits[i]['commitDateTime'] + '</p>';
 		content += '<div id="files' + i + '">';
 		content += '<p class="descriptor"><span class="link" onclick="showFileChanges( ' + i + ' ) ">File changes</span> <img id="image' + i + '" onclick="showFileChanges( ' + i + ' ) " class="commitImage" src="images/plussign.png" /></span></p>';
@@ -25,7 +26,7 @@ function handlePaginationClick( new_page_index, pagination_container ) {
 
 		for( var j = 0; j < commits[i]['filechanges'].length; j++ ) {
 			content += '<tr>';
-			content += '<td>' + commits[i]['filechanges'][j]['file'] + '</td>';
+			content += '<td><a href="viewFileChange.php?repoId=' + commits[i]['repoId'] + '&commitId=' + commits[i]['commitId'] + '&file=' + commits[i]['filechanges'][j]['file'] + '">' + commits[i]['filechanges'][j]['file'] + '</a></td>';
 			content += '<td>' + commits[i]['filechanges'][j]['insertions'] + '</td>';
 			content += '<td>' + commits[i]['filechanges'][j]['deletions'] + '</td>';
 			content += '</tr>';

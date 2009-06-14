@@ -28,6 +28,7 @@ class Commit{
   private $_commitVal;
   private $_commitMessage;
   private $_commitDateTime;
+	private $_commitAuthor;
 
   /* Load a commit from the database */
   function __construct( $commitId = NULL ) {
@@ -51,6 +52,7 @@ class Commit{
       $this->_commitVal = $data->commitVal;
       $this->_commitMessage = $data->commitMessage;
       $this->_commitDateTime = $data->commitDateTime;
+			$this->_commitAuthor = $data->commitAuthor;
     }
     else{
       $this->_commitId = -1;
@@ -65,16 +67,16 @@ class Commit{
   }
 
   /* Create a new commit and add it to the database */
-  function create( $repoId, $commitVal, $commitMessage, $commitDateTime ) {
+  function create( $repoId, $commitVal, $commitMessage, $commitDateTime, $commitAuthor ) {
     $framework = frameworkDir(); /* Get the directory of the framework */
     require_once( $framework.'/class/Database.class.php' );
 
     $link = new Database;
     $link->connect();
 
-    $sql = 'INSERT INTO commits VALUES ( NULL, %1 , %2 , %3 , %4 )';
+    $sql = 'INSERT INTO commits VALUES ( NULL, %1 , %2 , %3 , %4 , %5 )';
 
-    $result = $link->query( $sql, $repoId, $commitVal, $commitMessage, $commitDateTime );
+    $result = $link->query( $sql, $repoId, $commitVal, $commitMessage, $commitDateTime, $commitAuthor );
     if( !$result ){
       die( 'Could not execute query' );
     }
@@ -84,15 +86,17 @@ class Commit{
     $this->_commitVal = $commitVal;
     $this->_commitMessage = $commitMessage;
     $this->_commitDateTime = $commitDateTime;
+		$this->_commitAuthor = $commitAuthor;
 
     $link->disconnect();
   }
 
   /* Return the commit's data */
   function getData() {
-    return array( $this->_commitVal,
-		  $this->_commitMessage,
-		  $this->_commitDateTime );
+    return array( 'commitVal' => $this->_commitVal,
+			  					'commitMessage' => $this->_commitMessage,
+									'commitDateTime' => $this->_commitDateTime,
+									'commitAuthor' => $this->_commitAuthor );
   }
 }
 
