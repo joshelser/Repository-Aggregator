@@ -167,7 +167,7 @@ function getCommits( $repoId ) {
 											'commitMessage' => htmlspecialchars( $row['commitMessage'] ),
 											'commitDateTime' => $row['commitDateTime'],
 											'commitId' => htmlspecialchars( $row['commitId'] ),
-											'commitAuthor' =>  htmlspecialchars( $row['author'] ),
+											'commitAuthor' =>  htmlspecialchars( $row['commitAuthor'] ),
 											'fileChanges' => $files );
 
 		$files = array();

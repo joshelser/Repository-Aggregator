@@ -29,6 +29,7 @@ if( !isset( $_GET['file'] ) ) {
 }
 
 require_once( 'config/Config.class.php' );
+require_once( 'class/Commit.class.php' );
 
 // Library File
 include 'framework/lib/library.php';
@@ -40,13 +41,21 @@ $subtitle = Config::get( 'siteName' );
 $commitId = $_GET['commitId'];
 $file = $_GET['file'];
 $repoId = $_GET['repoId'];
-$diff = shell_exec( "./getFileChange.pl $repoId '$commitId' '$file'" );
 
+$commit = new Commit( $commitId );
+$data = $commit->getData();
+$data['commitAuthor'] = htmlspecialchars( $data['commitAuthor'] );
+
+$diff = shell_exec( "./getFileChange.pl $repoId '$commitId' '$file'" );
 $diff = nl2br( htmlspecialchars( $diff ) );
 
 $content = <<<EOT
 <div class="indent">
-	<h3 class="indent">{$file}</h3>
+	<h3 class="indent">{$data['commitMessage']}</h3>
+	<p><span class="indent">Commit:&nbsp;{$data['commitVal']}</span></p>
+	<p><span class="indent">Author:&nbsp;{$data['commitAuthor']}</span></p>
+	<p><span class="indent">Time:&nbsp;{$data['commitDateTime']}</span></p>
+	<p><span class="indent">File:&nbsp;{$file}</span></p>
 	<div id="code">
 		<code>
 			{$diff}
