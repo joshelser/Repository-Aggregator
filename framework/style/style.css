@@ -1,4 +1,5 @@
-body {
+body{
+	font-family: verdana, arial, Sans-serif;
 	background-color: #99ff77;
 	background-image: url('../../images/logo.png');
 	background-repeat: no-repeat;
