@@ -4,3 +4,6 @@ Perl Modules Used:
      DBI
      Config::Abstract::Ini
      POSIX qw(strftime)
+
+ToDo:
+		Refactor framework/lib/scripts.php (ability to add JS from the top php level w/o having to dive into the framework)
