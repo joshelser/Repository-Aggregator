@@ -176,4 +176,58 @@ function getCommits( $repoId ) {
   return $commits;		/* Return the repository Ids */
 }
 
+/* Return the recent (50) commits associated with a repository */
+function getLimitedCommits( $repoId ) {
+	require_once( 'class/Repository.class.php' );
+  $framework = frameworkDir();
+
+  /* Database */
+  require_once( $framework.'/class/Database.class.php' );
+
+  $link = new Database;
+  $link->connect();
+
+  /* Query */
+  $sql = 'SELECT * FROM commits WHERE repoId = %1 ORDER BY commitDateTime DESC LIMIT 50';
+
+  $result = $link->query( $sql, $repoId );
+
+  $commits = array();
+	$files = array();
+
+  /* Get Ids */
+  while( $row = mysql_fetch_array( $result ) ){
+  	$sql = 'SELECT * FROM fileChanges WHERE commitId = %1'; /* Get the changes for the commit */
+
+		$fileResult = $link->query( $sql, $row['commitId'] );
+
+		/* Fetch all the changes */
+		while( $fileRow = mysql_fetch_array( $fileResult ) ) {
+			$files[] = array( 'file' => htmlspecialchars( $fileRow['file'] ),
+												'insertions' => $fileRow['insertions'],
+												'deletions' => $fileRow['deletions'] );
+		}
+
+		$sql = 'SELECT name FROM repositories WHERE repoId = %1 ';
+		$repoResult = $link->query( $sql, $row['repoId'] );
+
+		$repoName = mysql_fetch_array( $repoResult );
+
+		/* Store the commit data and the changes */
+		$commits[] = array( 'commitVal' => $row['commitVal'],
+											'commitMessage' => htmlspecialchars( $row['commitMessage'] ),
+											'commitDateTime' => $row['commitDateTime'],
+											'commitId' => htmlspecialchars( $row['commitId'] ),
+											'commitAuthor' =>  htmlspecialchars( $row['commitAuthor'] ),
+											'fileChanges' => $files,
+											'repoId' => $row['repoId'],
+											'repoName' => $repoName['name']);
+
+		$files = array();
+	}
+
+  return $commits;		/* Return the repository Ids */
+}
+
+
 ?>

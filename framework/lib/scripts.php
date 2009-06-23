@@ -5,7 +5,14 @@ function scripts( $js = '' ) {
   $framework = frameworkDir();
 
 	$return = '';
-	
+	if( preg_match( '/index.php$/', this_page() ) ) {
+		$return .= <<<EOT
+<script src="{$framework}/scripts/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
+<script src="{$framework}/scripts/jquery/jquery.pagination.js" language="javascript" type="text/javascript"></script>
+<script src="{$framework}/scripts/paginationFrontPage.js" language="javascript" type="text/javascript"></script>
+EOT;
+	}
+
 	if( preg_match( '/viewCommits\.php$/', this_page() ) ){ 
 		$return .= <<<EOT
 <script src="{$framework}/scripts/jquery/jquery.min.js" language="javascript" type="text/javascript"></script>
