@@ -40,6 +40,16 @@ function authorize() {
 }
 
 
+function isLoggedIn() {
+	if( isset( $_SESSION['userId'] ) && isset( $_SESSION['username'] ) ) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
 /* Logout the user */
 function logout(){
   unset( $_SESSION['userId'] );
